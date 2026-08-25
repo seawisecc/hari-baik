@@ -1,26 +1,179 @@
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════════════════════════════════
+   Hari Baik — Design System
+   Soft-neumorphic: permukaan off-white, sudut lembut, elevasi dari bayangan
+   ganda (terang di kiri-atas, gelap di kanan-bawah) — bukan dari garis.
+   Dua tema aksen: `mint` (default) dan `senja` (orange).
+   Tema dipilih lewat atribut [data-theme] di <html>.
+   ═══════════════════════════════════════════════════════════════════════ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Netral — dasar yang sama untuk semua tema */
+  --hb-canvas:        #f2f0ec;  /* latar halaman */
+  --hb-surface:       #fbfaf8;  /* kartu, panel */
+  --hb-surface-sunk:  #eceae5;  /* input, area tertekan */
+  --hb-border:        #e2ded6;
+  --hb-border-strong: #cfc9be;
+
+  --hb-ink:           #2f2c28;  /* teks utama */
+  --hb-ink-soft:      #6b6660;  /* teks sekunder */
+  --hb-ink-faint:     #9c968e;  /* caption, hint */
+
+  /* Bayangan neumorphic — dipakai lewat utilitas .hb-raise / .hb-sink */
+  --hb-light: rgba(255, 255, 255, 0.9);
+  --hb-dark:  rgba(163, 155, 143, 0.32);
+
+  /* Status — netral terhadap tema aksen */
+  --hb-success: #7fc8a0;
+  --hb-warning: #e8c979;
+  --hb-error:   #e08b8b;
+
+  /* Empat kategori siklus personal. Bukan "baik/buruk" — masing-masing
+     punya karakter sendiri, jadi warnanya setara, bukan gradasi merah-hijau. */
+  --hb-guru: #7fc8a0;  /* Hari Mengalir  */
+  --hb-ratu: #8fb8d8;  /* Hari Tenang    */
+  --hb-lara: #e0b878;  /* Hari Mawas     */
+  --hb-pati: #b0a8bd;  /* Hari Istirahat */
+
+  /* Radius & spacing */
+  --hb-r-sm: 10px;
+  --hb-r-md: 16px;
+  --hb-r-lg: 22px;
+  --hb-r-xl: 30px;
+  --hb-r-pill: 999px;
+}
+
+/* ── Tema aksen: Mint (default) ─────────────────────────────────────── */
+:root,
+:root[data-theme="mint"] {
+  --hb-accent:        #a8ddc4;
+  --hb-accent-strong: #6fbf95;
+  --hb-accent-deep:   #4a9c73;
+  --hb-accent-ink:    #1f4634;  /* teks di atas aksen */
+  --hb-accent-wash:   #eef8f3;  /* latar sangat tipis */
+  --hb-focus:         #6fd6ac;
+}
+
+/* ── Tema aksen: Senja (orange) ─────────────────────────────────────── */
+:root[data-theme="senja"] {
+  --hb-accent:        #f3c39a;
+  --hb-accent-strong: #e0975a;
+  --hb-accent-deep:   #bf7434;
+  --hb-accent-ink:    #4a2a11;
+  --hb-accent-wash:   #fdf3ea;
+  --hb-focus:         #f0a463;
+
+  /* Kategori digeser ke arah hangat, tapi hue-nya tetap dijaga terpisah —
+     empat kategori ini harus bisa dibedakan sekilas di grid kalender. */
+  --hb-guru: #e59255;  /* Hari Mengalir  — jingga */
+  --hb-ratu: #7fa8a0;  /* Hari Tenang    — teal   */
+  --hb-lara: #d9b866;  /* Hari Mawas     — emas   */
+  --hb-pati: #ac9d9d;  /* Hari Istirahat — mauve  */
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-canvas:        var(--hb-canvas);
+  --color-surface:       var(--hb-surface);
+  --color-surface-sunk:  var(--hb-surface-sunk);
+  --color-border-soft:   var(--hb-border);
+  --color-border-strong: var(--hb-border-strong);
+
+  --color-ink:       var(--hb-ink);
+  --color-ink-soft:  var(--hb-ink-soft);
+  --color-ink-faint: var(--hb-ink-faint);
+
+  --color-accent:        var(--hb-accent);
+  --color-accent-strong: var(--hb-accent-strong);
+  --color-accent-deep:   var(--hb-accent-deep);
+  --color-accent-ink:    var(--hb-accent-ink);
+  --color-accent-wash:   var(--hb-accent-wash);
+
+  --color-success: var(--hb-success);
+  --color-warning: var(--hb-warning);
+  --color-error:   var(--hb-error);
+
+  --color-guru: var(--hb-guru);
+  --color-ratu: var(--hb-ratu);
+  --color-lara: var(--hb-lara);
+  --color-pati: var(--hb-pati);
+
+  --radius-sm:   var(--hb-r-sm);
+  --radius-md:   var(--hb-r-md);
+  --radius-lg:   var(--hb-r-lg);
+  --radius-xl:   var(--hb-r-xl);
+  --radius-pill: var(--hb-r-pill);
+
+  --font-sans:    var(--font-body);
+  --font-heading: var(--font-display);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Elevasi ─────────────────────────────────────────────────────────
+   Neumorphism butuh dua bayangan berlawanan arah. Level dinaikkan dengan
+   memperbesar offset + blur bersamaan, supaya kartu terasa mengambang
+   bukan sekadar bergaris tebal. */
+@utility hb-raise-1 {
+  box-shadow: 2px 2px 5px var(--hb-dark), -2px -2px 5px var(--hb-light);
+}
+@utility hb-raise-2 {
+  box-shadow: 4px 4px 10px var(--hb-dark), -4px -4px 10px var(--hb-light);
+}
+@utility hb-raise-3 {
+  box-shadow: 7px 7px 18px var(--hb-dark), -6px -6px 16px var(--hb-light);
+}
+@utility hb-raise-4 {
+  box-shadow: 11px 11px 28px var(--hb-dark), -9px -9px 22px var(--hb-light);
+}
+/* Tertekan ke dalam — untuk input dan state aktif */
+@utility hb-sink {
+  box-shadow: inset 3px 3px 7px var(--hb-dark), inset -3px -3px 7px var(--hb-light);
+}
+@utility hb-sink-sm {
+  box-shadow: inset 2px 2px 4px var(--hb-dark), inset -2px -2px 4px var(--hb-light);
+}
+
+/* Cincin fokus lembut ala styleguide — halo, bukan garis tajam */
+@utility hb-ring {
+  outline: none;
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--hb-focus) 45%, transparent),
+    0 0 14px color-mix(in srgb, var(--hb-focus) 40%, transparent);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--hb-canvas);
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--hb-canvas);
+  color: var(--hb-ink);
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display), Georgia, serif;
+  letter-spacing: -0.015em;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--hb-focus) 45%, transparent),
+    0 0 14px color-mix(in srgb, var(--hb-focus) 40%, transparent);
+}
+
+/* Hormati preferensi pengguna yang sensitif terhadap gerak */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

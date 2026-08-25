@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Hari Baik
 
-## Getting Started
+Kalender siklus personal — memadukan Wariga & kalender Bali di atas kalender
+Masehi. Pengembangan ulang dari app sebelumnya (base44).
 
-First, run the development server:
+## Stack
+
+Next.js 16 (App Router) · TypeScript · Tailwind v4 · Firebase (Auth + Firestore)
+· Vercel.
+
+## Jalankan
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Rute | Isi |
+|---|---|
+| `/` | Beranda + wariga hari ini |
+| `/styleguide` | Sistem desain, pemilih tema |
+| `/debug-wariga` | Self-test engine (41 tes) |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Struktur
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/                  # rute App Router
+├── components/ui/        # primitif desain (Button, Card, Input, Chip, Alert)
+├── lib/
+│   ├── wariga/           # engine kalender Bali — murni fungsi, tanpa DB
+│   │   ├── constants.ts  # nama wara, urip, epoch
+│   │   ├── pawukon.ts    # semua siklus wara + sasih + fase bulan
+│   │   ├── dewasa.ts     # hari raya + kategori siklus personal
+│   │   ├── holidays.ts   # tabel libur (perlu update tiap tahun)
+│   │   └── selftest.ts   # 41 tes terhadap tanggal acuan
+│   └── theme/            # provider tema
+└── types/
+docs/
+├── arsitektur.md            # dokumen arsitektur awal
+└── inventaris-app-lama.md   # hasil pembacaan app lama + sisa pekerjaan
+```
 
-## Learn More
+## Tema
 
-To learn more about Next.js, take a look at the following resources:
+Dua tema aksen di atas dasar netral off-white yang sama:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Mint** (default) — hijau mint, sesuai styleguide referensi
+- **Senja** — jingga hangat
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Dipilih lewat `[data-theme]` di `<html>`, disimpan di `localStorage`, dan
+dipasang sebelum paint pertama supaya tidak berkedip. Semua warna adalah
+token CSS di `src/app/globals.css` — komponen tidak pernah memakai nilai hex
+langsung, jadi menambah tema ketiga cukup dengan satu blok `:root[data-theme=...]`.
 
-## Deploy on Vercel
+## Status
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- [x] Engine Wariga lengkap — 41/41 tes lolos
+- [x] Sistem desain + 2 tema
+- [ ] Konten (i18n, panduan harian, pangarasan, pancasuda, aksara nama)
+- [ ] Firebase Auth + Firestore
+- [ ] Halaman kalender & dashboard
+- [ ] Fitur Pro (nama, kecocokan, perjalanan hidup, kepribadian)
+- [ ] Admin + approval langganan
+- [ ] Deploy Vercel
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Rincian sisa pekerjaan ada di `docs/inventaris-app-lama.md`.
