@@ -9,7 +9,7 @@ import {
   signOut,
   type User,
 } from "firebase/auth";
-import { doc, getDoc, onSnapshot, setDoc } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { evaluateAccess } from "@/lib/subscription";
 import type { AccessState, UserProfile } from "@/types";
@@ -38,6 +38,22 @@ const LOCKED: AccessState = {
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+/**
+ * Minta server membuat dokumen profil. Server yang menentukan masa trial,
+ * jadi nilainya tidak bisa dikarang dari browser.
+ */
+async function bootstrapProfile(user: User): Promise<void> {
+  const token = await user.getIdToken();
+  const res = await fetch("/api/auth/bootstrap", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error ?? "Gagal menyiapkan profil.");
+  }
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -76,36 +92,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const auth = getFirebaseAuth();
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     await sendEmailVerification(cred.user);
-
-    // Dokumen dibuat sekali saja; kalau sudah ada (mis. daftar ulang setelah
-    // gagal di tengah jalan) jangan ditimpa supaya data lama tidak hilang.
-    const ref = doc(getDb(), "users", cred.user.uid);
-    const existing = await getDoc(ref);
-    if (existing.exists()) return;
-
-    const baru: Omit<UserProfile, "uid"> = {
-      email,
-      nama: "",
-      tanggalLahir: null,
-      phoneNumber: null,
-      role: "user",
-      subscriptionStatus: "trial",
-      subscriptionExpiresAt: null,
-      trialEndsAt: null,
-      onboardingComplete: false,
-      createdAt: new Date().toISOString(),
-      saptaWaraLahir: null,
-      pancaWaraLahir: null,
-      sadWaraLahir: null,
-      wukuLahir: null,
-      uripLahir: null,
-      uripPetemonLahir: null,
-    };
-    await setDoc(ref, baru);
+    await bootstrapProfile(cred.user);
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
+    const cred = await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
+    // Jaring pengaman: kalau pendaftaran dulu terputus sebelum profil dibuat,
+    // ini membuatnya sekarang. Tidak mengubah apa pun bila profil sudah ada.
+    await bootstrapProfile(cred.user);
   }, []);
 
   const logout = useCallback(async () => {

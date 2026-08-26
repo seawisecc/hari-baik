@@ -64,7 +64,7 @@ const dict = {
     "admin.delete.confirm":
       "Apakah kamu yakin ingin menghapus akun ini? Tindakan ini tidak dapat dibatalkan.",
     "admin.delete.success": "Akun berhasil dihapus.",
-    "profile.dob.readonly": "Untuk mengubah tanggal lahir, hubungi admin.",
+    "profile.dob.hint": "Mengubah tanggal lahir akan menghitung ulang seluruh siklusmu.",
     "expired.title": "Waktunya Isi Ulang Energi",
     "expired.desc":
       "Akses kalender siklus personalmu telah berakhir. Aktifkan kembali untuk melanjutkan perjalananmu.",
@@ -151,7 +151,7 @@ const dict = {
     "admin.delete.confirm":
       "Are you sure you want to delete this account? This action cannot be undone.",
     "admin.delete.success": "Account successfully deleted.",
-    "profile.dob.readonly": "To change your birth date, contact admin.",
+    "profile.dob.hint": "Changing your birth date recalculates your entire cycle.",
     "expired.title": "Time to Recharge",
     "expired.desc":
       "Your access to the personal cycle calendar has ended. Reactivate to continue your journey.",

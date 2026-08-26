@@ -17,7 +17,9 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == uid;
     }
 
-    // Field yang hanya boleh disentuh admin.
+    // Field yang menentukan akses dan penagihan. Hanya server (Admin SDK,
+    // yang melewati rules) dan admin yang boleh menyentuhnya. Kalau klien
+    // bisa menulis trialEndsAt, siapa pun bisa memberi dirinya trial abadi.
     function protectedFields() {
       return [
         'role',
@@ -39,23 +41,16 @@ service cloud.firestore {
     match /users/{uid} {
       allow get, list: if isOwner(uid) || isAdmin();
 
-      // Saat mendaftar, klien menulis dokumen awal untuk dirinya sendiri.
-      // Statusnya dipaksa 'trial' dan role dipaksa 'user' supaya tidak ada
-      // yang bisa mendaftar langsung sebagai admin atau berlangganan aktif.
-      allow create: if isOwner(uid)
-        && request.resource.data.role == 'user'
-        && request.resource.data.subscriptionStatus == 'trial'
-        && request.resource.data.subscriptionExpiresAt == null
-        && request.resource.data.email == request.auth.token.email;
+      // Klien tidak pernah membuat dokumen profil. Pembuatannya lewat
+      // /api/auth/bootstrap yang memakai Admin SDK, supaya masa trial
+      // ditentukan server dan tidak bisa dikarang dari browser.
+      allow create: if false;
 
-      // Pengguna boleh mengubah profilnya sendiri, kecuali field terlindungi.
-      // Tanggal lahir hanya boleh diisi sekali (saat onboarding); setelah itu
-      // perubahan harus lewat admin.
-      allow update: if isAdmin()
-        || (isOwner(uid)
-            && keepsProtectedFields()
-            && (resource.data.tanggalLahir == null
-                || request.resource.data.tanggalLahir == resource.data.tanggalLahir));
+      // Pengguna boleh mengubah profilnya sendiri: nama, tanggal lahir,
+      // nomor HP, dan field wariga turunannya. Tanggal lahir sengaja TIDAK
+      // dikunci, karena salah ketik itu wajar dan mengubahnya tidak memberi
+      // keuntungan apa pun selain perhitungan yang benar.
+      allow update: if isAdmin() || (isOwner(uid) && keepsProtectedFields());
 
       allow delete: if isAdmin();
 

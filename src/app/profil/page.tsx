@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { EditTanggalLahir } from "@/components/EditTanggalLahir";
 import { Button } from "@/components/ui/Button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Memuat } from "@/components/ProGate";
@@ -76,7 +77,9 @@ export default function ProfilPage() {
               <Baris label="Urip" value={profile.uripLahir?.toString() ?? "-"} />
               <Baris label="WhatsApp" value={profile.phoneNumber ?? "-"} />
             </dl>
-            <p className="mt-3 text-xs italic text-ink-faint">{t("profile.dob.readonly")}</p>
+            <div className="mt-5">
+              <EditTanggalLahir uid={profile.uid} tanggalLahir={profile.tanggalLahir} />
+            </div>
           </CardBody>
         </Card>
 

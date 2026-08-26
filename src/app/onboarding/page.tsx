@@ -11,7 +11,6 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { uripPetemon } from "@/lib/content/petemon";
 import { getDb } from "@/lib/firebase/client";
 import { useAuth } from "@/lib/firebase/AuthProvider";
-import { trialEnd } from "@/lib/subscription";
 import {
   getSadwara,
   pancawaraName,
@@ -84,7 +83,6 @@ export default function OnboardingPage() {
                   tanggalLahir,
                   phoneNumber: phone.trim() || null,
                   onboardingComplete: true,
-                  trialEndsAt: trialEnd(),
                   saptaWaraLahir: saptawaraName(tanggalLahir),
                   pancaWaraLahir: pancawaraName(tanggalLahir),
                   sadWaraLahir: getSadwara(tanggalLahir),
