@@ -235,6 +235,6 @@ memakai hex langsung, jadi menambah tema ketiga cukup satu blok
 - [x] Gerbang akses terpusat: trial habis mengunci total ke `/expired`
 - [x] Verifikasi email diwajibkan
 - [x] Lupa kata sandi
-- [ ] Poles halaman auth, onboarding, profil, admin
+- [x] Poles halaman auth, onboarding, profil, admin
 - [ ] Alur langganan dalam aplikasi (sekarang lewat WhatsApp)
 - [ ] Tabel libur nasional baru terisi 2026–2027 (`src/lib/wariga/holidays.ts`)

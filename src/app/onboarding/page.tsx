@@ -1,17 +1,18 @@
 "use client";
 
-import { Wordmark } from "@/components/ui/Logo";
+import { doc, updateDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { doc, updateDoc } from "firebase/firestore";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input, Label } from "@/components/ui/Input";
+import { Wordmark } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { Bidang } from "@/app/(auth)/AuthShell";
 import { uripPetemon } from "@/lib/content/petemon";
-import { getDb } from "@/lib/firebase/client";
 import { useAuth } from "@/lib/firebase/AuthProvider";
+import { getDb } from "@/lib/firebase/client";
 import {
   getSadwara,
   pancawaraName,
@@ -32,15 +33,21 @@ export default function OnboardingPage() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  if (loading) return <main className="px-6 py-16 text-ink-faint">Memuat…</main>;
+  if (loading) {
+    return (
+      <main className="grid min-h-screen place-items-center text-sm text-ink-faint">
+        Memuat…
+      </main>
+    );
+  }
 
   if (!user) {
     return (
-      <main className="mx-auto max-w-md px-6 py-20">
+      <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6">
         <Card>
           <CardBody className="pt-6">
             <p className="text-[15px] text-ink-soft">Kamu belum masuk.</p>
-            <Button className="mt-4" block onClick={() => router.push("/login")}>
+            <Button className="mt-5" block onClick={() => router.push("/login")}>
               Ke halaman masuk
             </Button>
           </CardBody>
@@ -54,23 +61,24 @@ export default function OnboardingPage() {
     return null;
   }
 
+  const siap = nama.trim().length > 0 && tanggalLahir.length > 0;
+
   return (
-    <main className="mx-auto max-w-md px-6 py-12">
-      <div className="mb-8 flex items-center justify-between">
+    <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-6 py-14">
+      <div className="mb-9 flex items-center justify-between gap-4">
         <Wordmark size={28} textClassName="text-2xl" />
         <ThemeToggle />
       </div>
 
       <Card elevation={3}>
-        <CardHeader>
-          <CardTitle>Lengkapi profil</CardTitle>
-          <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
-            Kalender siklusmu dihitung dari tanggal lahir, jadi pastikan benar: setelah ini
-            hanya admin yang bisa mengubahnya.
+        <CardHeader className="pb-4">
+          <CardTitle className="text-2xl">Satu langkah lagi</CardTitle>
+          <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+            Kalender siklusmu dihitung dari tanggal lahir, jadi pastikan benar.
           </p>
         </CardHeader>
 
-        <CardBody>
+        <CardBody className="pb-7">
           <form
             className="space-y-5"
             onSubmit={async (e) => {
@@ -101,18 +109,17 @@ export default function OnboardingPage() {
           >
             {error && <Alert tone="error">{error}</Alert>}
 
-            <div className="space-y-2">
-              <Label htmlFor="nama">Nama lengkap</Label>
+            <Bidang label={<Label htmlFor="nama">Nama lengkap</Label>}>
               <Input
                 id="nama"
+                autoComplete="name"
                 value={nama}
                 onChange={(e) => setNama(e.target.value)}
                 required
               />
-            </div>
+            </Bidang>
 
-            <div className="space-y-2">
-              <Label htmlFor="lahir">Tanggal lahir Masehi</Label>
+            <Bidang label={<Label htmlFor="lahir">Tanggal lahir Masehi</Label>}>
               <Input
                 id="lahir"
                 type="date"
@@ -121,32 +128,16 @@ export default function OnboardingPage() {
                 onChange={(e) => setTanggalLahir(e.target.value)}
                 required
               />
-            </div>
+            </Bidang>
 
-            <div className="space-y-2">
-              <Label htmlFor="phone">
-                Nomor WhatsApp <span className="font-normal text-ink-faint">(opsional)</span>
-              </Label>
-              <Input
-                id="phone"
-                type="tel"
-                inputMode="tel"
-                placeholder="08123456789"
-                value={phone}
-                onChange={(e) => {
-                  const bersih = e.target.value.replace(/[^0-9+]/g, "");
-                  if (bersih.length <= 15) setPhone(bersih);
-                }}
-              />
-              <p className="text-xs text-ink-faint">
-                Memudahkan admin menghubungimu soal langganan.
-              </p>
-            </div>
-
+            {/* Pratinjau langsung: kalau wetonnya terasa asing, kemungkinan
+                tanggalnya salah ketik, dan itu ketahuan sebelum disimpan. */}
             {tanggalLahir && (
               <div className="rounded-md bg-surface-sunk px-5 py-4 hb-sink">
-                <p className="text-xs text-ink-faint">Hari lahirmu</p>
-                <p className="mt-0.5 font-heading text-lg font-semibold text-ink">
+                <p className="text-[11px] uppercase tracking-wide text-ink-faint">
+                  Hari lahirmu
+                </p>
+                <p className="mt-1 font-heading text-xl font-semibold text-ink">
                   {saptawaraName(tanggalLahir)} {pancawaraName(tanggalLahir)}
                 </p>
                 <p className="mt-0.5 text-xs text-ink-soft">
@@ -155,7 +146,29 @@ export default function OnboardingPage() {
               </div>
             )}
 
-            <Button type="submit" block disabled={busy || !nama.trim() || !tanggalLahir}>
+            <Bidang
+              label={
+                <Label htmlFor="phone">
+                  Nomor WhatsApp <span className="font-normal text-ink-faint">(opsional)</span>
+                </Label>
+              }
+              hint="Memudahkan admin menghubungimu soal langganan."
+            >
+              <Input
+                id="phone"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                placeholder="08123456789"
+                value={phone}
+                onChange={(e) => {
+                  const bersih = e.target.value.replace(/[^0-9+]/g, "");
+                  if (bersih.length <= 15) setPhone(bersih);
+                }}
+              />
+            </Bidang>
+
+            <Button type="submit" block size="lg" disabled={busy || !siap}>
               {busy ? "Menyimpan…" : "Mulai perjalanan"}
             </Button>
           </form>

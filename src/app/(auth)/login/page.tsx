@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AuthShell, BelumDikonfigurasi } from "../AuthShell";
+import { AuthShell, BelumDikonfigurasi, Bidang } from "../AuthShell";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
@@ -34,7 +34,7 @@ export default function LoginPage() {
         <BelumDikonfigurasi />
       ) : (
         <form
-          className="space-y-4"
+          className="space-y-5"
           onSubmit={async (e) => {
             e.preventDefault();
             setError(null);
@@ -51,8 +51,7 @@ export default function LoginPage() {
         >
           {error && <Alert tone="error">{error}</Alert>}
 
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+          <Bidang label={<Label htmlFor="email">Email</Label>}>
             <Input
               id="email"
               type="email"
@@ -61,10 +60,21 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
-          </div>
+          </Bidang>
 
-          <div className="space-y-2">
-            <Label htmlFor="password">Kata sandi</Label>
+          <Bidang
+            label={
+              <div className="flex items-baseline justify-between gap-3">
+                <Label htmlFor="password">Kata sandi</Label>
+                <Link
+                  href="/lupa-sandi"
+                  className="text-xs text-ink-faint underline underline-offset-2 hover:text-ink-soft"
+                >
+                  Lupa?
+                </Link>
+              </div>
+            }
+          >
             <Input
               id="password"
               type="password"
@@ -73,20 +83,11 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-          </div>
+          </Bidang>
 
-          <Button type="submit" block disabled={busy}>
+          <Button type="submit" block size="lg" disabled={busy || !email || !password}>
             {busy ? "Memproses…" : "Masuk"}
           </Button>
-
-          <p className="text-center text-sm">
-            <Link
-              href="/lupa-sandi"
-              className="text-ink-soft underline underline-offset-2 hover:text-ink"
-            >
-              Lupa kata sandi?
-            </Link>
-          </p>
         </form>
       )}
     </AuthShell>

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AuthShell, BelumDikonfigurasi } from "../AuthShell";
+import { AuthShell, BelumDikonfigurasi, Bidang } from "../AuthShell";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
@@ -19,12 +19,15 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const cocok = password === ulangi;
+  // Peringatan baru muncul setelah ada yang diketik, supaya tidak menegur
+  // pengguna atas kolom yang belum sempat diisi.
+  const tidakCocok = ulangi.length > 0 && password !== ulangi;
+  const siap = email.length > 0 && password.length >= 6 && password === ulangi;
 
   return (
     <AuthShell
       title="Daftar"
-      subtitle="Gratis 3 hari. Tanpa kartu kredit."
+      subtitle="Gratis 3 hari, tanpa kartu kredit."
       footer={
         <>
           Sudah punya akun?{" "}
@@ -38,10 +41,10 @@ export default function RegisterPage() {
         <BelumDikonfigurasi />
       ) : (
         <form
-          className="space-y-4"
+          className="space-y-5"
           onSubmit={async (e) => {
             e.preventDefault();
-            if (!cocok) return;
+            if (!siap) return;
             setError(null);
             setBusy(true);
             try {
@@ -56,8 +59,7 @@ export default function RegisterPage() {
         >
           {error && <Alert tone="error">{error}</Alert>}
 
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+          <Bidang label={<Label htmlFor="email">Email</Label>}>
             <Input
               id="email"
               type="email"
@@ -66,10 +68,12 @@ export default function RegisterPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
-          </div>
+          </Bidang>
 
-          <div className="space-y-2">
-            <Label htmlFor="password">Kata sandi</Label>
+          <Bidang
+            label={<Label htmlFor="password">Kata sandi</Label>}
+            hint="Minimal 6 karakter."
+          >
             <Input
               id="password"
               type="password"
@@ -79,11 +83,12 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <p className="text-xs text-ink-faint">Minimal 6 karakter.</p>
-          </div>
+          </Bidang>
 
-          <div className="space-y-2">
-            <Label htmlFor="ulangi">Ulangi kata sandi</Label>
+          <Bidang
+            label={<Label htmlFor="ulangi">Ulangi kata sandi</Label>}
+            error={tidakCocok ? "Kata sandi belum sama." : undefined}
+          >
             <Input
               id="ulangi"
               type="password"
@@ -92,10 +97,9 @@ export default function RegisterPage() {
               onChange={(e) => setUlangi(e.target.value)}
               required
             />
-            {ulangi && !cocok && <p className="text-xs text-error">Kata sandi belum sama.</p>}
-          </div>
+          </Bidang>
 
-          <Button type="submit" block disabled={busy || !cocok}>
+          <Button type="submit" block size="lg" disabled={busy || !siap}>
             {busy ? "Memproses…" : "Daftar"}
           </Button>
         </form>

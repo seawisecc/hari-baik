@@ -8,7 +8,7 @@ import { Memuat } from "@/components/ProGate";
 import { PageContainer } from "@/components/shell/AppShell";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { useAuth } from "@/lib/firebase/AuthProvider";
 import type { SubscriptionStatus, UserProfile } from "@/types";
 
@@ -103,13 +103,14 @@ export default function AdminPage() {
   return (
     <PageContainer wide>
       <div className="space-y-6">
-        <header className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h1 className="font-heading text-3xl font-bold text-ink">Kelola Pengguna</h1>
-            <p className="mt-1 text-sm text-ink-soft">Masuk sebagai {profile.email}</p>
-          </div>
-          <ThemeToggle />
-        </header>
+        <PageHeader
+          title="Kelola Pengguna"
+          subtitle={
+            memuat
+              ? "Memuat…"
+              : `${users.length} pengguna${filter === "all" ? "" : " pada filter ini"}`
+          }
+        />
 
         {error && <Alert tone="error">{error}</Alert>}
 

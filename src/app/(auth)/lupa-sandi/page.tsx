@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { AuthShell, BelumDikonfigurasi } from "../AuthShell";
+import { AuthShell, BelumDikonfigurasi, Bidang } from "../AuthShell";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
@@ -38,7 +38,7 @@ export default function LupaSandiPage() {
         </div>
       ) : (
         <form
-          className="space-y-4"
+          className="space-y-5"
           onSubmit={async (e) => {
             e.preventDefault();
             setError(null);
@@ -55,8 +55,7 @@ export default function LupaSandiPage() {
         >
           {error && <Alert tone="error">{error}</Alert>}
 
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+          <Bidang label={<Label htmlFor="email">Email</Label>}>
             <Input
               id="email"
               type="email"
@@ -65,9 +64,9 @@ export default function LupaSandiPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
-          </div>
+          </Bidang>
 
-          <Button type="submit" block disabled={busy || !email}>
+          <Button type="submit" block size="lg" disabled={busy || !email}>
             {busy ? "Mengirim…" : "Kirim tautan"}
           </Button>
         </form>

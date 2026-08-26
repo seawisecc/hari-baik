@@ -1,27 +1,24 @@
 "use client";
 
+import { LogOut, MessageCircle, Shield } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { EditTanggalLahir } from "@/components/EditTanggalLahir";
-import { Button } from "@/components/ui/Button";
-import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Memuat } from "@/components/ProGate";
 import { PageContainer } from "@/components/shell/AppShell";
+import { Button } from "@/components/ui/Button";
+import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { WhatsAppCard } from "@/components/WhatsAppCard";
-import { useT } from "@/lib/content/LangProvider";
+import { EditTanggalLahir } from "@/components/EditTanggalLahir";
+import { ADMIN_WA, ADMIN_WA_DISPLAY } from "@/components/WhatsAppCard";
+import { cn } from "@/lib/cn";
+import { useLang, useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
-
-function Baris({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-baseline justify-between gap-4 py-2">
-      <dt className="text-sm text-ink-faint">{label}</dt>
-      <dd className="text-right text-sm font-medium text-ink">{value}</dd>
-    </div>
-  );
-}
+import { tanggalMedium } from "@/lib/tanggal";
+import type { AccessState } from "@/types";
 
 export default function ProfilPage() {
   const t = useT();
+  const { lang } = useLang();
   const router = useRouter();
   const { profile, access, logout, loading } = useAuth();
 
@@ -32,10 +29,10 @@ export default function ProfilPage() {
       <PageContainer>
         <div className="space-y-6">
           <PageHeader title={t("nav.profile")} />
-          <Card>
+          <Card className="mx-auto max-w-lg">
             <CardBody className="pt-6">
               <p className="text-[15px] text-ink-soft">Kamu belum masuk.</p>
-              <Button className="mt-4" block onClick={() => router.push("/login")}>
+              <Button className="mt-5" block onClick={() => router.push("/login")}>
                 Masuk
               </Button>
             </CardBody>
@@ -45,85 +42,196 @@ export default function ProfilPage() {
     );
   }
 
-  const statusLabel =
-    access.type === "subscription"
-      ? `${t("subscription.active")} ${new Date(access.expiresAt!).toLocaleDateString("id-ID")}`
-      : access.type === "trial"
-        ? `${t("subscription.trial")} ${new Date(access.expiresAt!).toLocaleDateString("id-ID")}`
-        : t("subscription.expired");
+  const weton =
+    profile.saptaWaraLahir && profile.pancaWaraLahir
+      ? `${profile.saptaWaraLahir} ${profile.pancaWaraLahir}`
+      : "-";
 
   return (
     <PageContainer>
       <div className="space-y-6">
-        <PageHeader title={t("nav.profile")} />
+        <PageHeader title={t("nav.profile")} action={<StatusPill access={access} />} />
 
-        <Card elevation={3}>
+        {/* Identitas dan data kelahiran: satu kartu, karena semuanya
+            diturunkan dari satu tanggal yang sama. */}
+        <Card elevation={2}>
           <CardHeader>
             <CardTitle>{profile.nama || "(nama belum diisi)"}</CardTitle>
             <p className="mt-0.5 text-sm text-ink-soft">{profile.email}</p>
           </CardHeader>
-          <CardBody>
-            <dl className="divide-y divide-border-soft">
-              <Baris label="Tanggal lahir" value={profile.tanggalLahir ?? "-"} />
-              <Baris
-                label="Weton"
-                value={
-                  profile.saptaWaraLahir && profile.pancaWaraLahir
-                    ? `${profile.saptaWaraLahir} ${profile.pancaWaraLahir}`
-                    : "-"
-                }
-              />
-              <Baris label="Wuku" value={profile.wukuLahir ?? "-"} />
-              <Baris label="Urip" value={profile.uripLahir?.toString() ?? "-"} />
-              <Baris label="WhatsApp" value={profile.phoneNumber ?? "-"} />
+
+          <CardBody className="space-y-6">
+            <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-md bg-border-soft sm:grid-cols-4">
+              <Kotak label="Tanggal lahir" nilai={profile.tanggalLahir ?? "-"} />
+              <Kotak label="Weton" nilai={weton} />
+              <Kotak label="Wuku" nilai={profile.wukuLahir ?? "-"} />
+              <Kotak label="Urip" nilai={profile.uripLahir?.toString() ?? "-"} />
             </dl>
-            <div className="mt-5">
+
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <p className="text-xs text-ink-faint">{t("profile.dob.hint")}</p>
               <EditTanggalLahir uid={profile.uid} tanggalLahir={profile.tanggalLahir} />
             </div>
           </CardBody>
         </Card>
 
-        <Card>
+        <Card elevation={2}>
           <CardHeader>
             <CardTitle>{t("subscription.title")}</CardTitle>
           </CardHeader>
-          <CardBody className="space-y-4">
-            <p className="text-[15px] text-ink-soft">
-              {statusLabel}
-              {access.daysLeft !== null && (
-                <span className="text-ink-faint">
-                  {" "}
-                  · {access.daysLeft} {t("subscription.days")}
-                </span>
-              )}
-            </p>
+          <CardBody>
+            <RingkasanLangganan access={access} lang={lang} />
             {!access.isPro && (
-              <Button block onClick={() => router.push("/expired")}>
-                {t("subscription.cta")}
-              </Button>
+              <Link href="/expired" className="mt-5 block">
+                <Button block>{t("subscription.cta")}</Button>
+              </Link>
             )}
           </CardBody>
         </Card>
 
         {profile.role === "admin" && (
-          <Button variant="surface" block onClick={() => router.push("/admin")}>
-            Panel Admin
-          </Button>
+          <Link href="/admin" className="block">
+            <Card
+              elevation={1}
+              className="flex items-center gap-4 px-6 py-5 transition-shadow hover:hb-raise-2"
+            >
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-pill bg-accent-wash">
+                <Shield className="h-4 w-4 text-accent-deep" aria-hidden />
+              </span>
+              <div>
+                <p className="font-medium text-ink">Panel Admin</p>
+                <p className="text-sm text-ink-soft">Kelola pengguna dan langganan</p>
+              </div>
+            </Card>
+          </Link>
         )}
 
-        <WhatsAppCard />
+        {/* Bantuan dibuat ringkas: di halaman profil ini pelengkap, bukan
+            ajakan utama seperti di halaman terkunci. */}
+        <Card elevation={1} className="flex flex-wrap items-center gap-x-4 gap-y-3 px-6 py-5">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-pill bg-accent-wash">
+            <MessageCircle className="h-4 w-4 text-accent-deep" aria-hidden />
+          </span>
+          <div className="flex-1">
+            <p className="font-medium text-ink">Butuh bantuan?</p>
+            <p className="text-sm text-ink-soft">Hubungi admin lewat WhatsApp</p>
+          </div>
+          <a
+            href={`https://wa.me/${ADMIN_WA}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-10 items-center rounded-pill bg-surface-sunk px-5 text-sm font-medium text-ink hb-sink-sm transition-colors hover:text-accent-deep"
+          >
+            {ADMIN_WA_DISPLAY}
+          </a>
+        </Card>
 
-        <Button
-          variant="ghost"
-          block
-          onClick={async () => {
-            await logout();
-            router.push("/");
-          }}
-        >
-          {t("nav.logout")}
-        </Button>
+        <div className="pt-2">
+          <Button
+            variant="ghost"
+            onClick={async () => {
+              await logout();
+              router.push("/");
+            }}
+          >
+            <LogOut className="h-4 w-4" aria-hidden />
+            {t("nav.logout")}
+          </Button>
+        </div>
       </div>
     </PageContainer>
+  );
+}
+
+function Kotak({ label, nilai }: { label: string; nilai: string }) {
+  return (
+    <div className="bg-surface px-5 py-4">
+      <dt className="text-[11px] uppercase tracking-wide text-ink-faint">{label}</dt>
+      <dd className="mt-0.5 text-sm font-medium text-ink">{nilai}</dd>
+    </div>
+  );
+}
+
+function StatusPill({ access }: { access: AccessState }) {
+  const { label, nada } =
+    access.type === "lifetime"
+      ? { label: "Selamanya", nada: "border-accent-strong/50 text-accent-deep" }
+      : access.type === "subscription"
+        ? { label: "Aktif", nada: "border-guru/45 text-guru" }
+        : access.type === "trial"
+          ? { label: "Trial", nada: "border-ratu/45 text-ratu" }
+          : { label: "Habis", nada: "border-pati/45 text-pati" };
+
+  return (
+    <span className={cn("rounded-pill border px-3.5 py-1.5 text-xs font-medium", nada)}>
+      {label}
+    </span>
+  );
+}
+
+function RingkasanLangganan({ access, lang }: { access: AccessState; lang: "id" | "en" }) {
+  if (access.type === "lifetime") {
+    return (
+      <Ringkasan
+        utama="Tanpa batas waktu"
+        keterangan="Akses penuh ke semua fitur, tidak perlu diperpanjang."
+      />
+    );
+  }
+
+  if (!access.expiresAt) {
+    return (
+      <Ringkasan
+        utama="Tidak aktif"
+        keterangan="Aktifkan langganan untuk membuka kembali seluruh fitur."
+      />
+    );
+  }
+
+  const sisa = access.daysLeft ?? 0;
+  const tanggal = tanggalMedium(access.expiresAt.slice(0, 10), lang);
+  const trial = access.type === "trial";
+
+  // Sisa hari jadi judul hanya ketika angkanya berarti. "1589 hari lagi"
+  // tidak memberi tahu apa pun; tanggalnya yang lebih berguna.
+  if (sisa <= 45) {
+    return (
+      <Ringkasan
+        utama={`${sisa} hari lagi`}
+        keterangan={`${trial ? "Masa coba berakhir" : "Berlaku sampai"} ${tanggal}`}
+        mendesak={sisa <= 7}
+      />
+    );
+  }
+
+  return (
+    <Ringkasan
+      utama={tanggal}
+      keterangan={`${trial ? "Akhir masa coba" : "Berlaku sampai tanggal ini"}, ${sisa} hari lagi`}
+    />
+  );
+}
+
+function Ringkasan({
+  utama,
+  keterangan,
+  mendesak = false,
+}: {
+  utama: string;
+  keterangan: string;
+  mendesak?: boolean;
+}) {
+  return (
+    <div>
+      <p
+        className={cn(
+          "font-heading text-2xl font-semibold",
+          mendesak ? "text-lara" : "text-ink",
+        )}
+      >
+        {utama}
+      </p>
+      <p className="mt-1 text-sm leading-relaxed text-ink-soft">{keterangan}</p>
+    </div>
   );
 }
