@@ -8,7 +8,7 @@
  *
  *   npm run build-assets
  */
-import { readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import sharp from "sharp";
 
 const LOGO = "src/assets/logo.svg";
@@ -17,6 +17,8 @@ const TINTA = "#2f2c28";
 const REDUP = "#6b6660";
 
 const logo = readFileSync(LOGO);
+
+mkdirSync("public/icons", { recursive: true });
 
 /** Lambang di atas kotak berlatar kanvas, dengan ruang napas di tepinya. */
 async function ikonKotak(ukuran: number, tujuan: string, padding = 0.18) {
@@ -87,6 +89,17 @@ async function pratinjauTautan(tujuan: string) {
   console.log(`  ${tujuan}  ${W}x${H}`);
 }
 
+/**
+ * Ikon "maskable" untuk Android.
+ *
+ * Android memotong ikon jadi bentuknya sendiri (bulat, kotak membulat,
+ * dan lain-lain). Lambang harus muat di dalam lingkaran aman selebar 80%
+ * dari kanvas, kalau tidak tepinya akan terpotong.
+ */
+async function ikonMaskable(ukuran: number, tujuan: string) {
+  await ikonKotak(ukuran, tujuan, 0.28);
+}
+
 async function main() {
   console.log("\nMembangun aset dari", LOGO, "\n");
 
@@ -97,6 +110,11 @@ async function main() {
   // iOS memakai ikon ini sebagai pintasan layar utama; latarnya harus padat
   // karena iOS tidak menghormati transparansi di sini.
   await ikonKotak(180, "src/app/apple-icon.png");
+
+  // Ikon manifest: Chrome butuh 192 dan 512 supaya tombol pasang muncul.
+  await ikonKotak(192, "public/icons/icon-192.png");
+  await ikonKotak(512, "public/icons/icon-512.png");
+  await ikonMaskable(512, "public/icons/icon-maskable-512.png");
 
   await pratinjauTautan("src/app/opengraph-image.png");
   console.log("");

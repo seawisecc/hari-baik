@@ -59,6 +59,14 @@ service cloud.firestore {
       }
     }
 
+    // Daftar harga: dibaca siapa pun karena ini informasi publik, tapi hanya
+    // bisa ditulis lewat Admin SDK di server (route /api/admin/harga), yang
+    // memvalidasi bentuk dan batas nilainya lebih dulu.
+    match /pengaturan/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     // Tolak selain yang di atas.
     match /{document=**} {
       allow read, write: if false;

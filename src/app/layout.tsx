@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Source_Serif_4 } from "next/font/google";
+import { PWA } from "@/components/PWA";
 import { AppShell } from "@/components/shell/AppShell";
 import { LangProvider } from "@/lib/content/LangProvider";
 import { AuthProvider } from "@/lib/firebase/AuthProvider";
@@ -46,6 +47,11 @@ export const metadata: Metadata = {
     title: JUDUL,
     description: RINGKASAN,
   },
+  appleWebApp: {
+    capable: true,
+    title: "Hari Baik",
+    statusBarStyle: "default",
+  },
   twitter: {
     card: "summary_large_image",
     title: JUDUL,
@@ -70,6 +76,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <LangProvider>
             <AuthProvider>
               <AppShell>{children}</AppShell>
+              <PWA />
             </AuthProvider>
           </LangProvider>
         </ThemeProvider>

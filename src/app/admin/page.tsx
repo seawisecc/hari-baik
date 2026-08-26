@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { AksiLangganan } from "@/components/admin/AturLangganan";
+import { AturHarga } from "@/components/admin/AturHarga";
 import { UserTable } from "@/components/admin/UserTable";
 import { Alert } from "@/components/ui/Alert";
 import { Memuat } from "@/components/ProGate";
@@ -31,6 +32,7 @@ export default function AdminPage() {
   const [memuat, setMemuat] = useState(true);
   /** Dinaikkan untuk memaksa muat ulang setelah sebuah aksi berhasil. */
   const [refresh, setRefresh] = useState(0);
+  const [tab, setTab] = useState<"pengguna" | "harga">("pengguna");
 
   useEffect(() => {
     if (!user) return;
@@ -116,32 +118,63 @@ export default function AdminPage() {
 
         {error && <Alert tone="error">{error}</Alert>}
 
-        <div className="flex flex-wrap gap-2.5">
-          {FILTER.map((f) => (
-            <Chip
-              key={f.key}
-              selected={filter === f.key}
-              onClick={() => {
-                if (f.key === filter) return;
-                setMemuat(true);
-                setError(null);
-                setFilter(f.key);
-              }}
+        {/* Dua bagian yang jarang dipakai bersamaan: kelola pengguna
+            sehari-hari, atur harga sesekali. */}
+        <div
+          role="tablist"
+          className="inline-flex gap-1 rounded-pill bg-surface-sunk p-1 hb-sink"
+        >
+          {(["pengguna", "harga"] as const).map((k) => (
+            <button
+              key={k}
+              role="tab"
+              aria-selected={tab === k}
+              onClick={() => setTab(k)}
+              className={`rounded-pill px-5 py-2 text-sm font-medium transition-[box-shadow,background-color] duration-150 ${
+                tab === k
+                  ? "bg-accent text-accent-ink hb-raise-1"
+                  : "text-ink-faint hover:text-ink-soft"
+              }`}
             >
-              {t(f.labelKey)}
-            </Chip>
+              {t(k === "pengguna" ? "price.tab.users" : "price.tab.pricing")}
+            </button>
           ))}
         </div>
 
-        <Card elevation={2}>
-          <CardBody className="pt-6">
-            {memuat ? (
-              <p className="py-10 text-center text-sm text-ink-faint">{t("common.loading")}</p>
-            ) : (
-              <UserTable users={users} onAction={aksi} />
-            )}
-          </CardBody>
-        </Card>
+        {tab === "harga" ? (
+          <AturHarga />
+        ) : (
+          <>
+            <div className="flex flex-wrap gap-2.5">
+              {FILTER.map((f) => (
+                <Chip
+                  key={f.key}
+                  selected={filter === f.key}
+                  onClick={() => {
+                    if (f.key === filter) return;
+                    setMemuat(true);
+                    setError(null);
+                    setFilter(f.key);
+                  }}
+                >
+                  {t(f.labelKey)}
+                </Chip>
+              ))}
+            </div>
+
+            <Card elevation={2}>
+              <CardBody className="pt-6">
+                {memuat ? (
+                  <p className="py-10 text-center text-sm text-ink-faint">
+                    {t("common.loading")}
+                  </p>
+                ) : (
+                  <UserTable users={users} onAction={aksi} />
+                )}
+              </CardBody>
+            </Card>
+          </>
+        )}
       </div>
     </PageContainer>
   );
