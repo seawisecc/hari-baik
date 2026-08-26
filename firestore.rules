@@ -8,7 +8,7 @@ service cloud.firestore {
     }
 
     // Role admin datang dari custom claim yang di-set lewat Admin SDK di server,
-    // bukan dari field dokumen — supaya tidak bisa diubah dari klien.
+    // bukan dari field dokumen, supaya tidak bisa diubah dari klien.
     function isAdmin() {
       return isSignedIn() && request.auth.token.admin == true;
     }

@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test": "tsx src/lib/__tests__/wariga.test.ts && tsx src/lib/__tests__/content.test.ts && tsx src/lib/__tests__/subscription.test.ts",
     "set-admin": "tsx scripts/set-admin.ts",
-    "check-firebase": "tsx scripts/check-firebase.ts"
+    "check-firebase": "tsx scripts/check-firebase.ts",
+    "import-sa": "tsx scripts/import-service-account.ts"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
