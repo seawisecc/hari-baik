@@ -371,6 +371,18 @@ const dict = {
     "landing.energy.lead":
       "Setiap hari jatuh pada salah satu dari empat kategori, dihitung dari pertemuan urip kelahiranmu dengan urip hari itu.",
     "landing.features.title": "Yang kamu dapat",
+    "landing.features.addon": "Add-on",
+    "landing.features.lead":
+      "Sebagian termasuk dalam langganan, sebagian dibeli terpisah sebagai tambahan.",
+    "landing.f.finder.title": "Pencari hari acara",
+    "landing.f.finder.desc":
+      "Pilih rentang tanggal, lalu lihat hari paling mendukung untuk pernikahan, buka usaha, atau perjalanan.",
+    "landing.f.family.title": "Profil keluarga",
+    "landing.f.family.desc":
+      "Simpan sampai 12 anggota keluarga, lalu lihat kategori hari dan weton masing-masing dalam satu halaman.",
+    "landing.f.report.title": "Laporan lengkap",
+    "landing.f.report.desc":
+      "Semua bacaanmu dalam satu lembar siap cetak, atau disimpan sebagai PDF.",
     "landing.features.free": "Termasuk",
     "landing.features.pro": "Pro",
     "landing.f.today.title": "Panduan hari ini",
@@ -842,6 +854,17 @@ const dict = {
     "landing.energy.lead":
       "Every day falls into one of four categories, found where the urip of your birth meets the urip of that day.",
     "landing.features.title": "What you get",
+    "landing.features.addon": "Add-on",
+    "landing.features.lead":
+      "Some are part of the subscription, some are bought separately as add-ons.",
+    "landing.f.finder.title": "Event day finder",
+    "landing.f.finder.desc":
+      "Pick a date range, then see the most supportive days for a wedding, a business opening, or travel.",
+    "landing.f.family.title": "Family profiles",
+    "landing.f.family.desc":
+      "Save up to 12 family members, then see each one's day category and weton on a single page.",
+    "landing.f.report.title": "Full report",
+    "landing.f.report.desc": "Every reading on one sheet, ready to print or save as a PDF.",
     "landing.features.free": "Included",
     "landing.features.pro": "Pro",
     "landing.f.today.title": "Today's guidance",

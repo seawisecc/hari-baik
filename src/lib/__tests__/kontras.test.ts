@@ -102,6 +102,32 @@ for (const tema of [undefined, "senja"] as const) {
   }
 }
 
+/*
+ * Penanda tingkat fitur di halaman depan memakai latar setengah tembus
+ * (bg-lara/15), yang tidak punya token sendiri sehingga mudah terlewat saat
+ * memeriksa kontras. Nilai 20% sempat dipakai dan hanya mencapai 4,48:1.
+ */
+{
+  const campur = (fg: string, bg: string, a: number) => {
+    const komponen = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+    const A = komponen(fg);
+    const B = komponen(bg);
+    return (
+      "#" +
+      [0, 1, 2]
+        .map((i) =>
+          Math.round(A[i] * a + B[i] * (1 - a))
+            .toString(16)
+            .padStart(2, "0"),
+        )
+        .join("")
+    );
+  };
+  const latar = campur(token("hb-lara"), token("hb-surface"), 0.15);
+  const r = rasio(token("hb-lara-teks"), latar);
+  eq(`penanda add-on di halaman depan (${bulat(r)}:1)`, true, r >= 4.5);
+}
+
 // Identitas warna kategori tidak boleh bergeser: biru, hijau, kuning, merah
 // dari aplikasi lama. Varian -teks dan -pekat boleh gelap, aslinya tidak.
 eq("guru tetap hijau asli", "#7a9e7e", token("hb-guru"));

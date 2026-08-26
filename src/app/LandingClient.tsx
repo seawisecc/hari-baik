@@ -3,13 +3,16 @@
 import {
   ArrowRight,
   CalendarDays,
+  CalendarSearch,
   Check,
+  FileText,
   Heart,
   Route,
   Sparkles,
   Sun,
   User,
   UserPlus,
+  UsersRound,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -31,17 +34,39 @@ const LANGKAH: { icon: LucideIcon; n: number }[] = [
 
 /**
  * Daftar fitur mengikuti apa yang benar-benar ada di aplikasi, lengkap dengan
- * penanda mana yang termasuk dan mana yang butuh langganan. Calon pelanggan
- * berhak tahu batasnya sebelum membayar, bukan setelahnya.
+ * penanda tingkatnya. Calon pelanggan berhak tahu batasnya sebelum membayar,
+ * bukan setelahnya.
+ *
+ * Tiga tingkat, bukan dua: yang termasuk langganan, yang butuh langganan, dan
+ * yang dibeli terpisah. Add-on dulu hanya muncul di daftar harga di bawah,
+ * jadi pengunjung yang memindai bagian fitur tidak pernah tahu fitur itu ada.
  */
-const FITUR: { icon: LucideIcon; kunci: string; pro: boolean }[] = [
-  { icon: Sun, kunci: "today", pro: false },
-  { icon: CalendarDays, kunci: "calendar", pro: false },
-  { icon: User, kunci: "traits", pro: false },
-  { icon: Sparkles, kunci: "name", pro: true },
-  { icon: Heart, kunci: "match", pro: true },
-  { icon: Route, kunci: "journey", pro: true },
+type Tingkat = "termasuk" | "pro" | "addon";
+
+const FITUR: { icon: LucideIcon; kunci: string; tingkat: Tingkat }[] = [
+  { icon: Sun, kunci: "today", tingkat: "termasuk" },
+  { icon: CalendarDays, kunci: "calendar", tingkat: "termasuk" },
+  { icon: User, kunci: "traits", tingkat: "termasuk" },
+  { icon: Sparkles, kunci: "name", tingkat: "pro" },
+  { icon: Heart, kunci: "match", tingkat: "pro" },
+  { icon: Route, kunci: "journey", tingkat: "pro" },
+  { icon: CalendarSearch, kunci: "finder", tingkat: "addon" },
+  { icon: UsersRound, kunci: "family", tingkat: "addon" },
+  { icon: FileText, kunci: "report", tingkat: "addon" },
 ];
+
+/** Penanda tingkat. Add-on dibedakan dari Pro supaya tidak dikira sudah termasuk. */
+const TINGKAT_LABEL: Record<Tingkat, string> = {
+  termasuk: "landing.features.free",
+  pro: "landing.features.pro",
+  addon: "landing.features.addon",
+};
+
+const TINGKAT_GAYA: Record<Tingkat, string> = {
+  termasuk: "bg-surface-sunk text-ink-faint",
+  pro: "bg-accent text-accent-ink",
+  addon: "bg-lara/15 text-lara-teks",
+};
 
 const KATEGORI = ["guru", "ratu", "lara", "pati"] as const;
 const KATEGORI_BG: Record<(typeof KATEGORI)[number], string> = {
@@ -182,7 +207,7 @@ export function LandingClient({
           </div>
         </Section>
 
-        <Section title={t("landing.features.title")}>
+        <Section title={t("landing.features.title")} lead={t("landing.features.lead")}>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {FITUR.map((f) => (
               <Card key={f.kunci} className="p-6">
@@ -191,13 +216,9 @@ export function LandingClient({
                     <f.icon className="h-5 w-5 text-accent-deep" aria-hidden />
                   </span>
                   <span
-                    className={
-                      f.pro
-                        ? "rounded-pill bg-accent px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-accent-ink"
-                        : "rounded-pill bg-surface-sunk px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-ink-faint"
-                    }
+                    className={`rounded-pill px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide ${TINGKAT_GAYA[f.tingkat]}`}
                   >
-                    {t(f.pro ? "landing.features.pro" : "landing.features.free")}
+                    {t(TINGKAT_LABEL[f.tingkat])}
                   </span>
                 </div>
                 <h3 className="font-heading text-lg font-semibold text-ink">

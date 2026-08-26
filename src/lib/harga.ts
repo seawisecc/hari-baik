@@ -80,8 +80,8 @@ export const HARGA_BAWAAN: PengaturanHarga = {
       harga: 75_000,
       nama: { id: "Profil Keluarga", en: "Family Profiles" },
       deskripsi: {
-        id: "Tambah sampai 4 anggota keluarga, lengkap dengan kalender siklus dan kepribadian masing-masing.",
-        en: "Add up to 4 family members, each with their own cycle calendar and personality reading.",
+        id: "Simpan sampai 12 anggota keluarga, lalu lihat kategori hari dan weton masing-masing dalam satu halaman.",
+        en: "Save up to 12 family members, then see each one's day category and weton on a single page.",
       },
       sekali: false,
       aktif: true, // fiturnya sudah ada di /keluarga
@@ -102,8 +102,8 @@ export const HARGA_BAWAAN: PengaturanHarga = {
       harga: 60_000,
       nama: { id: "Laporan Lengkap PDF", en: "Full PDF Report" },
       deskripsi: {
-        id: "Rangkuman kepribadian, perjalanan hidup, dan makna nama dalam satu berkas siap cetak.",
-        en: "Personality, life journey, and name meaning gathered into one printable file.",
+        id: "Identitas kelahiran, watak, perjalanan hidup, dan makna nama dalam satu lembar siap cetak atau disimpan sebagai PDF.",
+        en: "Birth identity, traits, life journey, and name meaning on one sheet, ready to print or save as PDF.",
       },
       sekali: true,
       aktif: true, // fiturnya sudah ada di /laporan
