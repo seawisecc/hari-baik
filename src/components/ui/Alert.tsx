@@ -3,10 +3,12 @@ import { cn } from "@/lib/cn";
 
 type Tone = "success" | "warning" | "error";
 
+// Warna dindingnya ikut warna peringatannya; dinding netral pada permukaan
+// berwarna membuat sisinya terlihat kotor, bukan seperti bahan yang sama.
 const TONE: Record<Tone, { bg: string; icon: typeof CheckCircle2 }> = {
-  success: { bg: "bg-success/25 text-ink", icon: CheckCircle2 },
-  warning: { bg: "bg-warning/30 text-ink", icon: TriangleAlert },
-  error: { bg: "bg-error/25 text-ink", icon: AlertCircle },
+  success: { bg: "wall-guru bg-success/30 text-ink", icon: CheckCircle2 },
+  warning: { bg: "wall-lara bg-warning/35 text-ink", icon: TriangleAlert },
+  error: { bg: "wall-error bg-error/30 text-ink", icon: AlertCircle },
 };
 
 export function Alert({

@@ -62,3 +62,16 @@ export const KATEGORI_SOLID: Record<KategoriName, string> = {
   LARA: "bg-lara text-white",
   PATI: "bg-pati text-white",
 };
+
+/**
+ * Kelas dinding untuk permukaan berwarna kategori.
+ *
+ * Dinding netral pada permukaan berwarna terlihat kotor, seolah bendanya
+ * terbuat dari dua bahan berbeda; warnanya harus turunan dari warna atasnya.
+ */
+export const KATEGORI_WALL: Record<KategoriName, string> = {
+  GURU: "wall-guru",
+  RATU: "wall-ratu",
+  LARA: "wall-lara",
+  PATI: "wall-pati",
+};

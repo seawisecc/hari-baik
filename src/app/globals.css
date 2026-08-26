@@ -10,27 +10,33 @@
 
 :root {
   /* Netral, dasar yang sama untuk semua tema */
-  --hb-canvas:        #f2f0ec;  /* latar halaman */
-  --hb-surface:       #fbfaf8;  /* kartu, panel */
-  --hb-surface-sunk:  #eceae5;  /* input, area tertekan */
-  --hb-border:        #e2ded6;
+  --hb-canvas: #f2f0ec; /* latar halaman */
+  --hb-surface: #fbfaf8; /* kartu, panel */
+  --hb-surface-sunk: #eceae5; /* input, area tertekan */
+  --hb-border: #e2ded6;
   --hb-border-strong: #cfc9be;
 
-  --hb-ink:           #2f2c28;  /* teks utama */
-  --hb-ink-soft:      #6b6660;  /* teks sekunder */
-  --hb-ink-faint:     #9c968e;  /* caption, hint */
+  --hb-ink: #2f2c28; /* teks utama */
+  --hb-ink-soft: #6b6660; /* teks sekunder */
+  --hb-ink-faint: #9c968e; /* caption, hint */
 
-  /* Bayangan neumorphic, dipakai lewat utilitas .hb-raise / .hb-sink.
-     Kontrasnya dinaikkan dari versi awal: dengan bayangan setipis itu
-     permukaan terlihat rata, padahal seluruh gaya ini bergantung pada
-     kesan ditekan keluar dari satu lembar bahan yang sama. */
-  --hb-light: rgba(255, 255, 255, 1);
-  --hb-dark: rgba(152, 142, 127, 0.5);
+  /* Kedalaman.
+     Elemen digambar sebagai benda yang punya ketebalan, bukan permukaan
+     rata yang diberi dua bayangan berlawanan arah. Tiga bagian
+     membentuknya: dinding samping yang padat tanpa blur, bayangan jatuh
+     yang lembut di bawahnya, dan sorotan tipis di tepi atas.
+     Warna dinding mengikuti warna elemennya, jadi tiap komponen menyetel
+     --wall sendiri lewat gaya sebaris. */
+  --hb-wall: #e0dcd4;
+  --hb-drop: rgba(112, 102, 89, 0.28);
+  --hb-drop-kuat: rgba(112, 102, 89, 0.34);
+  --hb-sheen: rgba(255, 255, 255, 0.85);
+  --hb-carve: rgba(112, 102, 89, 0.34);
 
   /* Status, netral terhadap tema aksen */
   --hb-success: #7fc8a0;
   --hb-warning: #e8c979;
-  --hb-error:   #e08b8b;
+  --hb-error: #e08b8b;
 
   /* Empat kategori siklus personal, warna diambil dari aplikasi sebelumnya
      supaya pengguna lama tidak perlu belajar ulang. Nadanya sengaja diredam
@@ -38,10 +44,10 @@
      terbaca sebagai peringatan.
      Sama di semua tema: identitas kategori tidak boleh ikut berubah saat
      pengguna mengganti tema aksen. */
-  --hb-guru: #7a9e7e;  /* Hari Mengalir, hijau */
-  --hb-ratu: #7a8e9e;  /* Hari Tenang, biru  */
-  --hb-lara: #c4935a;  /* Hari Mawas, kuning */
-  --hb-pati: #9e5a5a;  /* Hari Istirahat, merah */
+  --hb-guru: #7a9e7e; /* Hari Mengalir, hijau */
+  --hb-ratu: #7a8e9e; /* Hari Tenang, biru  */
+  --hb-lara: #c4935a; /* Hari Mawas, kuning */
+  --hb-pati: #9e5a5a; /* Hari Istirahat, merah */
 
   /* Radius & spacing */
   --hb-r-sm: 10px;
@@ -54,82 +60,129 @@
 /* ── Tema aksen: Mint (default) ─────────────────────────────────────── */
 :root,
 :root[data-theme="mint"] {
-  --hb-accent:        #a8ddc4;
+  --hb-accent: #a8ddc4;
   --hb-accent-strong: #6fbf95;
-  --hb-accent-deep:   #4a9c73;
-  --hb-accent-ink:    #1f4634;  /* teks di atas aksen */
-  --hb-accent-wash:   #eef8f3;  /* latar sangat tipis */
-  --hb-focus:         #6fd6ac;
+  --hb-accent-deep: #4a9c73;
+  --hb-accent-ink: #1f4634; /* teks di atas aksen */
+  --hb-accent-wash: #eef8f3; /* latar sangat tipis */
+  --hb-focus: #6fd6ac;
+  --hb-accent-wall: #79bf9b;
 }
 
 /* ── Tema aksen: Senja (orange) ─────────────────────────────────────── */
 :root[data-theme="senja"] {
-  --hb-accent:        #f3c39a;
+  --hb-accent: #f3c39a;
   --hb-accent-strong: #e0975a;
-  --hb-accent-deep:   #bf7434;
-  --hb-accent-ink:    #4a2a11;
-  --hb-accent-wash:   #fdf3ea;
-  --hb-focus:         #f0a463;
+  --hb-accent-deep: #bf7434;
+  --hb-accent-ink: #4a2a11;
+  --hb-accent-wash: #fdf3ea;
+  --hb-focus: #f0a463;
+  --hb-accent-wall: #cf8b4d;
+}
+
+/* Warna dinding untuk elemen berwarna. Dipasang lewat kelas supaya komponen
+   cukup menyebut satu nama, bukan menulis gaya sebaris di banyak tempat. */
+.wall-accent {
+  --wall: var(--hb-accent-wall);
+}
+.wall-surface {
+  --wall: var(--hb-wall);
+}
+.wall-guru {
+  --wall: color-mix(in srgb, var(--hb-guru) 55%, var(--hb-canvas));
+}
+.wall-ratu {
+  --wall: color-mix(in srgb, var(--hb-ratu) 74%, #000);
+}
+.wall-lara {
+  --wall: color-mix(in srgb, var(--hb-lara) 55%, var(--hb-canvas));
+}
+.wall-pati {
+  --wall: color-mix(in srgb, var(--hb-pati) 74%, #000);
+}
+.wall-error {
+  --wall: color-mix(in srgb, var(--hb-error) 60%, var(--hb-canvas));
 }
 
 @theme inline {
-  --color-canvas:        var(--hb-canvas);
-  --color-surface:       var(--hb-surface);
-  --color-surface-sunk:  var(--hb-surface-sunk);
-  --color-border-soft:   var(--hb-border);
+  --color-canvas: var(--hb-canvas);
+  --color-surface: var(--hb-surface);
+  --color-surface-sunk: var(--hb-surface-sunk);
+  --color-border-soft: var(--hb-border);
   --color-border-strong: var(--hb-border-strong);
 
-  --color-ink:       var(--hb-ink);
-  --color-ink-soft:  var(--hb-ink-soft);
+  --color-ink: var(--hb-ink);
+  --color-ink-soft: var(--hb-ink-soft);
   --color-ink-faint: var(--hb-ink-faint);
 
-  --color-accent:        var(--hb-accent);
+  --color-accent: var(--hb-accent);
   --color-accent-strong: var(--hb-accent-strong);
-  --color-accent-deep:   var(--hb-accent-deep);
-  --color-accent-ink:    var(--hb-accent-ink);
-  --color-accent-wash:   var(--hb-accent-wash);
+  --color-accent-deep: var(--hb-accent-deep);
+  --color-accent-ink: var(--hb-accent-ink);
+  --color-accent-wash: var(--hb-accent-wash);
 
   --color-success: var(--hb-success);
   --color-warning: var(--hb-warning);
-  --color-error:   var(--hb-error);
+  --color-error: var(--hb-error);
 
   --color-guru: var(--hb-guru);
   --color-ratu: var(--hb-ratu);
   --color-lara: var(--hb-lara);
   --color-pati: var(--hb-pati);
 
-  --radius-sm:   var(--hb-r-sm);
-  --radius-md:   var(--hb-r-md);
-  --radius-lg:   var(--hb-r-lg);
-  --radius-xl:   var(--hb-r-xl);
+  --radius-sm: var(--hb-r-sm);
+  --radius-md: var(--hb-r-md);
+  --radius-lg: var(--hb-r-lg);
+  --radius-xl: var(--hb-r-xl);
   --radius-pill: var(--hb-r-pill);
 
-  --font-sans:    var(--font-body);
+  --font-sans: var(--font-body);
   --font-heading: var(--font-display);
 }
 
-/* ── Elevasi ─────────────────────────────────────────────────────────
-   Neumorphism butuh dua bayangan berlawanan arah. Level dinaikkan dengan
-   memperbesar offset + blur bersamaan, supaya kartu terasa mengambang
-   bukan sekadar bergaris tebal. */
+/* Kedalaman.
+   Tinggi dinding yang menentukan tingkat elevasi, bukan besarnya blur:
+   benda yang lebih tinggi punya sisi yang lebih terlihat dan bayangan
+   yang jatuh lebih jauh. Blur saja hanya membuat tepinya kabur. */
 @utility hb-raise-1 {
-  box-shadow: 3px 3px 7px var(--hb-dark), -3px -3px 6px var(--hb-light);
+  box-shadow:
+    0 2px 0 var(--wall, var(--hb-wall)),
+    0 4px 7px var(--hb-drop),
+    inset 0 1px 0 var(--hb-sheen);
 }
 @utility hb-raise-2 {
-  box-shadow: 6px 6px 14px var(--hb-dark), -5px -5px 12px var(--hb-light);
+  box-shadow:
+    0 4px 0 var(--wall, var(--hb-wall)),
+    0 7px 10px var(--hb-drop),
+    inset 0 1px 0 var(--hb-sheen);
 }
 @utility hb-raise-3 {
-  box-shadow: 9px 9px 22px var(--hb-dark), -8px -8px 18px var(--hb-light);
+  box-shadow:
+    0 6px 0 var(--wall, var(--hb-wall)),
+    0 10px 15px var(--hb-drop-kuat),
+    inset 0 1.5px 0 var(--hb-sheen);
 }
 @utility hb-raise-4 {
-  box-shadow: 13px 13px 32px var(--hb-dark), -11px -11px 26px var(--hb-light);
+  box-shadow:
+    0 9px 0 var(--wall, var(--hb-wall)),
+    0 15px 22px var(--hb-drop-kuat),
+    inset 0 1.5px 0 var(--hb-sheen);
 }
-/* Tertekan ke dalam, untuk input dan state aktif */
+
+/* Terukir ke dalam, kebalikan dari yang timbul: gelap di tepi atas karena
+   cahaya dari atas tertahan dindingnya, terang di tepi bawah, ditambah
+   garis putih tipis di luar tepi bawah sebagai bibir lubangnya. */
 @utility hb-sink {
-  box-shadow: inset 5px 5px 10px var(--hb-dark), inset -4px -4px 9px var(--hb-light);
+  box-shadow:
+    inset 0 4px 7px var(--hb-carve),
+    inset 0 -1.5px 0 rgba(255, 255, 255, 0.9),
+    0 1px 0 rgba(255, 255, 255, 0.95);
 }
 @utility hb-sink-sm {
-  box-shadow: inset 3px 3px 6px var(--hb-dark), inset -2px -2px 5px var(--hb-light);
+  box-shadow:
+    inset 0 2px 4px var(--hb-carve),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.85),
+    0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 /* Cincin fokus lembut ala styleguide, halo, bukan garis tajam */
@@ -157,7 +210,10 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   font-family: var(--font-display), Georgia, serif;
   letter-spacing: -0.015em;
 }
@@ -171,7 +227,9 @@ h1, h2, h3, h4 {
 
 /* Hormati preferensi pengguna yang sensitif terhadap gerak */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
