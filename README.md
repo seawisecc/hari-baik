@@ -219,22 +219,23 @@ kadang gagal pada endpoint dinamis.
 
 ## Kedalaman
 
-Elemen digambar sebagai benda yang punya ketebalan, bukan permukaan rata yang
-diberi dua bayangan berlawanan arah. Tiga bagian membentuknya: dinding samping
-yang padat tanpa blur, bayangan jatuh yang lembut di bawahnya, dan sorotan
-tipis di tepi atas.
+Elemen dibentuk seperti bantal yang menggembung, bukan lempeng rata yang
+diberi bayangan. Empat lapis membentuknya:
 
-Tingkat elevasi ditentukan tinggi dindingnya, bukan besar blur. Benda yang
-lebih tinggi punya sisi yang lebih terlihat dan bayangan yang jatuh lebih
-jauh; blur saja hanya membuat tepinya kabur, bukan tebal.
+1. gradasi putih ke hitam transparan, memberi kesan permukaan melengkung dan
+   disinari dari atas
+2. rim putih tipis mengelilingi tepi, sisi yang paling terang
+3. bayangan di dalam tepi bawah, tempat permukaannya melengkung pergi
+4. dua bayangan jatuh: satu dekat dan tegas sebagai titik sentuh, satu jauh
+   dan lembut sebagai bayangan ruangan
 
-Warna dinding harus turunan dari warna elemennya, kalau tidak sisinya terlihat
-seperti bahan yang berbeda. Komponen memilihnya lewat kelas `wall-*`
-(`wall-accent`, `wall-surface`, `wall-guru`, dan seterusnya).
+Semuanya putih dan hitam transparan, tanpa warna tetap, jadi satu utilitas
+yang sama bekerja di atas warna apa pun. Tingkat elevasi dibedakan oleh
+seberapa dalam lengkung bawahnya dan seberapa jauh bayangannya jatuh.
 
-Elemen yang terukir ke dalam memakai kebalikannya: gelap di tepi atas karena
-cahaya dari atas tertahan dindingnya, terang di tepi bawah, ditambah garis
-putih tipis di luar tepi bawah sebagai bibir lubangnya.
+Elemen yang terukir memakai kebalikannya: gelap di tepi atas karena cahaya
+dari atas tertahan dindingnya, terang di tepi bawah, ditambah garis putih
+tipis di luar tepi bawah sebagai bibir lubangnya.
 
 ## Tipografi
 

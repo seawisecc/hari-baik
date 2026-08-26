@@ -27,7 +27,6 @@
      yang lembut di bawahnya, dan sorotan tipis di tepi atas.
      Warna dinding mengikuti warna elemennya, jadi tiap komponen menyetel
      --wall sendiri lewat gaya sebaris. */
-  --hb-wall: #e0dcd4;
   --hb-drop: rgba(112, 102, 89, 0.28);
   --hb-drop-kuat: rgba(112, 102, 89, 0.34);
   --hb-sheen: rgba(255, 255, 255, 0.85);
@@ -80,30 +79,6 @@
   --hb-accent-wall: #cf8b4d;
 }
 
-/* Warna dinding untuk elemen berwarna. Dipasang lewat kelas supaya komponen
-   cukup menyebut satu nama, bukan menulis gaya sebaris di banyak tempat. */
-.wall-accent {
-  --wall: var(--hb-accent-wall);
-}
-.wall-surface {
-  --wall: var(--hb-wall);
-}
-.wall-guru {
-  --wall: color-mix(in srgb, var(--hb-guru) 55%, var(--hb-canvas));
-}
-.wall-ratu {
-  --wall: color-mix(in srgb, var(--hb-ratu) 74%, #000);
-}
-.wall-lara {
-  --wall: color-mix(in srgb, var(--hb-lara) 55%, var(--hb-canvas));
-}
-.wall-pati {
-  --wall: color-mix(in srgb, var(--hb-pati) 74%, #000);
-}
-.wall-error {
-  --wall: color-mix(in srgb, var(--hb-error) 60%, var(--hb-canvas));
-}
-
 @theme inline {
   --color-canvas: var(--hb-canvas);
   --color-surface: var(--hb-surface);
@@ -141,48 +116,109 @@
 }
 
 /* Kedalaman.
-   Tinggi dinding yang menentukan tingkat elevasi, bukan besarnya blur:
-   benda yang lebih tinggi punya sisi yang lebih terlihat dan bayangan
-   yang jatuh lebih jauh. Blur saja hanya membuat tepinya kabur. */
-@utility hb-raise-1 {
-  box-shadow:
-    0 2px 0 var(--wall, var(--hb-wall)),
-    0 4px 7px var(--hb-drop),
-    inset 0 1px 0 var(--hb-sheen);
-}
-@utility hb-raise-2 {
-  box-shadow:
-    0 4px 0 var(--wall, var(--hb-wall)),
-    0 7px 10px var(--hb-drop),
-    inset 0 1px 0 var(--hb-sheen);
-}
-@utility hb-raise-3 {
-  box-shadow:
-    0 6px 0 var(--wall, var(--hb-wall)),
-    0 10px 15px var(--hb-drop-kuat),
-    inset 0 1.5px 0 var(--hb-sheen);
-}
-@utility hb-raise-4 {
-  box-shadow:
-    0 9px 0 var(--wall, var(--hb-wall)),
-    0 15px 22px var(--hb-drop-kuat),
-    inset 0 1.5px 0 var(--hb-sheen);
+
+   Elemen dibentuk seperti bantal yang menggembung, bukan lempeng rata
+   dengan pita gelap di bawahnya. Empat lapis membentuknya:
+
+   1. gradasi putih ke hitam transparan, memberi kesan permukaan
+      melengkung dan disinari dari atas
+   2. rim putih tipis mengelilingi tepi, sisi yang paling terang
+   3. bayangan di dalam tepi bawah, tempat permukaannya melengkung pergi
+   4. dua bayangan jatuh: satu dekat dan tegas sebagai titik sentuh,
+      satu jauh dan lembut sebagai bayangan ruangan
+
+   Semuanya putih dan hitam transparan, tidak ada warna tetap, jadi satu
+   utilitas yang sama bekerja di atas warna apa pun tanpa perlu tiap
+   komponen menyebutkan warna dindingnya sendiri.
+
+   Tingkat elevasi dibedakan oleh seberapa dalam lengkung bawahnya dan
+   seberapa jauh bayangannya jatuh. */
+
+@utility hb-gembung {
+  background-image: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.32) 0%,
+    rgb(255 255 255 / 0) 55%,
+    rgb(0 0 0 / 0.08) 100%
+  );
 }
 
-/* Terukir ke dalam, kebalikan dari yang timbul: gelap di tepi atas karena
-   cahaya dari atas tertahan dindingnya, terang di tepi bawah, ditambah
-   garis putih tipis di luar tepi bawah sebagai bibir lubangnya. */
+@utility hb-raise-1 {
+  background-image: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.26) 0%,
+    rgb(255 255 255 / 0) 58%,
+    rgb(0 0 0 / 0.06) 100%
+  );
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.5),
+    inset 0 -4px 7px rgb(0 0 0 / 0.1),
+    0 2px 3px var(--hb-drop),
+    0 6px 12px var(--hb-drop);
+}
+
+@utility hb-raise-2 {
+  background-image: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.32) 0%,
+    rgb(255 255 255 / 0) 55%,
+    rgb(0 0 0 / 0.08) 100%
+  );
+  box-shadow:
+    inset 0 0 0 1.5px rgb(255 255 255 / 0.7),
+    inset 0 -7px 11px rgb(0 0 0 / 0.14),
+    0 4px 5px var(--hb-drop),
+    0 12px 20px var(--hb-drop);
+}
+
+@utility hb-raise-3 {
+  background-image: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.36) 0%,
+    rgb(255 255 255 / 0) 52%,
+    rgb(0 0 0 / 0.1) 100%
+  );
+  box-shadow:
+    inset 0 0 0 1.5px rgb(255 255 255 / 0.75),
+    inset 0 -10px 15px rgb(0 0 0 / 0.16),
+    0 6px 7px var(--hb-drop),
+    0 18px 30px var(--hb-drop-kuat);
+}
+
+@utility hb-raise-4 {
+  background-image: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.4) 0%,
+    rgb(255 255 255 / 0) 50%,
+    rgb(0 0 0 / 0.12) 100%
+  );
+  box-shadow:
+    inset 0 0 0 2px rgb(255 255 255 / 0.8),
+    inset 0 -14px 20px rgb(0 0 0 / 0.18),
+    0 9px 10px var(--hb-drop),
+    0 26px 42px var(--hb-drop-kuat);
+}
+
+/* Terukir ke dalam: kebalikannya. Gelap di tepi atas karena cahaya dari
+   atas tertahan dindingnya, terang di tepi bawah, ditambah garis putih
+   tipis di luar tepi bawah sebagai bibir lubangnya. */
 @utility hb-sink {
+  background-image: linear-gradient(
+    180deg,
+    rgb(0 0 0 / 0.07) 0%,
+    rgb(0 0 0 / 0) 45%,
+    rgb(255 255 255 / 0.3) 100%
+  );
   box-shadow:
     inset 0 4px 7px var(--hb-carve),
-    inset 0 -1.5px 0 rgba(255, 255, 255, 0.9),
-    0 1px 0 rgba(255, 255, 255, 0.95);
+    inset 0 -1.5px 0 rgb(255 255 255 / 0.9),
+    0 1px 0 rgb(255 255 255 / 0.95);
 }
 @utility hb-sink-sm {
   box-shadow:
     inset 0 2px 4px var(--hb-carve),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.85),
-    0 1px 0 rgba(255, 255, 255, 0.9);
+    inset 0 -1px 0 rgb(255 255 255 / 0.85),
+    0 1px 0 rgb(255 255 255 / 0.9);
 }
 
 /* Cincin fokus lembut ala styleguide, halo, bukan garis tajam */

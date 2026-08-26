@@ -16,8 +16,8 @@ export function Chip({ className, selected = false, ...props }: ChipProps) {
         "transition-[box-shadow,background-color] duration-150",
         "disabled:pointer-events-none disabled:opacity-55",
         selected
-          ? "wall-accent bg-accent text-accent-ink hb-raise-1"
-          : "wall-surface bg-surface text-ink-soft hb-raise-1 hover:text-ink",
+          ? "bg-accent text-accent-ink hb-raise-1"
+          : "bg-surface text-ink-soft hb-raise-1 hover:text-ink",
         className,
       )}
       {...props}

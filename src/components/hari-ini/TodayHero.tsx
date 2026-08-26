@@ -3,7 +3,7 @@
 import { Sparkles, Star } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useT } from "@/lib/content/LangProvider";
-import { KATEGORI_KEY, KATEGORI_SOLID, KATEGORI_WALL } from "@/lib/kategori";
+import { KATEGORI_KEY, KATEGORI_SOLID } from "@/lib/kategori";
 import type { WarigaDay } from "@/lib/wariga";
 
 /**
@@ -26,7 +26,6 @@ export function TodayHero({
       className={cn(
         "relative overflow-hidden rounded-xl px-7 py-8 hb-raise-3 sm:px-10 sm:py-10",
         KATEGORI_SOLID[kategori],
-        KATEGORI_WALL[kategori],
       )}
     >
       {/* Bintang besar sebagai tekstur latar, sengaja terpotong di tepi. */}

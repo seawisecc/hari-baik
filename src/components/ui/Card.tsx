@@ -20,7 +20,7 @@ export function Card({ className, elevation = 2, sunken = false, ...props }: Car
     <div
       className={cn(
         "rounded-lg",
-        sunken ? "bg-surface-sunk hb-sink" : `wall-surface bg-surface ${RAISE[elevation]}`,
+        sunken ? "bg-surface-sunk hb-sink" : `bg-surface ${RAISE[elevation]}`,
         className,
       )}
       {...props}

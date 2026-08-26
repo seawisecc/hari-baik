@@ -12,7 +12,7 @@ const button = cva(
     variants: {
       variant: {
         // Aksi utama: pil aksen yang timbul, menekan saat aktif.
-        primary: "wall-accent bg-accent text-accent-ink hb-raise-2 hover:bg-accent-strong",
+        primary: "bg-accent text-accent-ink hb-raise-2 hover:bg-accent-strong",
         // Aksi sekunder: permukaan netral timbul.
         surface: "bg-surface text-ink hb-raise-1 hover:bg-surface-sunk active:hb-sink-sm",
         // Tanpa elevasi: untuk aksi tersier di dalam kartu.
