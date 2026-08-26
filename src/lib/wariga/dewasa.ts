@@ -21,7 +21,6 @@ import {
   pancawaraName,
   saptawaraName,
   uripHari,
-  wukuName,
 } from "./pawukon";
 import type { DayMarkers, KategoriHari, KategoriName, WarigaDay } from "./types";
 
