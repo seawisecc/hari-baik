@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { AksiLangganan } from "@/components/admin/AturLangganan";
 import { AturHarga } from "@/components/admin/AturHarga";
+import { DaftarPermintaan } from "@/components/admin/DaftarPermintaan";
 import { UserTable } from "@/components/admin/UserTable";
 import { Alert } from "@/components/ui/Alert";
 import { Memuat } from "@/components/ProGate";
@@ -32,7 +33,7 @@ export default function AdminPage() {
   const [memuat, setMemuat] = useState(true);
   /** Dinaikkan untuk memaksa muat ulang setelah sebuah aksi berhasil. */
   const [refresh, setRefresh] = useState(0);
-  const [tab, setTab] = useState<"pengguna" | "harga">("pengguna");
+  const [tab, setTab] = useState<"pengguna" | "permintaan" | "harga">("pengguna");
 
   useEffect(() => {
     if (!user) return;
@@ -106,13 +107,23 @@ export default function AdminPage() {
     <PageContainer wide>
       <div className="space-y-6">
         <PageHeader
-          title={t("admin.title")}
+          title={t(
+            tab === "permintaan"
+              ? "admin.title.requests"
+              : tab === "harga"
+                ? "admin.title.pricing"
+                : "admin.title.users",
+          )}
           subtitle={
-            memuat
-              ? t("common.loading")
-              : t(filter === "all" ? "admin.count" : "admin.countFiltered", {
-                  n: users.length,
-                })
+            tab === "permintaan"
+              ? t("admin.sub.requests")
+              : tab === "harga"
+                ? t("admin.sub.pricing")
+                : memuat
+                  ? t("common.loading")
+                  : t(filter === "all" ? "admin.count" : "admin.countFiltered", {
+                      n: users.length,
+                    })
           }
         />
 
@@ -124,7 +135,7 @@ export default function AdminPage() {
           role="tablist"
           className="inline-flex gap-1 rounded-pill bg-surface-sunk p-1 hb-sink"
         >
-          {(["pengguna", "harga"] as const).map((k) => (
+          {(["pengguna", "permintaan", "harga"] as const).map((k) => (
             <button
               key={k}
               role="tab"
@@ -136,13 +147,21 @@ export default function AdminPage() {
                   : "text-ink-faint hover:text-ink-soft"
               }`}
             >
-              {t(k === "pengguna" ? "price.tab.users" : "price.tab.pricing")}
+              {t(
+                k === "pengguna"
+                  ? "price.tab.users"
+                  : k === "permintaan"
+                    ? "admin.tab.requests"
+                    : "price.tab.pricing",
+              )}
             </button>
           ))}
         </div>
 
         {tab === "harga" ? (
           <AturHarga />
+        ) : tab === "permintaan" ? (
+          <DaftarPermintaan />
         ) : (
           <>
             <div className="flex flex-wrap gap-2.5">

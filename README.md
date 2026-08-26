@@ -145,6 +145,20 @@ CNAME   haribaik   1bf39122ca7a8100.vercel-dns-017.com.
 Perhatikan: `hari-baik.vercel.app` (tanpa akhiran tim) adalah milik aplikasi
 orang lain, bukan project ini.
 
+## Langganan
+
+Harga diatur dari panel admin, bukan ditulis di kode, jadi mengubahnya tidak
+perlu deploy. Tiga paket bawaan: 1, 2, dan 3 tahun, dengan diskon 10% dan 20%
+per tahun untuk yang lebih panjang. Add-on dijual terpisah.
+
+Alurnya: pengguna memilih paket di `/expired`, menekan "Saya sudah bayar", dan
+permintaannya masuk ke tab Permintaan di panel admin. Admin menyetujui, dan
+langganan otomatis diperpanjang sesuai lama paket yang diminta.
+
+Harga tidak pernah dikirim dari klien; klien hanya menyebut id paket dan
+server yang menghitung totalnya. Kalau harganya ikut dikirim, siapa pun bisa
+mengajukan paket tiga tahun seharga seribu rupiah.
+
 ## Keamanan
 
 Tiga lapis, dan lapisan klien **bukan** yang menentukan:
@@ -236,5 +250,5 @@ memakai hex langsung, jadi menambah tema ketiga cukup satu blok
 - [x] Verifikasi email diwajibkan
 - [x] Lupa kata sandi
 - [x] Poles halaman auth, onboarding, profil, admin
-- [ ] Alur langganan dalam aplikasi (sekarang lewat WhatsApp)
+- [x] Antrean aktivasi: pengguna ajukan, admin setujui
 - [ ] Tabel libur nasional baru terisi 2026–2027 (`src/lib/wariga/holidays.ts`)

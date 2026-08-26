@@ -47,3 +47,39 @@ export interface AccessState {
   daysLeft: number | null;
   expiresAt: string | null;
 }
+
+/** Status permintaan aktivasi langganan. */
+export type StatusAktivasi = "menunggu" | "disetujui" | "ditolak";
+
+/**
+ * Permintaan aktivasi yang diajukan pengguna setelah membayar.
+ *
+ * Dicatat sebagai dokumen tersendiri, bukan sekadar mengubah status pengguna,
+ * supaya ada jejak: paket apa yang dimaksud, kapan diajukan, siapa yang
+ * memutuskan, dan apa alasannya bila ditolak.
+ */
+export interface Aktivasi {
+  id: string;
+  uid: string;
+  email: string;
+  nama: string;
+  phoneNumber: string | null;
+
+  /** Salinan dari daftar harga saat permintaan dibuat. Harga bisa berubah
+   *  nanti; yang mengikat adalah yang dilihat pengguna waktu itu. */
+  paketId: string;
+  paketNama: string;
+  paketTahun: number;
+  harga: number;
+  addOn: { id: string; nama: string; harga: number }[];
+  total: number;
+
+  /** Catatan opsional dari pengguna, mis. nama pengirim transfer. */
+  catatan: string | null;
+
+  status: StatusAktivasi;
+  createdAt: string;
+  diputuskanPada: string | null;
+  diputuskanOleh: string | null;
+  alasanTolak: string | null;
+}

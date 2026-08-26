@@ -4,7 +4,14 @@ import { Check, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 import { useLang, useT } from "@/lib/content/LangProvider";
-import { hemat, perTahun, rupiah, teks, type PengaturanHarga } from "@/lib/harga";
+import {
+  hemat,
+  perTahun,
+  rupiah,
+  teks,
+  type PaketLangganan,
+  type PengaturanHarga,
+} from "@/lib/harga";
 
 /**
  * Daftar harga yang dilihat pengguna.
@@ -13,10 +20,15 @@ import { hemat, perTahun, rupiah, teks, type PengaturanHarga } from "@/lib/harga
  * harga tanpa perlu deploy ulang.
  */
 export function DaftarHarga({
+  dipilih,
   onPilih,
+  tanpaAddOn = false,
 }: {
-  /** Dipanggil dengan nama paket, untuk menyusun pesan ke admin. */
-  onPilih?: (namaPaket: string, harga: number) => void;
+  /** Id paket yang sedang dipilih; diberi tanda di daftar. */
+  dipilih?: string | null;
+  onPilih?: (paket: PaketLangganan) => void;
+  /** Sembunyikan daftar add-on, mis. bila pemilihannya ada di tempat lain. */
+  tanpaAddOn?: boolean;
 }) {
   const t = useT();
   const { lang } = useLang();
@@ -58,13 +70,15 @@ export function DaftarHarga({
               <li key={p.id}>
                 <button
                   type="button"
-                  onClick={() => onPilih?.(teks(p.nama, lang), p.harga)}
+                  onClick={() => onPilih?.(p)}
                   className={cn(
                     "flex w-full items-center gap-4 rounded-lg px-5 py-4 text-left",
                     "transition-shadow duration-150",
-                    p.populer
-                      ? "bg-accent-wash hb-raise-2 ring-1 ring-accent-strong/35"
-                      : "bg-surface hb-raise-1 hover:hb-raise-2",
+                    dipilih === p.id
+                      ? "bg-accent-wash hb-raise-2 ring-2 ring-accent-strong/55"
+                      : p.populer
+                        ? "bg-accent-wash/60 hb-raise-1 ring-1 ring-accent-strong/25"
+                        : "bg-surface hb-raise-1 hover:hb-raise-2",
                   )}
                 >
                   <div className="min-w-0 flex-1">
@@ -99,7 +113,7 @@ export function DaftarHarga({
         </ul>
       </div>
 
-      {addOn.length > 0 && (
+      {!tanpaAddOn && addOn.length > 0 && (
         <div>
           <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-ink-faint">
             {t("price.addonsPublic")}

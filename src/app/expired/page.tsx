@@ -1,33 +1,46 @@
 "use client";
 
-import { Lock, MessageCircle } from "lucide-react";
+import { Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { AjukanAktivasi } from "@/components/AjukanAktivasi";
 import { DaftarHarga } from "@/components/DaftarHarga";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Wordmark } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
-import { ADMIN_WA, ADMIN_WA_DISPLAY } from "@/components/WhatsAppCard";
 import { useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
-import { rupiah } from "@/lib/harga";
+import { HARGA_BAWAAN, type PengaturanHarga, type PaketLangganan } from "@/lib/harga";
 
 export default function ExpiredPage() {
   const t = useT();
   const router = useRouter();
   const { profile, logout } = useAuth();
-  const [dipilih, setDipilih] = useState<{ nama: string; harga: number } | null>(null);
+  const [harga, setHarga] = useState<PengaturanHarga>(HARGA_BAWAAN);
+  const [paket, setPaket] = useState<PaketLangganan | null>(null);
 
-  // Paket yang diklik ikut ke pesan WhatsApp, jadi admin langsung tahu
-  // yang dimaksud tanpa perlu bertanya lagi.
-  const baris = [
-    "Halo, saya ingin berlangganan Hari Baik.",
-    dipilih ? `Paket: ${dipilih.nama} (${rupiah(dipilih.harga)})` : null,
-    `Nama: ${profile?.nama || "-"}`,
-    `Email: ${profile?.email ?? "-"}`,
-  ].filter(Boolean);
+  useEffect(() => {
+    let batal = false;
+    void (async () => {
+      try {
+        const res = await fetch("/api/admin/harga");
+        const d = (await res.json()) as PengaturanHarga;
+        if (batal) return;
+        setHarga(d);
+        // Paket populer dipilih lebih dulu supaya tombol kirim langsung
+        // bisa ditekan; pengguna tetap bebas mengganti.
+        const aktif = d.paket.filter((p) => p.aktif);
+        setPaket(aktif.find((p) => p.populer) ?? aktif[0] ?? null);
+      } catch {
+        /* daftar bawaan tetap dipakai */
+      }
+    })();
+    return () => {
+      batal = true;
+    };
+  }, []);
 
-  const waHref = `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(baris.join("\n"))}`;
+  const menunggu = profile?.subscriptionStatus === "pending";
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col justify-center px-6 py-14">
@@ -46,36 +59,32 @@ export default function ExpiredPage() {
         </CardHeader>
 
         <CardBody className="space-y-8 pb-7">
-          <DaftarHarga onPilih={(nama, harga) => setDipilih({ nama, harga })} />
+          {!menunggu && (
+            <DaftarHarga dipilih={paket?.id ?? null} onPilih={(p) => setPaket(p)} tanpaAddOn />
+          )}
 
-          <div className="space-y-4 border-t border-border-soft pt-6">
-            <div>
-              <p className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-ink-faint">
-                {t("expired.howTo")}
-              </p>
-              <ol className="space-y-2 text-sm leading-relaxed text-ink-soft">
-                {["expired.step1", "expired.step2", "expired.step3"].map((k, i) => (
-                  <li key={k} className="flex gap-2.5">
-                    <span className="font-semibold text-ink">{i + 1}.</span>
-                    {t(k)}
-                  </li>
-                ))}
-              </ol>
-            </div>
+          <div className="space-y-5 border-t border-border-soft pt-6">
+            {!menunggu && (
+              <div>
+                <p className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-ink-faint">
+                  {t("expired.howTo")}
+                </p>
+                <ol className="space-y-2 text-sm leading-relaxed text-ink-soft">
+                  {["expired.step1", "expired.step2", "expired.step3"].map((k, i) => (
+                    <li key={k} className="flex gap-2.5">
+                      <span className="font-semibold text-ink">{i + 1}.</span>
+                      {t(k)}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
 
-            <a
-              href={waHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex h-13 w-full items-center justify-center gap-2 rounded-pill bg-accent text-[15px] font-medium text-accent-ink hb-raise-2 transition-colors hover:bg-accent-strong"
-            >
-              <MessageCircle className="h-4 w-4" aria-hidden />
-              {t("expired.chatAdmin")} {ADMIN_WA_DISPLAY}
-            </a>
-
-            <p className="text-center text-xs leading-relaxed text-ink-faint">
-              {t("expired.manualNote")}
-            </p>
+            <AjukanAktivasi
+              paket={paket}
+              addOnTersedia={harga.addOn.filter((a) => a.aktif)}
+              sudahMenunggu={menunggu}
+            />
           </div>
         </CardBody>
       </Card>
