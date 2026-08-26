@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════════════
-   Hari Baik — Design System
+   Hari Baik, Design System
    Soft-neumorphic: permukaan off-white, sudut lembut, elevasi dari bayangan
-   ganda (terang di kiri-atas, gelap di kanan-bawah) — bukan dari garis.
+   ganda (terang di kiri-atas, gelap di kanan-bawah), bukan dari garis.
    Dua tema aksen: `mint` (default) dan `senja` (orange).
    Tema dipilih lewat atribut [data-theme] di <html>.
    ═══════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* Netral — dasar yang sama untuk semua tema */
+  /* Netral, dasar yang sama untuk semua tema */
   --hb-canvas:        #f2f0ec;  /* latar halaman */
   --hb-surface:       #fbfaf8;  /* kartu, panel */
   --hb-surface-sunk:  #eceae5;  /* input, area tertekan */
@@ -20,25 +20,28 @@
   --hb-ink-soft:      #6b6660;  /* teks sekunder */
   --hb-ink-faint:     #9c968e;  /* caption, hint */
 
-  /* Bayangan neumorphic — dipakai lewat utilitas .hb-raise / .hb-sink */
-  --hb-light: rgba(255, 255, 255, 0.9);
-  --hb-dark:  rgba(163, 155, 143, 0.32);
+  /* Bayangan neumorphic, dipakai lewat utilitas .hb-raise / .hb-sink.
+     Kontrasnya dinaikkan dari versi awal: dengan bayangan setipis itu
+     permukaan terlihat rata, padahal seluruh gaya ini bergantung pada
+     kesan ditekan keluar dari satu lembar bahan yang sama. */
+  --hb-light: rgba(255, 255, 255, 1);
+  --hb-dark: rgba(152, 142, 127, 0.5);
 
-  /* Status — netral terhadap tema aksen */
+  /* Status, netral terhadap tema aksen */
   --hb-success: #7fc8a0;
   --hb-warning: #e8c979;
   --hb-error:   #e08b8b;
 
-  /* Empat kategori siklus personal — warna diambil dari aplikasi sebelumnya
+  /* Empat kategori siklus personal, warna diambil dari aplikasi sebelumnya
      supaya pengguna lama tidak perlu belajar ulang. Nadanya sengaja diredam
      (bukan hijau/merah penuh) agar menyatu dengan dasar off-white dan tidak
      terbaca sebagai peringatan.
      Sama di semua tema: identitas kategori tidak boleh ikut berubah saat
      pengguna mengganti tema aksen. */
-  --hb-guru: #7a9e7e;  /* Hari Mengalir  — hijau */
-  --hb-ratu: #7a8e9e;  /* Hari Tenang    — biru  */
-  --hb-lara: #c4935a;  /* Hari Mawas     — kuning */
-  --hb-pati: #9e5a5a;  /* Hari Istirahat — merah */
+  --hb-guru: #7a9e7e;  /* Hari Mengalir, hijau */
+  --hb-ratu: #7a8e9e;  /* Hari Tenang, biru  */
+  --hb-lara: #c4935a;  /* Hari Mawas, kuning */
+  --hb-pati: #9e5a5a;  /* Hari Istirahat, merah */
 
   /* Radius & spacing */
   --hb-r-sm: 10px;
@@ -110,26 +113,26 @@
    memperbesar offset + blur bersamaan, supaya kartu terasa mengambang
    bukan sekadar bergaris tebal. */
 @utility hb-raise-1 {
-  box-shadow: 2px 2px 5px var(--hb-dark), -2px -2px 5px var(--hb-light);
+  box-shadow: 3px 3px 7px var(--hb-dark), -3px -3px 6px var(--hb-light);
 }
 @utility hb-raise-2 {
-  box-shadow: 4px 4px 10px var(--hb-dark), -4px -4px 10px var(--hb-light);
+  box-shadow: 6px 6px 14px var(--hb-dark), -5px -5px 12px var(--hb-light);
 }
 @utility hb-raise-3 {
-  box-shadow: 7px 7px 18px var(--hb-dark), -6px -6px 16px var(--hb-light);
+  box-shadow: 9px 9px 22px var(--hb-dark), -8px -8px 18px var(--hb-light);
 }
 @utility hb-raise-4 {
-  box-shadow: 11px 11px 28px var(--hb-dark), -9px -9px 22px var(--hb-light);
+  box-shadow: 13px 13px 32px var(--hb-dark), -11px -11px 26px var(--hb-light);
 }
-/* Tertekan ke dalam — untuk input dan state aktif */
+/* Tertekan ke dalam, untuk input dan state aktif */
 @utility hb-sink {
-  box-shadow: inset 3px 3px 7px var(--hb-dark), inset -3px -3px 7px var(--hb-light);
+  box-shadow: inset 5px 5px 10px var(--hb-dark), inset -4px -4px 9px var(--hb-light);
 }
 @utility hb-sink-sm {
-  box-shadow: inset 2px 2px 4px var(--hb-dark), inset -2px -2px 4px var(--hb-light);
+  box-shadow: inset 3px 3px 6px var(--hb-dark), inset -2px -2px 5px var(--hb-light);
 }
 
-/* Cincin fokus lembut ala styleguide — halo, bukan garis tajam */
+/* Cincin fokus lembut ala styleguide, halo, bukan garis tajam */
 @utility hb-ring {
   outline: none;
   box-shadow:
