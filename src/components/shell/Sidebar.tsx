@@ -109,6 +109,7 @@ export function Sidebar() {
         <Baris label={t("settings.theme")}>
           <ThemeToggle />
         </Baris>
+        <p className="px-1 pt-1 text-[10px] leading-relaxed text-ink-faint">{t("studio.by")}</p>
       </div>
     </aside>
   );

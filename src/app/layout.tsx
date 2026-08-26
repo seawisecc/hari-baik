@@ -27,6 +27,7 @@ const body = Inter({
 });
 
 const SITUS = "https://haribaik.seawise.id";
+const STUDIO = "Seawise Studio";
 const JUDUL = "Hari Baik | Kalender Siklus Personal";
 const RINGKASAN =
   "Kalender siklus personal yang dihitung dari tanggal lahirmu, memadukan Wariga dan kalender Bali dengan kalender Masehi.";
@@ -39,13 +40,18 @@ export const metadata: Metadata = {
   title: JUDUL,
   description: RINGKASAN,
   applicationName: "Hari Baik",
+  // Atribusi studio ikut di metadata, bukan hanya di layar, supaya terbaca
+  // mesin pencari dan pratinjau tautan saat halaman ini dibagikan.
+  authors: [{ name: STUDIO }],
+  creator: STUDIO,
+  publisher: STUDIO,
   openGraph: {
     type: "website",
     locale: "id_ID",
     url: SITUS,
     siteName: "Hari Baik",
     title: JUDUL,
-    description: RINGKASAN,
+    description: `${RINGKASAN} Dibuat oleh ${STUDIO}.`,
   },
   appleWebApp: {
     capable: true,

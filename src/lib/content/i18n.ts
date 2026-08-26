@@ -390,6 +390,10 @@ const dict = {
     "landing.faq.4.a":
       "Akunmu tetap ada dan datamu tersimpan. Aplikasi terkunci sampai langganan diaktifkan.",
     "landing.footer.tagline": "Kalender Siklus Personal",
+    "studio.by": "Dibuat oleh Seawise Studio",
+    "studio.name": "Seawise Studio",
+    "studio.about":
+      "Hari Baik dikembangkan Seawise Studio, memadukan Wariga dan kalender Bali dengan kalender Masehi.",
   },
   en: {
     "app.tagline": "Everyone has their own perfect timing",
@@ -766,6 +770,10 @@ const dict = {
     "landing.faq.4.a":
       "Your account and your data stay. The app locks until a subscription is activated.",
     "landing.footer.tagline": "Personal Cycle Calendar",
+    "studio.by": "Made by Seawise Studio",
+    "studio.name": "Seawise Studio",
+    "studio.about":
+      "Hari Baik is built by Seawise Studio, weaving Wariga and the Balinese calendar into the Gregorian one.",
   },
 } as const;
 

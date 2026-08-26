@@ -126,6 +126,12 @@ export default function ProfilPage() {
           </a>
         </Card>
 
+        {/* Atribusi studio. Ditaruh di profil, bukan di setiap halaman, supaya
+            hadir tanpa mengganggu pemakaian sehari-hari. */}
+        <p className="px-1 text-center text-xs leading-relaxed text-ink-faint">
+          {t("studio.about")}
+        </p>
+
         <div className="pt-2">
           <Button
             variant="ghost"

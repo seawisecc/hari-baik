@@ -314,8 +314,11 @@ export function LandingClient({
         </div>
       </div>
 
-      <footer className="mt-16 text-center text-xs text-ink-faint">
-        © {tahun} Hari Baik · {t("landing.footer.tagline")}
+      <footer className="mt-16 flex flex-col items-center gap-1.5 text-center text-xs text-ink-faint">
+        <p>
+          © {tahun} Hari Baik · {t("landing.footer.tagline")}
+        </p>
+        <p className="font-medium text-ink-soft">{t("studio.by")}</p>
       </footer>
     </div>
   );

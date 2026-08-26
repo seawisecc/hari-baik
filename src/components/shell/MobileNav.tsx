@@ -235,6 +235,7 @@ function LembarLainnya({
             </span>
             <ThemeToggle compact />
           </div>
+          <p className="pt-1 text-center text-[10px] text-ink-faint">{t("studio.by")}</p>
         </div>
       </div>
     </div>
