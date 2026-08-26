@@ -107,9 +107,12 @@ docs/
 
 ## Deploy
 
+Project tersambung ke `seawisecc/hari-baik`, branch `main`. Push ke `main`
+memicu deploy produksi otomatis; branch lain menghasilkan preview.
+
 ```bash
+git push                                       # cara biasa: deploy otomatis
 ./scripts/push-env.sh                          # kirim 9 variabel Firebase ke Vercel
-npx vercel deploy --prod
 npm run authorize-domains -- domain-baru.com   # daftarkan ke Firebase Auth
 ```
 
@@ -170,6 +173,25 @@ Satu kerangka (`AppShell`) dengan dua bentuk:
 
 Landing dan halaman auth sengaja tidak memakai shell — di sana navigasi
 aplikasi belum relevan.
+
+## Identitas
+
+Lambangnya cincin dari empat busur, satu per fase siklus: Mengalir, Tenang,
+Mawas, Istirahat. Warnanya sama persis dengan yang dipakai di kalender, jadi
+lambangnya sekaligus memperkenalkan kodenya sendiri.
+
+Sumbernya satu berkas, `src/assets/logo.svg`. Favicon, ikon iOS, gambar
+pratinjau tautan, dan lambang di dalam aplikasi semuanya berasal dari sana,
+jadi tidak mungkin berbeda satu sama lain.
+
+```bash
+npm run build-assets    # bangun ulang PNG setelah logo.svg diubah
+```
+
+Menghasilkan `src/app/icon.svg`, `src/app/apple-icon.png` (180px), dan
+`src/app/opengraph-image.png` (1200x630). PNG-nya ikut di-commit, bukan
+dibangkitkan saat request: WhatsApp menyimpan pratinjau dengan agresif dan
+kadang gagal pada endpoint dinamis.
 
 ## Tipografi
 

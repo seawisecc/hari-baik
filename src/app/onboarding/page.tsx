@@ -1,5 +1,6 @@
 "use client";
 
+import { Wordmark } from "@/components/ui/Logo";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { doc, updateDoc } from "firebase/firestore";
@@ -56,7 +57,7 @@ export default function OnboardingPage() {
   return (
     <main className="mx-auto max-w-md px-6 py-12">
       <div className="mb-8 flex items-center justify-between">
-        <p className="font-heading text-2xl font-bold italic text-ink">Hari Baik</p>
+        <Wordmark size={28} textClassName="text-2xl" />
         <ThemeToggle />
       </div>
 

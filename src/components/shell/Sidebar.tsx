@@ -1,5 +1,6 @@
 "use client";
 
+import { Wordmark } from "@/components/ui/Logo";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LangToggle } from "@/components/ui/LangToggle";
@@ -72,8 +73,8 @@ export function Sidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col border-r border-border-soft bg-surface px-4 py-6 lg:flex">
       <Link href="/hari-ini" className="px-3.5 pb-8">
-        <p className="font-heading text-2xl font-bold italic text-ink">Hari Baik</p>
-        <p className="mt-0.5 text-[11px] text-ink-faint">Kalender siklus personal</p>
+        <Wordmark size={30} textClassName="text-2xl" />
+        <p className="mt-1.5 text-[11px] text-ink-faint">Kalender siklus personal</p>
       </Link>
 
       <nav aria-label="Navigasi utama" className="flex-1 space-y-6 overflow-y-auto">

@@ -25,10 +25,32 @@ const body = Inter({
   display: "swap",
 });
 
+const SITUS = "https://haribaik.seawise.id";
+const JUDUL = "Hari Baik | Kalender Siklus Personal";
+const RINGKASAN =
+  "Kalender siklus personal yang dihitung dari tanggal lahirmu, memadukan Wariga dan kalender Bali dengan kalender Masehi.";
+
 export const metadata: Metadata = {
-  title: "Hari Baik | Kalender Siklus Personal",
-  description:
-    "Kalender siklus personal yang dihitung dari tanggal lahirmu, memadukan Wariga dan kalender Bali dengan kalender Masehi.",
+  // metadataBase membuat URL gambar jadi absolut. Tanpa ini WhatsApp dan
+  // aplikasi chat lain menerima path relatif yang tidak bisa mereka ambil,
+  // dan pratinjaunya muncul tanpa gambar.
+  metadataBase: new URL(SITUS),
+  title: JUDUL,
+  description: RINGKASAN,
+  applicationName: "Hari Baik",
+  openGraph: {
+    type: "website",
+    locale: "id_ID",
+    url: SITUS,
+    siteName: "Hari Baik",
+    title: JUDUL,
+    description: RINGKASAN,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: JUDUL,
+    description: RINGKASAN,
+  },
 };
 
 export const viewport: Viewport = {

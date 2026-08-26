@@ -1,5 +1,6 @@
 "use client";
 
+import { Wordmark } from "@/components/ui/Logo";
 import { Lock, MessageCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -24,7 +25,7 @@ export default function ExpiredPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center px-6 py-12">
       <div className="mb-8 flex items-center justify-between">
-        <p className="font-heading text-2xl font-bold italic text-ink">Hari Baik</p>
+        <Wordmark size={28} textClassName="text-2xl" />
         <ThemeToggle />
       </div>
 

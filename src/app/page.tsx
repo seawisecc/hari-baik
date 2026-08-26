@@ -1,5 +1,6 @@
 "use client";
 
+import { Logo, Wordmark } from "@/components/ui/Logo";
 import {
   ArrowRight,
   CalendarDays,
@@ -87,7 +88,7 @@ export default function LandingPage() {
   return (
     <div className="mx-auto max-w-5xl px-6 pb-24 sm:px-8">
       <header className="flex items-center justify-between gap-3 py-6">
-        <p className="font-heading text-xl font-bold italic text-ink">Hari Baik</p>
+        <Wordmark size={26} />
         <div className="flex items-center gap-2">
           <LangToggle />
           <ThemeToggle />
@@ -100,6 +101,7 @@ export default function LandingPage() {
       </header>
 
       <section className="py-16 text-center sm:py-28">
+        <Logo size={76} className="mx-auto mb-7" />
         <h1 className="font-heading text-5xl font-bold italic text-ink sm:text-7xl">
           Hari Baik
         </h1>
