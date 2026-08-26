@@ -95,7 +95,7 @@ export const HARGA_BAWAAN: PengaturanHarga = {
         en: "Pick a date range and see the most supportive days for a wedding, a business opening, or travel.",
       },
       sekali: false,
-      aktif: false,
+      aktif: true, // fiturnya sudah ada di /pencari-hari
     },
     {
       id: "pengingat-whatsapp",
