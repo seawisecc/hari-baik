@@ -1,5 +1,11 @@
 /** Keputusan pengalihan rute: siapa boleh melihat apa. */
-import { RUTE_PRO, perluLayarTunggu, tentukanAlihan, type KondisiAkses } from "../gate";
+import {
+  RUTE_PRO,
+  perluLayarTunggu,
+  tanggalKalender,
+  tentukanAlihan,
+  type KondisiAkses,
+} from "../gate";
 import {
   NAV_ADDON,
   NAV_AKUN,
@@ -142,6 +148,51 @@ for (const href of semuaRute) {
 // Setiap rute Pro harus punya penanda di navigasi, dan sebaliknya.
 for (const href of Object.keys(RUTE_PRO)) {
   eq(`rute pro ada di navigasi: ${href}`, true, semuaRute.includes(href));
+}
+
+/*
+ * Kalender selama masa coba.
+ *
+ * Tombol ganti bulan dinonaktifkan di layar, tapi itu saja tidak cukup:
+ * tanggal juga bisa datang dari URL lewat ?tanggal= pada kartu perkiraan.
+ * Yang diuji di sini adalah batas pada tanggal yang benar-benar dipakai.
+ */
+{
+  const hariIni = "2026-08-26";
+  // Pelanggan bebas ke mana pun.
+  eq(
+    "pelanggan: tanggal jauh diterima",
+    "2030-01-01",
+    tanggalKalender("2030-01-01", hariIni, true),
+  );
+  eq(
+    "pelanggan: tanggal lampau diterima",
+    "1993-06-30",
+    tanggalKalender("1993-06-30", hariIni, true),
+  );
+
+  // Masa coba: hanya bulan berjalan.
+  eq(
+    "masa coba: tanggal di bulan yang sama diterima",
+    "2026-08-01",
+    tanggalKalender("2026-08-01", hariIni, false),
+  );
+  eq(
+    "masa coba: bulan berikutnya ditolak",
+    hariIni,
+    tanggalKalender("2026-09-01", hariIni, false),
+  );
+  eq(
+    "masa coba: bulan sebelumnya ditolak",
+    hariIni,
+    tanggalKalender("2026-07-31", hariIni, false),
+  );
+  eq(
+    "masa coba: tahun lain di bulan yang sama tetap ditolak",
+    hariIni,
+    tanggalKalender("2025-08-26", hariIni, false),
+  );
+  eq("masa coba: hari ini sendiri diterima", hariIni, tanggalKalender(hariIni, hariIni, false));
 }
 
 console.log(fail === 0 ? "✓ gate: semua lolos" : `✗ gate: ${fail} gagal`);

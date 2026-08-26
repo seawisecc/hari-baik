@@ -1,6 +1,7 @@
 import {
   CalendarDays,
   CalendarSearch,
+  FileText,
   Heart,
   Route,
   Shield,
@@ -8,6 +9,7 @@ import {
   Sun,
   User,
   UserCircle,
+  UsersRound,
   type LucideIcon,
 } from "lucide-react";
 
@@ -72,6 +74,18 @@ export const NAV_ADDON: NavItem[] = [
     labelKey: "acara.title",
     shortKey: "nav.short.finder",
     icon: CalendarSearch,
+  },
+  {
+    href: "/keluarga",
+    labelKey: "keluarga.title",
+    shortKey: "nav.short.family",
+    icon: UsersRound,
+  },
+  {
+    href: "/laporan",
+    labelKey: "laporan.title",
+    shortKey: "nav.short.report",
+    icon: FileText,
   },
 ];
 

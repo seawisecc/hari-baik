@@ -37,6 +37,16 @@ export const RUTE_ADDON: Record<
     titleKey: "acara.title",
     descKey: "addon.lock.desc",
   },
+  "/keluarga": {
+    addOnId: "profil-keluarga",
+    titleKey: "keluarga.title",
+    descKey: "addon.lock.desc",
+  },
+  "/laporan": {
+    addOnId: "laporan-pdf",
+    titleKey: "laporan.title",
+    descKey: "addon.lock.desc",
+  },
 };
 
 export interface KondisiAkses {
@@ -85,4 +95,18 @@ export function tentukanAlihan(k: KondisiAkses): string | null {
  */
 export function perluLayarTunggu(k: Pick<KondisiAkses, "pathname" | "configured" | "loading">) {
   return k.configured && k.loading && !RUTE_PUBLIK.has(k.pathname);
+}
+
+/**
+ * Tanggal mana yang boleh dibuka kalender.
+ *
+ * Selama masa coba kalender terkunci di bulan berjalan. Batasnya diterapkan
+ * pada tanggal yang benar-benar dipakai, bukan hanya pada tombolnya, karena
+ * tanggal juga bisa datang dari URL lewat ?tanggal= pada kartu perkiraan.
+ * Menonaktifkan tombol saja akan meninggalkan pintu belakang yang terbuka.
+ */
+export function tanggalKalender(diminta: string, hariIni: string, bebas: boolean): string {
+  if (bebas) return diminta;
+  // Bandingkan "YYYY-MM": bulan yang sama berarti boleh.
+  return diminta.slice(0, 7) === hariIni.slice(0, 7) ? diminta : hariIni;
 }

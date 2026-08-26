@@ -84,7 +84,7 @@ export const HARGA_BAWAAN: PengaturanHarga = {
         en: "Add up to 4 family members, each with their own cycle calendar and personality reading.",
       },
       sekali: false,
-      aktif: false,
+      aktif: true, // fiturnya sudah ada di /keluarga
     },
     {
       id: "cari-hari-acara",
@@ -98,17 +98,6 @@ export const HARGA_BAWAAN: PengaturanHarga = {
       aktif: true, // fiturnya sudah ada di /pencari-hari
     },
     {
-      id: "pengingat-whatsapp",
-      harga: 40_000,
-      nama: { id: "Pengingat Harian WhatsApp", en: "Daily WhatsApp Reminder" },
-      deskripsi: {
-        id: "Ringkasan energi hari ini dikirim ke WhatsApp setiap pagi.",
-        en: "A summary of today's energy sent to WhatsApp every morning.",
-      },
-      sekali: false,
-      aktif: false,
-    },
-    {
       id: "laporan-pdf",
       harga: 60_000,
       nama: { id: "Laporan Lengkap PDF", en: "Full PDF Report" },
@@ -117,7 +106,7 @@ export const HARGA_BAWAAN: PengaturanHarga = {
         en: "Personality, life journey, and name meaning gathered into one printable file.",
       },
       sekali: true,
-      aktif: false,
+      aktif: true, // fiturnya sudah ada di /laporan
     },
   ],
   diperbaruiPada: null,

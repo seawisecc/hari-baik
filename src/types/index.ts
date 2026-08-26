@@ -10,6 +10,20 @@ export type Role = "user" | "admin";
  */
 export type SubscriptionStatus = "trial" | "pending" | "active" | "lifetime" | "expired";
 
+/** Satu anggota keluarga pada add-on Profil Keluarga. */
+export interface AnggotaKeluarga {
+  /** Stabil, dipakai sebagai kunci daftar. */
+  id: string;
+  nama: string;
+  /** "YYYY-MM-DD". */
+  tanggalLahir: string;
+  /** Hubungan bebas isi, mis. "Istri", "Anak". Boleh kosong. */
+  hubungan: string;
+}
+
+/** Batas jumlah anggota, supaya dokumen profil tidak membengkak. */
+export const MAKS_KELUARGA = 12;
+
 export interface UserProfile {
   uid: string;
   email: string;
@@ -33,6 +47,12 @@ export interface UserProfile {
    * menulis, sama seperti field langganan lainnya.
    */
   addOn: string[];
+  /**
+   * Anggota keluarga yang siklusnya ikut dipantau. Bagian dari add-on Profil
+   * Keluarga. Bukan field terlindungi: isinya milik pengguna sendiri dan tidak
+   * memberi akses apa pun.
+   */
+  keluarga?: AnggotaKeluarga[];
   onboardingComplete: boolean;
   createdAt: string;
 

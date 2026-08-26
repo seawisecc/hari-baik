@@ -21,6 +21,8 @@ export interface AddOnSiap {
 
 export const ADDON_SIAP: Record<string, AddOnSiap> = {
   "cari-hari-acara": { rute: "/pencari-hari" },
+  "profil-keluarga": { rute: "/keluarga" },
+  "laporan-pdf": { rute: "/laporan" },
 };
 
 /** True bila fitur di balik add-on ini sudah benar-benar ada. */

@@ -231,6 +231,48 @@ body {
 }
 
 /*
+ * Gaya cetak untuk halaman laporan.
+ *
+ * Laporan disimpan lewat jendela cetak peramban, bukan lewat pustaka pembuat
+ * PDF. Hasilnya bisa dipilih teksnya dan bisa dicari, dan bundelnya tidak
+ * bertambah ratusan kilobyte untuk sesuatu yang dipakai sesekali.
+ */
+@media print {
+  /* Navigasi dan tombol tidak ikut tercetak. */
+  .cetak-sembunyi,
+  nav,
+  aside {
+    display: none !important;
+  }
+
+  /* Kertas selalu putih dengan tinta gelap, apa pun tema di layar. */
+  html,
+  body {
+    background: #fff !important;
+    color: #1a1a1a !important;
+  }
+
+  .cetak-lembar {
+    background: #fff !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* Satu bagian jangan terpotong di antara dua halaman. */
+  .cetak-utuh {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Ruang cetak diatur di sini, bukan lewat kelas tata letak layar. */
+  @page {
+    margin: 16mm 14mm;
+  }
+}
+
+/*
  * Input tanggal di iOS.
  *
  * Safari iOS memberi `input[type=date]` lebar intrinsik dari isi tanggalnya
