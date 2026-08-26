@@ -27,14 +27,24 @@ Pro dikunci sesuai status langganan.
 1. Buat project di [Firebase Console](https://console.firebase.google.com).
 2. **Authentication** → aktifkan metode **Email/Password**.
 3. **Firestore Database** → buat database (mode production).
-4. Salin `.env.example` → `.env.local`, isi semua nilainya.
-   Kunci klien ada di *Project settings → General → Your apps*;
-   kredensial admin di *Project settings → Service accounts → Generate new private key*.
-5. Terapkan security rules:
+4. Salin `.env.example` → `.env.local`, isi nilai klien dari
+   *Project settings → General → Your apps*.
+5. Unduh kunci server dari *Project settings → Service accounts →
+   Generate new private key*, lalu:
    ```bash
-   npx firebase deploy --only firestore:rules,firestore:indexes
+   npm run import-sa        # baca JSON-nya, tulis ke .env.local
+   npm run check-firebase   # pastikan benar-benar tersambung
    ```
-6. Daftarkan akun pertamamu lewat aplikasi, lalu jadikan admin:
+   Setelah itu hapus file JSON-nya; isinya kunci penuh ke project.
+6. Terapkan rules dan index:
+   ```bash
+   npm run deploy-rules      # lewat Firebase Rules API
+   npm run deploy-indexes    # butuh peran datastore.indexAdmin
+   ```
+   Kalau `deploy-indexes` kena 403, buat index lewat tautan yang muncul di
+   pesan error Firestore saat query pertama dijalankan; tautan itu sudah
+   terisi otomatis.
+7. Daftarkan akun pertamamu lewat aplikasi, lalu jadikan admin:
    ```bash
    npm run set-admin -- email@kamu.com
    ```
@@ -151,7 +161,9 @@ memakai hex langsung, jadi menambah tema ketiga cukup satu blok
 - [x] Firebase Auth + Firestore + security rules
 - [x] Admin + approval langganan
 - [x] Layout desktop & mobile terpisah, beranda = insight hari ini
-- [ ] **Diuji terhadap project Firebase sungguhan** — kode auth/admin belum
-      pernah dijalankan dengan kredensial nyata
+- [x] Diuji terhadap project Firebase sungguhan (`hari-baik-7e56c`)
 - [ ] Deploy ke Vercel
+- [ ] Poles halaman auth, onboarding, profil, admin
+- [ ] Alur langganan dalam aplikasi (sekarang lewat WhatsApp)
+- [ ] Verifikasi email belum diwajibkan
 - [ ] Tabel libur nasional baru terisi 2026–2027 (`src/lib/wariga/holidays.ts`)

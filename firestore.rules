@@ -59,17 +59,6 @@ service cloud.firestore {
       }
     }
 
-    // Permintaan aktivasi langganan. Pengguna hanya boleh membuat dan membaca
-    // miliknya sendiri; keputusan approve/tolak hanya milik admin.
-    match /aktivasi/{reqId} {
-      allow get, list: if isAdmin()
-        || (isSignedIn() && resource.data.uid == request.auth.uid);
-      allow create: if isSignedIn()
-        && request.resource.data.uid == request.auth.uid
-        && request.resource.data.status == 'pending';
-      allow update, delete: if isAdmin();
-    }
-
     // Tolak selain yang di atas.
     match /{document=**} {
       allow read, write: if false;

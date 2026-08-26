@@ -11,8 +11,13 @@ export async function GET(req: NextRequest) {
     const status = req.nextUrl.searchParams.get("status");
     const limit = Math.min(Number(req.nextUrl.searchParams.get("limit") ?? 100), 500);
 
-    let query = adminDb().collection("users").orderBy("createdAt", "desc").limit(limit);
-    if (status) query = query.where("subscriptionStatus", "==", status) as typeof query;
+    // Filter dulu, baru urutkan dan batasi, mengikuti urutan yang dipakai
+    // Firestore saat menyusun query. Kombinasi where + orderBy pada field
+    // berbeda butuh composite index (lihat firestore.indexes.json).
+    const dasar = adminDb().collection("users");
+    const query = (status ? dasar.where("subscriptionStatus", "==", status) : dasar)
+      .orderBy("createdAt", "desc")
+      .limit(limit);
 
     const snap = await query.get();
     const users = snap.docs.map((d) => ({ uid: d.id, ...d.data() }) as UserProfile);
