@@ -1,0 +1,658 @@
+/**
+ * 35 kombinasi Saptawara × Pancawara.
+ *
+ * Di aplikasi lama data ini terpecah dua tabel (karakter hari + profil
+ * pangarasan/pancasuda) yang selalu dibaca bersamaan — di sini digabung
+ * jadi satu entri supaya tidak ada kemungkinan keduanya tidak sinkron.
+ */
+
+export interface WetonProfil {
+  energi: string;
+  tema: string;
+  cocokUntuk: string[];
+  hindari: string[];
+  afirmasi: string;
+  warnaMakna: string;
+  urip: number;
+  pangarasan: string;
+  pancasuda: string;
+}
+
+const WETON: Record<string, WetonProfil> = {
+  "Redite-Umanis": {
+    "energi": "Cerah Pagi",
+    "tema": "Awal yang segar, optimisme",
+    "cocokUntuk": [
+      "Olahraga",
+      "Rencana mingguan",
+      "Quality time keluarga",
+      "Aktivitas sosial"
+    ],
+    "hindari": [
+      "Keputusan karier besar yang mendadak"
+    ],
+    "afirmasi": "Hari baru membawa kemungkinan tak terbatas.",
+    "warnaMakna": "Kuning Cerah",
+    "urip": 10,
+    "pangarasan": "Lakuning Pandita Sakti",
+    "pancasuda": "Sumur Sinaba"
+  },
+  "Redite-Pahing": {
+    "energi": "Semangat Meluap",
+    "tema": "Antusiasme tinggi",
+    "cocokUntuk": [
+      "Networking",
+      "Brainstorming",
+      "Konten kreatif",
+      "Bertemu orang baru"
+    ],
+    "hindari": [
+      "Konflik dan debat panas"
+    ],
+    "afirmasi": "Energimu hari ini menular ke sekitarmu.",
+    "warnaMakna": "Oranye Hangat",
+    "urip": 14,
+    "pangarasan": "Lakuning Rembulan",
+    "pancasuda": "Wisesa Segara"
+  },
+  "Redite-Pon": {
+    "energi": "Tenang Stabil",
+    "tema": "Keseimbangan batin",
+    "cocokUntuk": [
+      "Meditasi",
+      "Journaling",
+      "Evaluasi diri",
+      "Beristirahat"
+    ],
+    "hindari": [
+      "Terburu-buru mengambil keputusan"
+    ],
+    "afirmasi": "Ketenangan adalah kekuatan terbesarmu.",
+    "warnaMakna": "Hijau Daun",
+    "urip": 12,
+    "pangarasan": "Aras Kembang",
+    "pancasuda": "Bumi Kapetak"
+  },
+  "Redite-Wage": {
+    "energi": "Refleksi Dalam",
+    "tema": "Introspeksi dan kesadaran",
+    "cocokUntuk": [
+      "Belajar",
+      "Membaca",
+      "Perencanaan jangka panjang",
+      "Introspeksi"
+    ],
+    "hindari": [
+      "Aktivitas sosial yang melelahkan"
+    ],
+    "afirmasi": "Dalam diam, kamu menemukan jawabanmu.",
+    "warnaMakna": "Biru Tenang",
+    "urip": 9,
+    "pangarasan": "Lakuning Angin",
+    "pancasuda": "Satria Wibawa"
+  },
+  "Redite-Kliwon": {
+    "energi": "Hening Sakral",
+    "tema": "Koneksi spiritual dan intuisi",
+    "cocokUntuk": [
+      "Doa",
+      "Meditasi",
+      "Kegiatan sosial bermakna",
+      "Ritual"
+    ],
+    "hindari": [
+      "Transaksi besar",
+      "Konfrontasi"
+    ],
+    "afirmasi": "Percayai bisikan hatimu hari ini.",
+    "warnaMakna": "Ungu Spiritual",
+    "urip": 13,
+    "pangarasan": "Lakuning Lintang",
+    "pancasuda": "Lebu Ketiup Angin"
+  },
+  "Soma-Umanis": {
+    "energi": "Langkah Pertama",
+    "tema": "Memulai dengan percaya diri",
+    "cocokUntuk": [
+      "Memulai proyek",
+      "Meeting pertama",
+      "Proposal baru",
+      "Komunikasi profesional"
+    ],
+    "hindari": [
+      "Menunda keputusan"
+    ],
+    "afirmasi": "Langkah pertama selalu yang terberat — dan terpenting.",
+    "warnaMakna": "Putih Bersih",
+    "urip": 9,
+    "pangarasan": "Lakuning Angin",
+    "pancasuda": "Tunggak Semi"
+  },
+  "Soma-Pahing": {
+    "energi": "Dorongan Kuat",
+    "tema": "Tekad dan determinasi",
+    "cocokUntuk": [
+      "Presentasi",
+      "Negosiasi",
+      "Closing deal",
+      "Target ambisius"
+    ],
+    "hindari": [
+      "Istirahat berlebihan"
+    ],
+    "afirmasi": "Tekadmu hari ini menentukan hasilmu besok.",
+    "warnaMakna": "Merah Tekad",
+    "urip": 13,
+    "pangarasan": "Lakuning Lintang",
+    "pancasuda": "Bumi Kapetak"
+  },
+  "Soma-Pon": {
+    "energi": "Alur Tenang",
+    "tema": "Produktivitas tanpa tekanan",
+    "cocokUntuk": [
+      "Pekerjaan rutin",
+      "Administrasi",
+      "Follow-up",
+      "Pekerjaan sistematis"
+    ],
+    "hindari": [
+      "Proyek baru yang terlalu kompleks"
+    ],
+    "afirmasi": "Konsistensi kecil menciptakan hasil besar.",
+    "warnaMakna": "Abu-abu Stabil",
+    "urip": 11,
+    "pangarasan": "Aras Tuding",
+    "pancasuda": "Sumur Sinaba"
+  },
+  "Soma-Wage": {
+    "energi": "Hati-Hati Melangkah",
+    "tema": "Kewaspadaan dan kehati-hatian",
+    "cocokUntuk": [
+      "Riset",
+      "Review dokumen",
+      "Cek ulang pekerjaan",
+      "Evaluasi"
+    ],
+    "hindari": [
+      "Tanda tangan kontrak baru tanpa review"
+    ],
+    "afirmasi": "Lebih baik lambat asal tepat.",
+    "warnaMakna": "Kuning Hati-hati",
+    "urip": 8,
+    "pangarasan": "Lakuning Geni",
+    "pancasuda": "Wisesa Segara"
+  },
+  "Soma-Kliwon": {
+    "energi": "Intuisi Bisnis",
+    "tema": "Kepekaan dan ketajaman",
+    "cocokUntuk": [
+      "Analisis situasi",
+      "Keputusan strategis",
+      "Brainstorming mendalam"
+    ],
+    "hindari": [
+      "Aktivitas impulsif tanpa perencanaan"
+    ],
+    "afirmasi": "Keputusan terbaik lahir dari kepala dan hati.",
+    "warnaMakna": "Biru Intuitif",
+    "urip": 12,
+    "pangarasan": "Aras Kembang",
+    "pancasuda": "Satria Wirang"
+  },
+  "Anggara-Umanis": {
+    "energi": "Api Terarah",
+    "tema": "Semangat yang fokus",
+    "cocokUntuk": [
+      "Olahraga intens",
+      "Pekerjaan fisik",
+      "Target ambisius",
+      "Eksekusi"
+    ],
+    "hindari": [
+      "Konflik ego dan perdebatan tidak perlu"
+    ],
+    "afirmasi": "Energimu hari ini paling kuat saat fokus pada satu tujuan.",
+    "warnaMakna": "Merah Api",
+    "urip": 8,
+    "pangarasan": "Lakuning Geni",
+    "pancasuda": "Wisesa Segara"
+  },
+  "Anggara-Pahing": {
+    "energi": "Berani Melangkah",
+    "tema": "Keberanian dan ketegasan",
+    "cocokUntuk": [
+      "Presentasi bold",
+      "Negosiasi alot",
+      "Minta kenaikan gaji",
+      "Ambil keputusan tegas"
+    ],
+    "hindari": [
+      "Keputusan emosional dan reaktif"
+    ],
+    "afirmasi": "Keberanian bukan absennya rasa takut — tapi bertindak meski takut.",
+    "warnaMakna": "Oranye Keberanian",
+    "urip": 12,
+    "pangarasan": "Aras Kembang",
+    "pancasuda": "Satria Wirang"
+  },
+  "Anggara-Pon": {
+    "energi": "Kerja Keras Diam",
+    "tema": "Fokus dan disiplin",
+    "cocokUntuk": [
+      "Deep work",
+      "Deadline ketat",
+      "Pekerjaan teknis",
+      "Fokus penuh"
+    ],
+    "hindari": [
+      "Meeting panjang yang tidak perlu"
+    ],
+    "afirmasi": "Hasil terbaikmu lahir dalam senyap dan fokus.",
+    "warnaMakna": "Coklat Disiplin",
+    "urip": 10,
+    "pangarasan": "Lakuning Pandita Sakti",
+    "pancasuda": "Satria Wibawa"
+  },
+  "Anggara-Wage": {
+    "energi": "Waspada Energi",
+    "tema": "Manajemen emosi",
+    "cocokUntuk": [
+      "Evaluasi risiko",
+      "Diskusi hati-hati",
+      "Persiapan matang"
+    ],
+    "hindari": [
+      "Konfrontasi langsung",
+      "Keputusan mendadak"
+    ],
+    "afirmasi": "Hari yang mengajarkan untuk memilih pertempuran dengan bijak.",
+    "warnaMakna": "Kuning Waspada",
+    "urip": 7,
+    "pangarasan": "Lakuning Bumi",
+    "pancasuda": "Lebu Ketiup Angin"
+  },
+  "Anggara-Kliwon": {
+    "energi": "Kekuatan Dalam",
+    "tema": "Ketahanan batin",
+    "cocokUntuk": [
+      "Menghadapi tantangan berat",
+      "Mediasi",
+      "Pemecahan masalah rumit"
+    ],
+    "hindari": [
+      "Memulai hal baru yang berisiko tinggi"
+    ],
+    "afirmasi": "Kekuatanmu sejati terlihat saat ditekan.",
+    "warnaMakna": "Hitam Kuat",
+    "urip": 11,
+    "pangarasan": "Aras Tuding",
+    "pancasuda": "Sumur Sinaba"
+  },
+  "Budha-Umanis": {
+    "energi": "Kata-Kata Mengalir",
+    "tema": "Ekspresi dan komunikasi",
+    "cocokUntuk": [
+      "Menulis",
+      "Pitching",
+      "Public speaking",
+      "Negosiasi",
+      "Komunikasi penting"
+    ],
+    "hindari": [
+      "Diam saat seharusnya bicara"
+    ],
+    "afirmasi": "Kata-katamu hari ini memiliki kekuatan luar biasa.",
+    "warnaMakna": "Biru Cerah",
+    "urip": 12,
+    "pangarasan": "Aras Kembang",
+    "pancasuda": "Sumur Sinaba"
+  },
+  "Budha-Pahing": {
+    "energi": "Tajam Berpikir",
+    "tema": "Analisis dan kecerdasan",
+    "cocokUntuk": [
+      "Riset mendalam",
+      "Problem-solving",
+      "Coding",
+      "Analisis data"
+    ],
+    "hindari": [
+      "Kerja monoton tanpa tantangan"
+    ],
+    "afirmasi": "Pikiranmu hari ini seperti pisau yang baru diasah.",
+    "warnaMakna": "Perak Tajam",
+    "urip": 16,
+    "pangarasan": "Lakuning Toya",
+    "pancasuda": "Wisesa Segara"
+  },
+  "Budha-Pon": {
+    "energi": "Bijak Berkata",
+    "tema": "Kehati-hatian dalam komunikasi",
+    "cocokUntuk": [
+      "Diplomasi",
+      "Mediasi",
+      "Email penting",
+      "Diskusi sensitif"
+    ],
+    "hindari": [
+      "Gosip dan perdebatan sia-sia"
+    ],
+    "afirmasi": "Kata yang tepat di waktu yang tepat mengubah segalanya.",
+    "warnaMakna": "Hijau Bijak",
+    "urip": 14,
+    "pangarasan": "Lakuning Rembulan",
+    "pancasuda": "Bumi Kapetak"
+  },
+  "Budha-Wage": {
+    "energi": "Hati-Hati Bersuara",
+    "tema": "Mawas dalam komunikasi",
+    "cocokUntuk": [
+      "Mendengarkan lebih banyak",
+      "Review ulang pesan sebelum kirim",
+      "Observasi"
+    ],
+    "hindari": [
+      "Keputusan besar berdasarkan informasi sepihak"
+    ],
+    "afirmasi": "Hari terbaik untuk lebih banyak mendengar daripada berbicara.",
+    "warnaMakna": "Abu Mawas",
+    "urip": 11,
+    "pangarasan": "Aras Tuding",
+    "pancasuda": "Satria Wibawa"
+  },
+  "Budha-Kliwon": {
+    "energi": "Pesan Bermakna",
+    "tema": "Komunikasi yang dalam",
+    "cocokUntuk": [
+      "Percakapan penting",
+      "Curhat bermakna",
+      "Konten inspiratif",
+      "Menulis dari hati"
+    ],
+    "hindari": [
+      "Komunikasi superfisial dan basa-basi berlebihan"
+    ],
+    "afirmasi": "Apa yang kamu sampaikan hari ini akan diingat lama.",
+    "warnaMakna": "Ungu Makna",
+    "urip": 15,
+    "pangarasan": "Lakuning Srengenge",
+    "pancasuda": "Lebu Ketiup Angin"
+  },
+  "Wraspati-Umanis": {
+    "energi": "Cahaya Penuh",
+    "tema": "Keberuntungan dan kelimpahan",
+    "cocokUntuk": [
+      "Grand opening",
+      "Launching",
+      "Pernikahan",
+      "Investasi",
+      "Mulai usaha"
+    ],
+    "hindari": [
+      "Tidak ada pantangan khusus hari ini"
+    ],
+    "afirmasi": "Hari ini semesta mendukung langkah beranimu.",
+    "warnaMakna": "Emas Penuh",
+    "urip": 13,
+    "pangarasan": "Lakuning Lintang",
+    "pancasuda": "Satria Wibawa"
+  },
+  "Wraspati-Pahing": {
+    "energi": "Berkembang Pesat",
+    "tema": "Pertumbuhan dan ekspansi",
+    "cocokUntuk": [
+      "Membangun jaringan",
+      "Ekspansi bisnis",
+      "Rekrut tim",
+      "Proyek besar"
+    ],
+    "hindari": [
+      "Terlalu konservatif dan ragu-ragu"
+    ],
+    "afirmasi": "Jangkau lebih jauh dari batas yang kamu bayangkan.",
+    "warnaMakna": "Hijau Tumbuh",
+    "urip": 17,
+    "pangarasan": "Lakuning Bumi",
+    "pancasuda": "Lebu Ketiup Angin"
+  },
+  "Wraspati-Pon": {
+    "energi": "Stabil Makmur",
+    "tema": "Kemakmuran yang terjaga",
+    "cocokUntuk": [
+      "Investasi jangka panjang",
+      "Tabungan",
+      "Properti",
+      "Perencanaan keuangan"
+    ],
+    "hindari": [
+      "Pengeluaran impulsif"
+    ],
+    "afirmasi": "Kemakmuran sejati dibangun dengan sabar dan konsisten.",
+    "warnaMakna": "Kuning Emas",
+    "urip": 15,
+    "pangarasan": "Lakuning Srengenge",
+    "pancasuda": "Satria Wirang"
+  },
+  "Wraspati-Wage": {
+    "energi": "Pertimbangan Matang",
+    "tema": "Kebijaksanaan sebelum ekspansi",
+    "cocokUntuk": [
+      "Due diligence",
+      "Riset sebelum investasi",
+      "Evaluasi peluang"
+    ],
+    "hindari": [
+      "Ekspansi terburu-buru tanpa riset"
+    ],
+    "afirmasi": "Pertumbuhan yang berkelanjutan dimulai dari akar yang kuat.",
+    "warnaMakna": "Coklat Bijak",
+    "urip": 12,
+    "pangarasan": "Aras Kembang",
+    "pancasuda": "Tunggak Semi"
+  },
+  "Wraspati-Kliwon": {
+    "energi": "Berkah Mengalir",
+    "tema": "Rezeki dan koneksi spiritual",
+    "cocokUntuk": [
+      "Berdoa",
+      "Bersyukur",
+      "Amal",
+      "Networking bermakna",
+      "Ritual syukuran"
+    ],
+    "hindari": [
+      "Kecemasan berlebihan dan pikiran negatif"
+    ],
+    "afirmasi": "Ketika kamu bersyukur, berkah semakin berdatangan.",
+    "warnaMakna": "Emas Spiritual",
+    "urip": 16,
+    "pangarasan": "Lakuning Banyu",
+    "pancasuda": "Bumi Kapetak"
+  },
+  "Sukra-Umanis": {
+    "energi": "Damai Penuh",
+    "tema": "Keindahan dan keselarasan",
+    "cocokUntuk": [
+      "Estetika",
+      "Desain",
+      "Relationship building",
+      "Perawatan diri"
+    ],
+    "hindari": [
+      "Konflik dan tekanan yang tidak perlu"
+    ],
+    "afirmasi": "Keindahan ada di setiap sudut hidupmu hari ini.",
+    "warnaMakna": "Pink Lembut",
+    "urip": 11,
+    "pangarasan": "Aras Tuding",
+    "pancasuda": "Satria Wirang"
+  },
+  "Sukra-Pahing": {
+    "energi": "Cinta Mengalir",
+    "tema": "Afeksi dan koneksi",
+    "cocokUntuk": [
+      "Kencan",
+      "Rekonsiliasi",
+      "Kolaborasi kreatif",
+      "Mempererat hubungan"
+    ],
+    "hindari": [
+      "Isolasi diri"
+    ],
+    "afirmasi": "Buka hatimu — hari ini koneksi tulus mudah terjalin.",
+    "warnaMakna": "Merah Muda",
+    "urip": 15,
+    "pangarasan": "Lakuning Srengenge",
+    "pancasuda": "Tunggak Semi"
+  },
+  "Sukra-Pon": {
+    "energi": "Seimbang Indah",
+    "tema": "Estetika dan keseimbangan",
+    "cocokUntuk": [
+      "Dekorasi",
+      "Seni",
+      "Pekerjaan kreatif",
+      "Spa atau relaksasi"
+    ],
+    "hindari": [
+      "Pekerjaan analitik berat dan tekanan tinggi"
+    ],
+    "afirmasi": "Jiwa yang seimbang menciptakan karya yang indah.",
+    "warnaMakna": "Lavender Seimbang",
+    "urip": 13,
+    "pangarasan": "Lakuning Lintang",
+    "pancasuda": "Lebu Ketiup Angin"
+  },
+  "Sukra-Wage": {
+    "energi": "Lembut Bijak",
+    "tema": "Sensitivitas dan empati",
+    "cocokUntuk": [
+      "Mendengarkan",
+      "Konseling",
+      "Merawat orang lain",
+      "Empati aktif"
+    ],
+    "hindari": [
+      "Keputusan bisnis keras dan konfrontasi"
+    ],
+    "afirmasi": "Kelembutan adalah kekuatan yang sering disalahpahami.",
+    "warnaMakna": "Biru Lembut",
+    "urip": 10,
+    "pangarasan": "Lakuning Pandita Sakti",
+    "pancasuda": "Sumur Sinaba"
+  },
+  "Sukra-Kliwon": {
+    "energi": "Cinta Terdalam",
+    "tema": "Koneksi jiwa dan spiritualitas",
+    "cocokUntuk": [
+      "Doa bersama",
+      "Quality time pasangan atau keluarga",
+      "Refleksi cinta"
+    ],
+    "hindari": [
+      "Transaksi finansial besar"
+    ],
+    "afirmasi": "Cinta yang tulus adalah investasi terbaik dalam hidupmu.",
+    "warnaMakna": "Merah Tua Dalam",
+    "urip": 14,
+    "pangarasan": "Lakuning Rembulan",
+    "pancasuda": "Wisesa Segara"
+  },
+  "Saniscara-Umanis": {
+    "energi": "Fondasi Kokoh",
+    "tema": "Membangun dan memperkuat",
+    "cocokUntuk": [
+      "Membangun rumah atau bisnis",
+      "Kontrak jangka panjang",
+      "Komitmen besar"
+    ],
+    "hindari": [
+      "Keputusan impulsif dan mendadak"
+    ],
+    "afirmasi": "Yang dibangun dengan sabar akan bertahan selamanya.",
+    "warnaMakna": "Abu Kuat",
+    "urip": 14,
+    "pangarasan": "Lakuning Rembulan",
+    "pancasuda": "Bumi Kapetak"
+  },
+  "Saniscara-Pahing": {
+    "energi": "Disiplin Tinggi",
+    "tema": "Sistem dan keteraturan",
+    "cocokUntuk": [
+      "Membuat SOP",
+      "Beres-beres besar",
+      "Audit keuangan",
+      "Tata kelola"
+    ],
+    "hindari": [
+      "Spontanitas berisiko tinggi"
+    ],
+    "afirmasi": "Disiplin hari ini adalah kebebasan di masa depan.",
+    "warnaMakna": "Hitam Disiplin",
+    "urip": 18,
+    "pangarasan": "Lakuning Geni",
+    "pancasuda": "Satria Wibawa"
+  },
+  "Saniscara-Pon": {
+    "energi": "Tenang Terstruktur",
+    "tema": "Keteraturan dan ketenangan",
+    "cocokUntuk": [
+      "Evaluasi bulanan",
+      "Laporan",
+      "Perencanaan strategis",
+      "Review sistem"
+    ],
+    "hindari": [
+      "Aktivitas tidak terstruktur dan kaotis"
+    ],
+    "afirmasi": "Keteraturan membawa ketenangan yang sesungguhnya.",
+    "warnaMakna": "Biru Terstruktur",
+    "urip": 16,
+    "pangarasan": "Lakuning Toya",
+    "pancasuda": "Satria Wirang"
+  },
+  "Saniscara-Wage": {
+    "energi": "Berhati-Hati",
+    "tema": "Kehati-hatian dan proteksi",
+    "cocokUntuk": [
+      "Evaluasi risiko",
+      "Proteksi aset",
+      "Backup data",
+      "Pencegahan"
+    ],
+    "hindari": [
+      "Ekspansi terburu-buru tanpa perhitungan"
+    ],
+    "afirmasi": "Lebih baik mencegah daripada memperbaiki.",
+    "warnaMakna": "Abu Waspada",
+    "urip": 13,
+    "pangarasan": "Lakuning Lintang",
+    "pancasuda": "Satria Wirang"
+  },
+  "Saniscara-Kliwon": {
+    "energi": "Karma Baik",
+    "tema": "Tabungan karma dan introspeksi",
+    "cocokUntuk": [
+      "Amal",
+      "Membantu orang lain",
+      "Refleksi diri",
+      "Ibadah",
+      "Berbagi"
+    ],
+    "hindari": [
+      "Keserakahan dan mendahulukan ego"
+    ],
+    "afirmasi": "Setiap kebaikan yang kamu tabung hari ini berbunga di masa depan.",
+    "warnaMakna": "Emas Karma",
+    "urip": 17,
+    "pangarasan": "Lakuning Bumi",
+    "pancasuda": "Tunggak Semi"
+  }
+};
+
+/** Kunci berbentuk "Saptawara-Pancawara", mis. "Budha-Kliwon". */
+export function getWeton(saptaWara: string, pancaWara: string): WetonProfil | null {
+  return WETON[`${saptaWara}-${pancaWara}`] ?? null;
+}
+
+export { WETON };

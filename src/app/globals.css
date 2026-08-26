@@ -29,12 +29,16 @@
   --hb-warning: #e8c979;
   --hb-error:   #e08b8b;
 
-  /* Empat kategori siklus personal. Bukan "baik/buruk" — masing-masing
-     punya karakter sendiri, jadi warnanya setara, bukan gradasi merah-hijau. */
-  --hb-guru: #7fc8a0;  /* Hari Mengalir  */
-  --hb-ratu: #8fb8d8;  /* Hari Tenang    */
-  --hb-lara: #e0b878;  /* Hari Mawas     */
-  --hb-pati: #b0a8bd;  /* Hari Istirahat */
+  /* Empat kategori siklus personal — warna diambil dari aplikasi sebelumnya
+     supaya pengguna lama tidak perlu belajar ulang. Nadanya sengaja diredam
+     (bukan hijau/merah penuh) agar menyatu dengan dasar off-white dan tidak
+     terbaca sebagai peringatan.
+     Sama di semua tema: identitas kategori tidak boleh ikut berubah saat
+     pengguna mengganti tema aksen. */
+  --hb-guru: #7a9e7e;  /* Hari Mengalir  — hijau */
+  --hb-ratu: #7a8e9e;  /* Hari Tenang    — biru  */
+  --hb-lara: #c4935a;  /* Hari Mawas     — kuning */
+  --hb-pati: #9e5a5a;  /* Hari Istirahat — merah */
 
   /* Radius & spacing */
   --hb-r-sm: 10px;
@@ -63,13 +67,6 @@
   --hb-accent-ink:    #4a2a11;
   --hb-accent-wash:   #fdf3ea;
   --hb-focus:         #f0a463;
-
-  /* Kategori digeser ke arah hangat, tapi hue-nya tetap dijaga terpisah —
-     empat kategori ini harus bisa dibedakan sekilas di grid kalender. */
-  --hb-guru: #e59255;  /* Hari Mengalir  — jingga */
-  --hb-ratu: #7fa8a0;  /* Hari Tenang    — teal   */
-  --hb-lara: #d9b866;  /* Hari Mawas     — emas   */
-  --hb-pati: #ac9d9d;  /* Hari Istirahat — mauve  */
 }
 
 @theme inline {
