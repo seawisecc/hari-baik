@@ -14,7 +14,7 @@ import { RUTE_PRO, RUTE_TUJUAN, perluLayarTunggu, tentukanAlihan } from "@/lib/g
  * Keputusannya sendiri ada di `tentukanAlihan`, yang bisa diuji terpisah.
  */
 export function AuthGate({ children }: { children: React.ReactNode }) {
-  const { user, profile, access, loading, configured } = useAuth();
+  const { user, emailVerified, profile, access, loading, configured } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -23,7 +23,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     configured,
     loading,
     signedIn: !!user,
-    emailVerified: !!user?.emailVerified,
+    emailVerified,
     onboardingComplete: profile ? profile.onboardingComplete : null,
     canView: access.canView,
     isAdmin: profile?.role === "admin",

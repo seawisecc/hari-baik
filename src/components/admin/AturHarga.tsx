@@ -9,6 +9,7 @@ import { Input, Label } from "@/components/ui/Input";
 import { cn } from "@/lib/cn";
 import { useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
+import { ambilToken } from "@/lib/firebase/client";
 import {
   hemat,
   perTahun,
@@ -78,7 +79,7 @@ export function AturHarga() {
     setBusy(true);
     setPesan(null);
     try {
-      const token = await user.getIdToken();
+      const token = await ambilToken();
       const res = await fetch("/api/admin/harga", {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },

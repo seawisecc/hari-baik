@@ -18,6 +18,8 @@ import { firebaseConfigured, getDb, getFirebaseAuth } from "./client";
 interface AuthContextValue {
   /** null = belum login. undefined tidak dipakai: cek `loading` dulu. */
   user: User | null;
+  /** Dibaca dari sini, bukan dari `user.emailVerified`, agar ikut menyegar. */
+  emailVerified: boolean;
   profile: UserProfile | null;
   access: AccessState;
   loading: boolean;
@@ -59,6 +61,11 @@ async function bootstrapProfile(user: User): Promise<void> {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  // Status verifikasi disimpan terpisah dari objek User. `reload()` mengubah
+  // objek yang sama di tempat, jadi tidak ada referensi baru yang memicu
+  // render, dan menyalinnya untuk memaksa render justru membuang seluruh
+  // method Firebase di prototype-nya.
+  const [emailVerified, setEmailVerified] = useState(false);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   // Kalau Firebase belum dikonfigurasi, tidak ada yang ditunggu.
   const [loading, setLoading] = useState(firebaseConfigured);
@@ -67,6 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!firebaseConfigured) return;
     return onAuthStateChanged(getFirebaseAuth(), (u) => {
       setUser(u);
+      setEmailVerified(!!u?.emailVerified);
       if (!u) {
         setProfile(null);
         setLoading(false);
@@ -123,8 +131,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // emailVerified ikut token, jadi baru berubah setelah ditarik ulang.
     await current.reload();
     await current.getIdToken(true);
-    // Salin ke state supaya penjaga rute ikut melihat nilai barunya.
-    setUser({ ...current, emailVerified: current.emailVerified } as User);
+    setEmailVerified(current.emailVerified);
     return current.emailVerified;
   }, []);
 
@@ -133,6 +140,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo(
     () => ({
       user,
+      emailVerified,
       profile,
       access,
       loading,
@@ -146,6 +154,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }),
     [
       user,
+      emailVerified,
       profile,
       access,
       loading,

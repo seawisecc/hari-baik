@@ -10,6 +10,7 @@ import { cn } from "@/lib/cn";
 import { useLang, useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
 import { rupiah, teks, type AddOn, type PaketLangganan } from "@/lib/harga";
+import { ambilToken } from "@/lib/firebase/client";
 
 /**
  * Ajukan aktivasi setelah membayar.
@@ -54,7 +55,7 @@ export function AjukanAktivasi({
     setBusy(true);
     setError(null);
     try {
-      const token = await user.getIdToken();
+      const token = await ambilToken();
       const res = await fetch("/api/aktivasi", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },

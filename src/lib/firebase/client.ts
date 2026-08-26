@@ -42,3 +42,18 @@ export function getDb(): Firestore {
   if (!dbInstance) dbInstance = getFirestore(ensureApp());
   return dbInstance;
 }
+
+/**
+ * ID token pengguna yang sedang masuk.
+ *
+ * Diambil dari `currentUser` milik Firebase, bukan dari objek User yang
+ * disimpan di state React. Bedanya penting: state React bisa memegang salinan
+ * yang sudah kehilangan methodnya, dan itu pernah terjadi. Dengan membaca dari
+ * sumbernya, tidak ada komponen yang perlu memegang objek User hanya untuk
+ * mengambil token.
+ */
+export async function ambilToken(): Promise<string> {
+  const current = getFirebaseAuth().currentUser;
+  if (!current) throw new Error("Sesi berakhir. Silakan masuk lagi.");
+  return current.getIdToken();
+}

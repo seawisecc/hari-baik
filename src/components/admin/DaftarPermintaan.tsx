@@ -10,6 +10,7 @@ import { useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
 import { rupiah } from "@/lib/harga";
 import type { Aktivasi, StatusAktivasi } from "@/types";
+import { ambilToken } from "@/lib/firebase/client";
 
 const FILTER: { key: StatusAktivasi; labelKey: string }[] = [
   { key: "menunggu", labelKey: "admin.req.filter.waiting" },
@@ -39,7 +40,7 @@ export function DaftarPermintaan() {
 
     void (async () => {
       try {
-        const token = await user.getIdToken();
+        const token = await ambilToken();
         if (batal) return;
         const res = await fetch(`/api/admin/aktivasi?status=${status}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -66,7 +67,7 @@ export function DaftarPermintaan() {
     setBusy(id);
     setError(null);
     try {
-      const token = await user.getIdToken();
+      const token = await ambilToken();
       const res = await fetch("/api/admin/aktivasi", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },

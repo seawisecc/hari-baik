@@ -14,6 +14,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
 import type { SubscriptionStatus, UserProfile } from "@/types";
+import { ambilToken } from "@/lib/firebase/client";
 
 const FILTER: { key: SubscriptionStatus | "all"; labelKey: string }[] = [
   { key: "all", labelKey: "admin.filter.all" },
@@ -43,7 +44,7 @@ export default function AdminPage() {
 
     void (async () => {
       try {
-        const token = await user.getIdToken();
+        const token = await ambilToken();
         if (batal) return;
         const q = filter === "all" ? "" : `?status=${filter}`;
         const res = await fetch(`/api/admin/users${q}`, {
@@ -71,7 +72,7 @@ export default function AdminPage() {
     if (!user) return;
     setError(null);
     try {
-      const token = await user.getIdToken();
+      const token = await ambilToken();
       const res = await fetch("/api/admin/subscription", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },

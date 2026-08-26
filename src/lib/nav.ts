@@ -87,12 +87,7 @@ export const NAV_ADMIN: NavItem = {
  * bilah bawah dijamin masih terjangkau lewat NAV_MOBILE_LAINNYA, dan tidak
  * ada rute yang bisa hilang diam-diam lagi.
  */
-export const NAV_MOBILE: NavItem[] = [
-  NAV_UTAMA[0],
-  NAV_UTAMA[1],
-  NAV_UTAMA[2],
-  NAV_AKUN[0],
-];
+export const NAV_MOBILE: NavItem[] = [NAV_UTAMA[0], NAV_UTAMA[1], NAV_UTAMA[2], NAV_AKUN[0]];
 
 /** Semua tujuan di luar bilah bawah, muncul di lembar "Lainnya". */
 export const NAV_MOBILE_LAINNYA: NavItem[] = NAV_PRO;
