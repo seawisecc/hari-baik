@@ -1,6 +1,5 @@
 "use client";
 
-import { doc, updateDoc } from "firebase/firestore";
 import { Pencil } from "lucide-react";
 import { useState } from "react";
 import { Alert } from "@/components/ui/Alert";
@@ -8,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
 import { useT } from "@/lib/content/LangProvider";
 import { uripPetemon } from "@/lib/content/petemon";
-import { getDb } from "@/lib/firebase/client";
+import { perbaruiProfil } from "@/lib/firebase/client";
 import {
   getSadwara,
   pancawaraName,
@@ -59,7 +58,7 @@ export function EditTanggalLahir({
         setError(null);
         try {
           const petemon = uripPetemon(nilai);
-          await updateDoc(doc(getDb(), "users", uid), {
+          await perbaruiProfil(uid, {
             tanggalLahir: nilai,
             saptaWaraLahir: saptawaraName(nilai),
             pancaWaraLahir: pancawaraName(nilai),

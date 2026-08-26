@@ -1,6 +1,5 @@
 "use client";
 
-import { doc, updateDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Alert } from "@/components/ui/Alert";
@@ -13,7 +12,7 @@ import { Bidang } from "@/app/(auth)/AuthShell";
 import { uripPetemon } from "@/lib/content/petemon";
 import { useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
-import { getDb } from "@/lib/firebase/client";
+import { perbaruiProfil } from "@/lib/firebase/client";
 import {
   getSadwara,
   pancawaraName,
@@ -89,7 +88,7 @@ export default function OnboardingPage() {
               setBusy(true);
               try {
                 const petemon = uripPetemon(tanggalLahir);
-                await updateDoc(doc(getDb(), "users", user.uid), {
+                await perbaruiProfil(user.uid, {
                   nama: nama.trim(),
                   tanggalLahir,
                   phoneNumber: phone.trim() || null,

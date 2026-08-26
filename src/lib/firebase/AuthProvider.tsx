@@ -1,19 +1,11 @@
 "use client";
 
-import {
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  sendEmailVerification,
-  sendPasswordResetEmail,
-  signInWithEmailAndPassword,
-  signOut,
-  type User,
-} from "firebase/auth";
-import { doc, onSnapshot } from "firebase/firestore";
+import type { User } from "firebase/auth";
+import { usePathname } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { evaluateAccess } from "@/lib/subscription";
 import type { AccessState, UserProfile } from "@/types";
-import { firebaseConfigured, getDb, getFirebaseAuth } from "./client";
+import { firebase, firebaseConfigured } from "./client";
 
 interface AuthContextValue {
   /** null = belum login. undefined tidak dipakai: cek `loading` dulu. */
@@ -70,63 +62,114 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Kalau Firebase belum dikonfigurasi, tidak ada yang ditunggu.
   const [loading, setLoading] = useState(firebaseConfigured);
 
+  /*
+   * Halaman depan tidak pernah memakai status masuk: header-nya selalu
+   * menampilkan tombol Masuk, dan isinya sama untuk semua pengunjung. Karena
+   * AuthProvider dipasang di kerangka paling luar, tanpa pengecualian ini
+   * setiap pengunjung pertama tetap mengunduh SDK Firebase hanya untuk
+   * berlangganan status yang tidak dipakai halaman itu.
+   *
+   * Halaman masuk dan daftar sengaja TIDAK dikecualikan: keduanya memang akan
+   * memerlukan Firebase sebentar lagi, jadi memuatnya lebih awal justru
+   * membuat penekanan tombolnya terasa lebih cepat.
+   */
+  const pathname = usePathname();
+  const perluAuth = pathname !== "/";
+
   useEffect(() => {
-    if (!firebaseConfigured) return;
-    return onAuthStateChanged(getFirebaseAuth(), (u) => {
-      setUser(u);
-      setEmailVerified(!!u?.emailVerified);
-      if (!u) {
-        setProfile(null);
-        setLoading(false);
+    if (!firebaseConfigured || !perluAuth) return;
+    // Firebase dimuat setelah halaman tampil, jadi berhenti berlangganan bisa
+    // diminta sebelum SDK-nya selesai datang. Tandanya disimpan supaya
+    // langganan yang telat tiba langsung dilepas lagi.
+    let batal = false;
+    let lepas: (() => void) | undefined;
+    void (async () => {
+      try {
+        const { auth, fn } = await firebase();
+        if (batal) return;
+        lepas = fn.onAuthStateChanged(auth, (u) => {
+          setUser(u);
+          setEmailVerified(!!u?.emailVerified);
+          if (!u) {
+            setProfile(null);
+            setLoading(false);
+          }
+        });
+      } catch {
+        // Firebase gagal dimuat: jangan menahan aplikasi di layar tunggu.
+        if (!batal) setLoading(false);
       }
-    });
-  }, []);
+    })();
+    return () => {
+      batal = true;
+      lepas?.();
+    };
+  }, [perluAuth]);
 
   // Profil di-subscribe, bukan sekali baca: saat admin mengaktifkan langganan,
   // status di perangkat pengguna ikut berubah tanpa perlu reload.
   useEffect(() => {
     if (!user || !firebaseConfigured) return;
-    const ref = doc(getDb(), "users", user.uid);
-    const unsub = onSnapshot(
-      ref,
-      (snap) => {
-        setProfile(snap.exists() ? ({ uid: user.uid, ...snap.data() } as UserProfile) : null);
-        setLoading(false);
-      },
-      () => setLoading(false),
-    );
-    return unsub;
+    let batal = false;
+    let lepas: (() => void) | undefined;
+    void (async () => {
+      try {
+        const { db, fn } = await firebase();
+        if (batal) return;
+        lepas = fn.onSnapshot(
+          fn.doc(db, "users", user.uid),
+          (snap) => {
+            setProfile(
+              snap.exists() ? ({ uid: user.uid, ...snap.data() } as UserProfile) : null,
+            );
+            setLoading(false);
+          },
+          () => setLoading(false),
+        );
+      } catch {
+        if (!batal) setLoading(false);
+      }
+    })();
+    return () => {
+      batal = true;
+      lepas?.();
+    };
   }, [user]);
 
   const register = useCallback(async (email: string, password: string) => {
-    const auth = getFirebaseAuth();
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-    await sendEmailVerification(cred.user);
+    const { auth, fn } = await firebase();
+    const cred = await fn.createUserWithEmailAndPassword(auth, email, password);
+    await fn.sendEmailVerification(cred.user);
     await bootstrapProfile(cred.user);
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    const cred = await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
+    const { auth, fn } = await firebase();
+    const cred = await fn.signInWithEmailAndPassword(auth, email, password);
     // Jaring pengaman: kalau pendaftaran dulu terputus sebelum profil dibuat,
     // ini membuatnya sekarang. Tidak mengubah apa pun bila profil sudah ada.
     await bootstrapProfile(cred.user);
   }, []);
 
   const logout = useCallback(async () => {
-    await signOut(getFirebaseAuth());
+    const { auth, fn } = await firebase();
+    await fn.signOut(auth);
   }, []);
 
   const resetPassword = useCallback(async (email: string) => {
-    await sendPasswordResetEmail(getFirebaseAuth(), email);
+    const { auth, fn } = await firebase();
+    await fn.sendPasswordResetEmail(auth, email);
   }, []);
 
   const resendVerification = useCallback(async () => {
-    const current = getFirebaseAuth().currentUser;
-    if (current) await sendEmailVerification(current);
+    const { auth, fn } = await firebase();
+    const current = auth.currentUser;
+    if (current) await fn.sendEmailVerification(current);
   }, []);
 
   const refreshUser = useCallback(async () => {
-    const current = getFirebaseAuth().currentUser;
+    const { auth } = await firebase();
+    const current = auth.currentUser;
     if (!current) return false;
     // emailVerified ikut token, jadi baru berubah setelah ditarik ulang.
     await current.reload();

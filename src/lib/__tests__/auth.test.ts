@@ -65,11 +65,41 @@ for (const f of komponen) {
   );
 }
 
-eq(
-  "ambilToken membaca dari currentUser",
-  true,
-  readFileSync("src/lib/firebase/client.ts", "utf8").includes("getFirebaseAuth().currentUser"),
-);
+{
+  const klien = readFileSync("src/lib/firebase/client.ts", "utf8");
+  eq("ambilToken membaca dari currentUser", true, /auth\.currentUser/.test(klien));
+
+  // SDK Firebase harus diimpor secara dinamis. Impor statis mengembalikannya
+  // ke bundel setiap halaman, termasuk halaman depan yang tidak memakainya.
+  eq("SDK diimpor dinamis", true, klien.includes('import("firebase/auth")'));
+  eq(
+    "client tidak mengimpor nilai firebase secara statis",
+    false,
+    /^import (?!type )/m.test(
+      klien
+        .split("\n")
+        .filter((l) => l.includes('from "firebase/'))
+        .join("\n"),
+    ),
+  );
+}
+
+// Komponen tidak boleh mengimpor nilai dari paket firebase langsung; itu
+// menarik SDK-nya kembali ke bundel halaman yang bersangkutan.
+for (const f of [
+  "src/app/onboarding/page.tsx",
+  "src/components/EditTanggalLahir.tsx",
+  "src/lib/firebase/AuthProvider.tsx",
+]) {
+  const barisImpor = readFileSync(f, "utf8")
+    .split("\n")
+    .filter((l) => l.includes('from "firebase/'));
+  eq(
+    `${f} hanya mengimpor tipe dari paket firebase`,
+    true,
+    barisImpor.every((l) => l.startsWith("import type")),
+  );
+}
 
 console.log(fail === 0 ? "✓ auth: semua lolos" : `✗ auth: ${fail} gagal`);
 if (fail) process.exit(1);

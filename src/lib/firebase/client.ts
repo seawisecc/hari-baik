@@ -1,11 +1,25 @@
-import { getApp, getApps, initializeApp, type FirebaseApp } from "firebase/app";
-import { getAuth, type Auth } from "firebase/auth";
-import { getFirestore, type Firestore } from "firebase/firestore";
+import type { FirebaseApp } from "firebase/app";
+import type { Auth, User } from "firebase/auth";
+import type { DocumentData, Firestore, Unsubscribe } from "firebase/firestore";
 
 /**
- * Firebase sisi klien. Nilai NEXT_PUBLIC_* memang ikut ter-bundle ke browser;
- * itu wajar untuk Firebase; pengamanannya ada di Security Rules, bukan di
- * kerahasiaan config.
+ * Firebase sisi klien, dimuat saat dibutuhkan.
+ *
+ * Nilai NEXT_PUBLIC_* memang ikut ter-bundle ke browser; itu wajar untuk
+ * Firebase, pengamanannya ada di Security Rules bukan di kerahasiaan config.
+ *
+ * Yang penting di berkas ini: SDK-nya diimpor secara dinamis, bukan di
+ * puncak modul. Dulu Auth dan Firestore diimpor langsung, dan karena
+ * AuthProvider dipasang di kerangka paling luar, keduanya ikut ke SETIAP
+ * halaman. Halaman depan sendirian mengunduh 640 KB Firebase yang tidak
+ * dipakainya sama sekali: pengunjung pertama yang belum punya akun tetap
+ * membayar ongkosnya.
+ *
+ * Dengan impor dinamis, Firebase menjadi potongan tersendiri yang baru
+ * diambil saat benar-benar diperlukan, setelah halaman tampil.
+ *
+ * Semua tipe di atas diimpor dengan `import type`, yang hilang saat dikompilasi
+ * dan tidak menarik apa pun ke bundel.
  */
 const config = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -19,28 +33,67 @@ const config = {
 /** True bila env sudah diisi: dipakai untuk memberi pesan yang jelas saat belum. */
 export const firebaseConfigured = Boolean(config.apiKey && config.projectId);
 
-let app: FirebaseApp | null = null;
-let authInstance: Auth | null = null;
-let dbInstance: Firestore | null = null;
+export interface Firebase {
+  auth: Auth;
+  db: Firestore;
+  /** Fungsi SDK yang dipakai aplikasi ini, dikumpulkan supaya pemanggil
+      tidak perlu mengimpor paket firebase sendiri dan menariknya kembali
+      ke bundel utama. */
+  fn: {
+    onAuthStateChanged: typeof import("firebase/auth").onAuthStateChanged;
+    createUserWithEmailAndPassword: typeof import("firebase/auth").createUserWithEmailAndPassword;
+    signInWithEmailAndPassword: typeof import("firebase/auth").signInWithEmailAndPassword;
+    signOut: typeof import("firebase/auth").signOut;
+    sendEmailVerification: typeof import("firebase/auth").sendEmailVerification;
+    sendPasswordResetEmail: typeof import("firebase/auth").sendPasswordResetEmail;
+    doc: typeof import("firebase/firestore").doc;
+    onSnapshot: typeof import("firebase/firestore").onSnapshot;
+    updateDoc: typeof import("firebase/firestore").updateDoc;
+  };
+}
 
-function ensureApp(): FirebaseApp {
+let dimuat: Promise<Firebase> | null = null;
+
+/**
+ * Muat Firebase sekali, lalu pakai ulang hasilnya.
+ *
+ * Janjinya di-cache, bukan hasilnya, supaya dua pemanggil yang datang
+ * bersamaan tidak memicu dua kali inisialisasi.
+ */
+export function firebase(): Promise<Firebase> {
   if (!firebaseConfigured) {
-    throw new Error(
-      "Firebase belum dikonfigurasi. Salin .env.example ke .env.local dan isi kredensial project Firebase-mu.",
+    return Promise.reject(
+      new Error(
+        "Firebase belum dikonfigurasi. Salin .env.example ke .env.local dan isi kredensial project Firebase-mu.",
+      ),
     );
   }
-  if (!app) app = getApps().length ? getApp() : initializeApp(config);
-  return app;
-}
-
-export function getFirebaseAuth(): Auth {
-  if (!authInstance) authInstance = getAuth(ensureApp());
-  return authInstance;
-}
-
-export function getDb(): Firestore {
-  if (!dbInstance) dbInstance = getFirestore(ensureApp());
-  return dbInstance;
+  dimuat ??= (async () => {
+    const [app, auth, firestore] = await Promise.all([
+      import("firebase/app"),
+      import("firebase/auth"),
+      import("firebase/firestore"),
+    ]);
+    const instance: FirebaseApp = app.getApps().length
+      ? app.getApp()
+      : app.initializeApp(config);
+    return {
+      auth: auth.getAuth(instance),
+      db: firestore.getFirestore(instance),
+      fn: {
+        onAuthStateChanged: auth.onAuthStateChanged,
+        createUserWithEmailAndPassword: auth.createUserWithEmailAndPassword,
+        signInWithEmailAndPassword: auth.signInWithEmailAndPassword,
+        signOut: auth.signOut,
+        sendEmailVerification: auth.sendEmailVerification,
+        sendPasswordResetEmail: auth.sendPasswordResetEmail,
+        doc: firestore.doc,
+        onSnapshot: firestore.onSnapshot,
+        updateDoc: firestore.updateDoc,
+      },
+    };
+  })();
+  return dimuat;
 }
 
 /**
@@ -53,7 +106,28 @@ export function getDb(): Firestore {
  * mengambil token.
  */
 export async function ambilToken(): Promise<string> {
-  const current = getFirebaseAuth().currentUser;
+  const { auth } = await firebase();
+  const current = auth.currentUser;
   if (!current) throw new Error("Sesi berakhir. Silakan masuk lagi.");
   return current.getIdToken();
 }
+
+/** Pengguna yang sedang masuk, atau null. */
+export async function penggunaSekarang(): Promise<User | null> {
+  const { auth } = await firebase();
+  return auth.currentUser;
+}
+
+/**
+ * Perbarui dokumen profil pengguna.
+ *
+ * Dibungkus di sini supaya halaman onboarding dan form ubah tanggal lahir
+ * tidak perlu mengimpor firebase/firestore sendiri, yang akan menarik SDK-nya
+ * kembali ke bundel halaman itu.
+ */
+export async function perbaruiProfil(uid: string, data: DocumentData): Promise<void> {
+  const { db, fn } = await firebase();
+  await fn.updateDoc(fn.doc(db, "users", uid), data);
+}
+
+export type { Unsubscribe };
