@@ -1,6 +1,13 @@
 /** Keputusan pengalihan rute: siapa boleh melihat apa. */
 import { RUTE_PRO, perluLayarTunggu, tentukanAlihan, type KondisiAkses } from "../gate";
-import { NAV_AKUN, NAV_MOBILE, NAV_MOBILE_LAINNYA, NAV_PRO, NAV_UTAMA } from "../nav";
+import {
+  NAV_ADDON,
+  NAV_AKUN,
+  NAV_MOBILE,
+  NAV_MOBILE_LAINNYA,
+  NAV_PRO,
+  NAV_UTAMA,
+} from "../nav";
 
 let fail = 0;
 const eq = (label: string, expected: unknown, actual: unknown) => {
@@ -126,7 +133,7 @@ eq(
 // Semua rute aplikasi harus terjangkau dari ponsel. Bilah bawah hanya muat
 // beberapa, sisanya wajib ada di lembar "Lainnya": pernah terjadi dua fitur
 // berbayar hilang sama sekali dari ponsel karena tidak ada yang memeriksa ini.
-const semuaRute = [...NAV_UTAMA, ...NAV_PRO, ...NAV_AKUN].map((i) => i.href);
+const semuaRute = [...NAV_UTAMA, ...NAV_PRO, ...NAV_ADDON, ...NAV_AKUN].map((i) => i.href);
 const terjangkau = new Set([...NAV_MOBILE, ...NAV_MOBILE_LAINNYA].map((i) => i.href));
 for (const href of semuaRute) {
   eq(`terjangkau dari ponsel: ${href}`, true, terjangkau.has(href));

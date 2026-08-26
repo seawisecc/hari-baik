@@ -21,6 +21,24 @@ export const RUTE_PRO: Record<string, { titleKey: string; descKey: string }> = {
   "/perjalanan-hidup": { titleKey: "pro.nasib.title", descKey: "pro.lock.desc.nasib" },
 };
 
+/**
+ * Rute yang butuh add-on tertentu, bukan sekadar langganan aktif.
+ *
+ * Dipisah dari RUTE_PRO karena syaratnya berbeda: Pro dibuka oleh langganan,
+ * add-on dibeli satu per satu. Id-nya harus sama dengan id di daftar harga,
+ * dan halamannya harus terdaftar di addon-registry; keduanya dijaga tes.
+ */
+export const RUTE_ADDON: Record<
+  string,
+  { addOnId: string; titleKey: string; descKey: string }
+> = {
+  "/pencari-hari": {
+    addOnId: "cari-hari-acara",
+    titleKey: "acara.title",
+    descKey: "addon.lock.desc",
+  },
+};
+
 export interface KondisiAkses {
   pathname: string;
   configured: boolean;

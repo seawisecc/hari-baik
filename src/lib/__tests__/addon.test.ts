@@ -11,6 +11,7 @@
  */
 import { existsSync, readFileSync } from "node:fs";
 import { ADDON_SIAP, addOnSiapJual } from "../addon-registry";
+import { RUTE_ADDON } from "../gate";
 import { HARGA_BAWAAN } from "../harga";
 
 let fail = 0;
@@ -58,6 +59,29 @@ for (const a of HARGA_BAWAAN.addOn) {
 
   const rules = readFileSync("firestore.rules", "utf8");
   eq("addOn terlindungi dari tulisan klien", true, rules.includes("'addOn'"));
+}
+
+// 5. Setiap rute yang dijaga sebagai add-on harus menunjuk add-on yang benar
+//    ada di daftar harga dan sudah terdaftar siap jual. Tanpa ini, salah ketik
+//    id membuat halaman terkunci selamanya untuk semua orang.
+for (const [rute, info] of Object.entries(RUTE_ADDON)) {
+  eq(
+    `${rute}: id ${info.addOnId} ada di daftar harga`,
+    true,
+    HARGA_BAWAAN.addOn.some((a) => a.id === info.addOnId),
+  );
+  eq(`${rute}: id ${info.addOnId} terdaftar siap jual`, true, addOnSiapJual(info.addOnId));
+  eq(`${rute}: halamannya ada`, true, existsSync(`src/app${rute}/page.tsx`));
+}
+
+// Sebaliknya: setiap add-on yang siap jual harus punya gerbangnya. Fitur yang
+// dijual tapi tidak dijaga berarti dibuka gratis untuk semua orang.
+for (const id of Object.keys(ADDON_SIAP)) {
+  eq(
+    `add-on ${id} punya rute terjaga`,
+    true,
+    Object.values(RUTE_ADDON).some((r) => r.addOnId === id),
+  );
 }
 
 console.log(fail === 0 ? "✓ add-on: semua lolos" : `✗ add-on: ${fail} gagal`);

@@ -6,7 +6,15 @@ import { usePathname } from "next/navigation";
 import { LangToggle } from "@/components/ui/LangToggle";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { cn } from "@/lib/cn";
-import { NAV_ADMIN, NAV_AKUN, NAV_PRO, NAV_UTAMA, butuhPro, type NavItem } from "@/lib/nav";
+import {
+  NAV_ADDON,
+  NAV_ADMIN,
+  NAV_AKUN,
+  NAV_PRO,
+  NAV_UTAMA,
+  butuhPro,
+  type NavItem,
+} from "@/lib/nav";
 import { useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
 import { useUserData } from "@/lib/useUserData";
@@ -90,6 +98,9 @@ export function Sidebar() {
         <Grup label={t("nav.group.analysis")}>
           {NAV_PRO.map((i) => (
             <Item key={i.href} item={i} terkunci={terkunci} />
+          ))}
+          {NAV_ADDON.map((i) => (
+            <Item key={i.href} item={i} terkunci={false} />
           ))}
         </Grup>
 

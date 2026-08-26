@@ -20,8 +20,7 @@ export interface AddOnSiap {
 }
 
 export const ADDON_SIAP: Record<string, AddOnSiap> = {
-  // Contoh setelah fiturnya jadi:
-  // "profil-keluarga": { rute: "/keluarga" },
+  "cari-hari-acara": { rute: "/pencari-hari" },
 };
 
 /** True bila fitur di balik add-on ini sudah benar-benar ada. */

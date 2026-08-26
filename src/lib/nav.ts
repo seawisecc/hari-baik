@@ -1,5 +1,6 @@
 import {
   CalendarDays,
+  CalendarSearch,
   Heart,
   Route,
   Shield,
@@ -59,6 +60,21 @@ export const NAV_PRO: NavItem[] = [
   },
 ];
 
+/**
+ * Fitur yang dibeli terpisah sebagai add-on, bukan dibuka langganan.
+ *
+ * Dipisah dari NAV_PRO supaya penanda di navigasinya bisa berbeda: yang ini
+ * tidak terbuka hanya karena langganan aktif.
+ */
+export const NAV_ADDON: NavItem[] = [
+  {
+    href: "/pencari-hari",
+    labelKey: "acara.title",
+    shortKey: "nav.short.finder",
+    icon: CalendarSearch,
+  },
+];
+
 /** True bila rute ini butuh langganan aktif. */
 export const butuhPro = (href: string) => href in RUTE_PRO;
 
@@ -90,7 +106,7 @@ export const NAV_ADMIN: NavItem = {
 export const NAV_MOBILE: NavItem[] = [NAV_UTAMA[0], NAV_UTAMA[1], NAV_UTAMA[2], NAV_AKUN[0]];
 
 /** Semua tujuan di luar bilah bawah, muncul di lembar "Lainnya". */
-export const NAV_MOBILE_LAINNYA: NavItem[] = NAV_PRO;
+export const NAV_MOBILE_LAINNYA: NavItem[] = [...NAV_PRO, ...NAV_ADDON];
 
 /** Rute yang tampil tanpa shell aplikasi. */
 export const RUTE_TELANJANG = [
