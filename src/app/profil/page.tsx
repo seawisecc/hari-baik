@@ -31,9 +31,9 @@ export default function ProfilPage() {
           <PageHeader title={t("nav.profile")} />
           <Card className="mx-auto max-w-lg">
             <CardBody className="pt-6">
-              <p className="text-[15px] text-ink-soft">Kamu belum masuk.</p>
+              <p className="text-[15px] text-ink-soft">{t("auth.notSignedIn")}</p>
               <Button className="mt-5" block onClick={() => router.push("/login")}>
-                Masuk
+                {t("auth.login")}
               </Button>
             </CardBody>
           </Card>
@@ -56,16 +56,16 @@ export default function ProfilPage() {
             diturunkan dari satu tanggal yang sama. */}
         <Card elevation={2}>
           <CardHeader>
-            <CardTitle>{profile.nama || "(nama belum diisi)"}</CardTitle>
+            <CardTitle>{profile.nama || t("profile.noName")}</CardTitle>
             <p className="mt-0.5 text-sm text-ink-soft">{profile.email}</p>
           </CardHeader>
 
           <CardBody className="space-y-6">
             <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-md bg-border-soft sm:grid-cols-4">
-              <Kotak label="Tanggal lahir" nilai={profile.tanggalLahir ?? "-"} />
-              <Kotak label="Weton" nilai={weton} />
-              <Kotak label="Wuku" nilai={profile.wukuLahir ?? "-"} />
-              <Kotak label="Urip" nilai={profile.uripLahir?.toString() ?? "-"} />
+              <Kotak label={t("profile.birthDate")} nilai={profile.tanggalLahir ?? "-"} />
+              <Kotak label={t("profile.weton")} nilai={weton} />
+              <Kotak label={t("profile.wuku")} nilai={profile.wukuLahir ?? "-"} />
+              <Kotak label={t("profile.urip")} nilai={profile.uripLahir?.toString() ?? "-"} />
             </dl>
 
             <div className="flex flex-wrap items-center justify-between gap-4">
@@ -99,8 +99,8 @@ export default function ProfilPage() {
                 <Shield className="h-4 w-4 text-accent-deep" aria-hidden />
               </span>
               <div>
-                <p className="font-medium text-ink">Panel Admin</p>
-                <p className="text-sm text-ink-soft">Kelola pengguna dan langganan</p>
+                <p className="font-medium text-ink">{t("profile.adminPanel")}</p>
+                <p className="text-sm text-ink-soft">{t("profile.adminPanelDesc")}</p>
               </div>
             </Card>
           </Link>
@@ -113,8 +113,8 @@ export default function ProfilPage() {
             <MessageCircle className="h-4 w-4 text-accent-deep" aria-hidden />
           </span>
           <div className="flex-1">
-            <p className="font-medium text-ink">Butuh bantuan?</p>
-            <p className="text-sm text-ink-soft">Hubungi admin lewat WhatsApp</p>
+            <p className="font-medium text-ink">{t("profile.needHelp")}</p>
+            <p className="text-sm text-ink-soft">{t("profile.contactAdmin")}</p>
           </div>
           <a
             href={`https://wa.me/${ADMIN_WA}`}

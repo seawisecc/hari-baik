@@ -7,10 +7,12 @@ import { AuthShell, BelumDikonfigurasi, Bidang } from "../AuthShell";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
+import { useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
 import { pesanAuth } from "@/lib/firebase/errors";
 
 export default function RegisterPage() {
+  const t = useT();
   const { register, configured } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -26,13 +28,13 @@ export default function RegisterPage() {
 
   return (
     <AuthShell
-      title="Daftar"
-      subtitle="Gratis 3 hari, tanpa kartu kredit."
+      title={t("auth.register")}
+      subtitle={t("auth.registerSubtitle")}
       footer={
         <>
-          Sudah punya akun?{" "}
+          {t("auth.haveAccount")}{" "}
           <Link href="/login" className="font-medium text-ink underline underline-offset-2">
-            Masuk
+            {t("auth.login")}
           </Link>
         </>
       }
@@ -59,7 +61,7 @@ export default function RegisterPage() {
         >
           {error && <Alert tone="error">{error}</Alert>}
 
-          <Bidang label={<Label htmlFor="email">Email</Label>}>
+          <Bidang label={<Label htmlFor="email">{t("auth.email")}</Label>}>
             <Input
               id="email"
               type="email"
@@ -71,8 +73,8 @@ export default function RegisterPage() {
           </Bidang>
 
           <Bidang
-            label={<Label htmlFor="password">Kata sandi</Label>}
-            hint="Minimal 6 karakter."
+            label={<Label htmlFor="password">{t("auth.password")}</Label>}
+            hint={t("auth.passwordHint")}
           >
             <Input
               id="password"
@@ -86,8 +88,8 @@ export default function RegisterPage() {
           </Bidang>
 
           <Bidang
-            label={<Label htmlFor="ulangi">Ulangi kata sandi</Label>}
-            error={tidakCocok ? "Kata sandi belum sama." : undefined}
+            label={<Label htmlFor="ulangi">{t("auth.passwordRepeat")}</Label>}
+            error={tidakCocok ? t("auth.passwordMismatch") : undefined}
           >
             <Input
               id="ulangi"
@@ -100,7 +102,7 @@ export default function RegisterPage() {
           </Bidang>
 
           <Button type="submit" block size="lg" disabled={busy || !siap}>
-            {busy ? "Memproses…" : "Daftar"}
+            {busy ? t("common.processing") : t("auth.register")}
           </Button>
         </form>
       )}

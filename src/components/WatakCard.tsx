@@ -2,6 +2,7 @@
 
 import * as Icons from "lucide-react";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
+import { useT } from "@/lib/content/LangProvider";
 import type { ProfilWatak } from "@/lib/content/kepribadian";
 
 /** Nama ikon di data mengikuti penamaan app lama; petakan ke lucide-react. */
@@ -26,6 +27,7 @@ const ICON: Record<string, keyof typeof Icons> = {
 };
 
 export function WatakCard({ label, profil }: { label: string; profil: ProfilWatak }) {
+  const t = useT();
   const name = ICON[profil.icon] ?? "Circle";
   const Icon = (Icons[name] ?? Icons.Circle) as React.ComponentType<{
     className?: string;
@@ -51,7 +53,7 @@ export function WatakCard({ label, profil }: { label: string; profil: ProfilWata
 
         <div>
           <p className="mb-2 text-xs font-medium uppercase tracking-wide text-ink-faint">
-            Kekuatan
+            {t("traits.strengths")}
           </p>
           <ul className="space-y-1.5">
             {profil.kekuatan.map((k) => (
@@ -68,7 +70,7 @@ export function WatakCard({ label, profil }: { label: string; profil: ProfilWata
 
         <div>
           <p className="mb-2 text-xs font-medium uppercase tracking-wide text-ink-faint">
-            Tantangan
+            {t("traits.challenges")}
           </p>
           <ul className="space-y-1.5">
             {profil.tantangan.map((k) => (
@@ -85,7 +87,7 @@ export function WatakCard({ label, profil }: { label: string; profil: ProfilWata
 
         <div className="rounded-md bg-surface-sunk px-5 py-4 hb-sink">
           <p className="mb-1 text-xs font-medium uppercase tracking-wide text-ink-faint">
-            Saran
+            {t("traits.advice")}
           </p>
           <p className="text-sm leading-relaxed text-ink">{profil.saran}</p>
         </div>

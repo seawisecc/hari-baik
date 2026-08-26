@@ -6,16 +6,18 @@ import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { PageContainer } from "@/components/shell/AppShell";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { getPancasuda, getPangarasan } from "@/lib/content/kepribadian";
+import { useT } from "@/lib/content/LangProvider";
 import { getWeton } from "@/lib/content/weton";
 import { useUserData } from "@/lib/useUserData";
 import { pancawaraName, saptawaraName, uripHari } from "@/lib/wariga";
 
 export default function KepribadianPage() {
+  const t = useT();
   const { birthDate, loading } = useUserData();
 
   if (loading) return <Memuat />;
 
-  if (!birthDate) return <ButuhTanggalLahir title="Kepribadian" />;
+  if (!birthDate) return <ButuhTanggalLahir title={t("traits.title")} />;
 
   const sapta = saptawaraName(birthDate);
   const panca = pancawaraName(birthDate);
@@ -26,11 +28,11 @@ export default function KepribadianPage() {
   return (
     <PageContainer>
       <div className="space-y-6">
-        <PageHeader title="Kepribadian" subtitle="Dibaca dari weton kelahiranmu" />
+        <PageHeader title={t("traits.title")} subtitle={t("traits.subtitle")} />
 
         <Card elevation={3}>
           <CardHeader>
-            <p className="text-sm text-ink-faint">Weton lahir</p>
+            <p className="text-sm text-ink-faint">{t("traits.birthWeton")}</p>
             <CardTitle className="mt-1">
               {sapta} {panca}
             </CardTitle>
@@ -47,8 +49,8 @@ export default function KepribadianPage() {
           )}
         </Card>
 
-        {pangarasan && <WatakCard label="Pangarasan: cara kamu bergerak" profil={pangarasan} />}
-        {pancasuda && <WatakCard label="Pancasuda: bekal bawaan" profil={pancasuda} />}
+        {pangarasan && <WatakCard label={t("traits.pangarasan")} profil={pangarasan} />}
+        {pancasuda && <WatakCard label={t("traits.pancasuda")} profil={pancasuda} />}
       </div>
     </PageContainer>
   );

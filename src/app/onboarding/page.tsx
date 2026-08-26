@@ -11,6 +11,7 @@ import { Wordmark } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { Bidang } from "@/app/(auth)/AuthShell";
 import { uripPetemon } from "@/lib/content/petemon";
+import { useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
 import { getDb } from "@/lib/firebase/client";
 import {
@@ -23,6 +24,7 @@ import {
 } from "@/lib/wariga";
 
 export default function OnboardingPage() {
+  const t = useT();
   const { user, profile, loading } = useAuth();
   const router = useRouter();
   const today = toDateString(new Date());
@@ -36,7 +38,7 @@ export default function OnboardingPage() {
   if (loading) {
     return (
       <main className="grid min-h-screen place-items-center text-sm text-ink-faint">
-        Memuat…
+        {t("common.loading")}
       </main>
     );
   }
@@ -46,9 +48,9 @@ export default function OnboardingPage() {
       <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6">
         <Card>
           <CardBody className="pt-6">
-            <p className="text-[15px] text-ink-soft">Kamu belum masuk.</p>
+            <p className="text-[15px] text-ink-soft">{t("auth.notSignedIn")}</p>
             <Button className="mt-5" block onClick={() => router.push("/login")}>
-              Ke halaman masuk
+              {t("auth.toLogin")}
             </Button>
           </CardBody>
         </Card>
@@ -72,9 +74,9 @@ export default function OnboardingPage() {
 
       <Card elevation={3}>
         <CardHeader className="pb-4">
-          <CardTitle className="text-2xl">Satu langkah lagi</CardTitle>
+          <CardTitle className="text-2xl">{t("onboarding.title")}</CardTitle>
           <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-            Kalender siklusmu dihitung dari tanggal lahir, jadi pastikan benar.
+            {t("onboarding.subtitle")}
           </p>
         </CardHeader>
 
@@ -101,7 +103,7 @@ export default function OnboardingPage() {
                 });
                 router.push("/hari-ini");
               } catch {
-                setError("Gagal menyimpan. Periksa koneksi lalu coba lagi.");
+                setError(t("common.saveFailed"));
               } finally {
                 setBusy(false);
               }
@@ -109,7 +111,7 @@ export default function OnboardingPage() {
           >
             {error && <Alert tone="error">{error}</Alert>}
 
-            <Bidang label={<Label htmlFor="nama">Nama lengkap</Label>}>
+            <Bidang label={<Label htmlFor="nama">{t("onboarding.fullName")}</Label>}>
               <Input
                 id="nama"
                 autoComplete="name"
@@ -119,7 +121,7 @@ export default function OnboardingPage() {
               />
             </Bidang>
 
-            <Bidang label={<Label htmlFor="lahir">Tanggal lahir Masehi</Label>}>
+            <Bidang label={<Label htmlFor="lahir">{t("onboarding.birthDate")}</Label>}>
               <Input
                 id="lahir"
                 type="date"
@@ -135,7 +137,7 @@ export default function OnboardingPage() {
             {tanggalLahir && (
               <div className="rounded-md bg-surface-sunk px-5 py-4 hb-sink">
                 <p className="text-[11px] uppercase tracking-wide text-ink-faint">
-                  Hari lahirmu
+                  {t("onboarding.yourBirthDay")}
                 </p>
                 <p className="mt-1 font-heading text-xl font-semibold text-ink">
                   {saptawaraName(tanggalLahir)} {pancawaraName(tanggalLahir)}
@@ -149,10 +151,11 @@ export default function OnboardingPage() {
             <Bidang
               label={
                 <Label htmlFor="phone">
-                  Nomor WhatsApp <span className="font-normal text-ink-faint">(opsional)</span>
+                  {t("onboarding.whatsapp")}{" "}
+                  <span className="font-normal text-ink-faint">({t("common.optional")})</span>
                 </Label>
               }
-              hint="Memudahkan admin menghubungimu soal langganan."
+              hint={t("onboarding.whatsappHint")}
             >
               <Input
                 id="phone"
@@ -169,7 +172,7 @@ export default function OnboardingPage() {
             </Bidang>
 
             <Button type="submit" block size="lg" disabled={busy || !siap}>
-              {busy ? "Menyimpan…" : "Mulai perjalanan"}
+              {busy ? t("common.saving") : t("onboarding.start")}
             </Button>
           </form>
         </CardBody>

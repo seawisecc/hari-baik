@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
+import { useT } from "@/lib/content/LangProvider";
 import { uripPetemon } from "@/lib/content/petemon";
 import { getDb } from "@/lib/firebase/client";
 import {
@@ -32,6 +33,7 @@ export function EditTanggalLahir({
   tanggalLahir: string | null;
   onSelesai?: () => void;
 }) {
+  const t = useT();
   const [buka, setBuka] = useState(false);
   const [nilai, setNilai] = useState(tanggalLahir ?? "");
   const [busy, setBusy] = useState(false);
@@ -42,7 +44,7 @@ export function EditTanggalLahir({
     return (
       <Button variant="surface" size="sm" onClick={() => setBuka(true)}>
         <Pencil className="h-3.5 w-3.5" aria-hidden />
-        Ubah tanggal lahir
+        {t("birth.change")}
       </Button>
     );
   }
@@ -69,7 +71,7 @@ export function EditTanggalLahir({
           setBuka(false);
           onSelesai?.();
         } catch {
-          setError("Gagal menyimpan. Periksa koneksi lalu coba lagi.");
+          setError(t("common.saveFailed"));
         } finally {
           setBusy(false);
         }
@@ -78,7 +80,7 @@ export function EditTanggalLahir({
       {error && <Alert tone="error">{error}</Alert>}
 
       <div className="space-y-2">
-        <Label htmlFor="ubah-lahir">Tanggal lahir Masehi</Label>
+        <Label htmlFor="ubah-lahir">{t("onboarding.birthDate")}</Label>
         <Input
           id="ubah-lahir"
           type="date"
@@ -91,7 +93,7 @@ export function EditTanggalLahir({
 
       {nilai && nilai !== tanggalLahir && (
         <div className="rounded-md bg-surface px-4 py-3 hb-raise-1">
-          <p className="text-xs text-ink-faint">Weton baru</p>
+          <p className="text-xs text-ink-faint">{t("birth.newWeton")}</p>
           <p className="mt-0.5 font-heading text-base font-semibold text-ink">
             {saptawaraName(nilai)} {pancawaraName(nilai)}
           </p>
@@ -101,14 +103,11 @@ export function EditTanggalLahir({
         </div>
       )}
 
-      <p className="text-xs leading-relaxed text-ink-faint">
-        Seluruh kalender siklus, kepribadian, dan perjalanan hidupmu akan dihitung ulang dari
-        tanggal ini.
-      </p>
+      <p className="text-xs leading-relaxed text-ink-faint">{t("birth.recalcNote")}</p>
 
       <div className="flex gap-2">
         <Button type="submit" size="sm" disabled={busy || !nilai || nilai === tanggalLahir}>
-          {busy ? "Menyimpan…" : "Simpan"}
+          {busy ? t("common.saving") : t("common.save")}
         </Button>
         <Button
           type="button"
@@ -121,7 +120,7 @@ export function EditTanggalLahir({
             setError(null);
           }}
         >
-          Batal
+          {t("common.cancel")}
         </Button>
       </div>
     </form>

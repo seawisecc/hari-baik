@@ -34,8 +34,15 @@ export function useLang() {
   return useContext(LangContext);
 }
 
-/** Hook penerjemah: `const t = useT(); t("day.guru")`. */
+/**
+ * Hook penerjemah: `const t = useT(); t("day.guru")`.
+ * Argumen kedua mengisi penanda: `t("profile.daysLeft", { n: 12 })`.
+ */
 export function useT() {
   const { lang } = useLang();
-  return useCallback((key: MessageKey | string) => translate(lang, key), [lang]);
+  return useCallback(
+    (key: MessageKey | string, nilai?: Record<string, string | number>) =>
+      translate(lang, key, nilai),
+    [lang],
+  );
 }

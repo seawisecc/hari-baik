@@ -7,10 +7,12 @@ import { LangToggle } from "@/components/ui/LangToggle";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { cn } from "@/lib/cn";
 import { NAV_ADMIN, NAV_AKUN, NAV_PRO, NAV_UTAMA, butuhPro, type NavItem } from "@/lib/nav";
+import { useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
 import { useUserData } from "@/lib/useUserData";
 
 function Item({ item, terkunci }: { item: NavItem; terkunci: boolean }) {
+  const t = useT();
   const pathname = usePathname();
   const active = pathname === item.href;
   const Icon = item.icon;
@@ -31,11 +33,11 @@ function Item({ item, terkunci }: { item: NavItem; terkunci: boolean }) {
         )}
       >
         <Icon className="h-[18px] w-[18px] shrink-0" aria-hidden />
-        <span className="flex-1 truncate">{item.label}</span>
+        <span className="flex-1 truncate">{t(item.labelKey)}</span>
         {tampilkanPro && (
           <span
             className="rounded-pill bg-surface-sunk px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-ink-faint"
-            title="Butuh langganan aktif"
+            title={t("pro.lock.title")}
           >
             PRO
           </span>
@@ -66,6 +68,7 @@ function Baris({ label, children }: { label: string; children: React.ReactNode }
 }
 
 export function Sidebar() {
+  const t = useT();
   const { profile } = useAuth();
   const { access } = useUserData();
   const terkunci = !access.isPro;
@@ -74,23 +77,23 @@ export function Sidebar() {
     <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col border-r border-border-soft bg-surface px-4 py-6 lg:flex">
       <Link href="/hari-ini" className="px-3.5 pb-8">
         <Wordmark size={30} textClassName="text-2xl" />
-        <p className="mt-1.5 text-[11px] text-ink-faint">Kalender siklus personal</p>
+        <p className="mt-1.5 text-[11px] text-ink-faint">{t("app.subtitle.short")}</p>
       </Link>
 
-      <nav aria-label="Navigasi utama" className="flex-1 space-y-6 overflow-y-auto">
-        <Grup label="Harian">
+      <nav aria-label={t("nav.mainLabel")} className="flex-1 space-y-6 overflow-y-auto">
+        <Grup label={t("nav.group.daily")}>
           {NAV_UTAMA.map((i) => (
             <Item key={i.href} item={i} terkunci={false} />
           ))}
         </Grup>
 
-        <Grup label="Analisis">
+        <Grup label={t("nav.group.analysis")}>
           {NAV_PRO.map((i) => (
             <Item key={i.href} item={i} terkunci={terkunci} />
           ))}
         </Grup>
 
-        <Grup label="Akun">
+        <Grup label={t("nav.group.account")}>
           {NAV_AKUN.map((i) => (
             <Item key={i.href} item={i} terkunci={false} />
           ))}
@@ -100,10 +103,10 @@ export function Sidebar() {
 
       {/* Ditumpuk, bukan berdampingan: dua toggle tidak muat berjajar di 256px. */}
       <div className="space-y-3 border-t border-border-soft pt-4">
-        <Baris label="Bahasa">
+        <Baris label={t("settings.language")}>
           <LangToggle />
         </Baris>
-        <Baris label="Tema">
+        <Baris label={t("settings.theme")}>
           <ThemeToggle />
         </Baris>
       </div>

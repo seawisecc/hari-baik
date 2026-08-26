@@ -4,6 +4,7 @@ import { CalendarDays, Infinity as InfinityIcon, Plus, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
+import { useT } from "@/lib/content/LangProvider";
 
 export type AksiLangganan =
   | { action: "extend"; tahun: number }
@@ -30,6 +31,7 @@ export function AturLangganan({
   onTutup: () => void;
   busy: boolean;
 }) {
+  const t = useT();
   const [tanggal, setTanggal] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -37,7 +39,7 @@ export function AturLangganan({
   // berjalan di tengah render membuat hasil render tidak murni.
   const tetapkan = () => {
     if (new Date(`${tanggal}T23:59:59`) <= new Date()) {
-      setError("Tanggal habis harus di masa depan.");
+      setError(t("admin.dateMustBeFuture"));
       return;
     }
     setError(null);
@@ -48,12 +50,12 @@ export function AturLangganan({
     <div className="space-y-5 rounded-md bg-surface-sunk px-5 py-5 hb-sink">
       <div className="flex items-start justify-between gap-3">
         <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-faint">
-          Atur langganan
+          {t("admin.manageSub")}
         </p>
         <button
           onClick={onTutup}
           disabled={busy}
-          aria-label="Tutup"
+          aria-label={t("common.close")}
           className="text-ink-faint hover:text-ink"
         >
           <X className="h-4 w-4" />
@@ -61,7 +63,7 @@ export function AturLangganan({
       </div>
 
       <div>
-        <p className="mb-2 text-xs text-ink-soft">Tambah dari tanggal habis sekarang</p>
+        <p className="mb-2 text-xs text-ink-soft">{t("admin.addFromExpiry")}</p>
         <div className="flex flex-wrap gap-2">
           {CEPAT.map((n) => (
             <Button
@@ -72,7 +74,7 @@ export function AturLangganan({
               onClick={() => onPilih({ action: "extend", tahun: n })}
             >
               <Plus className="h-3.5 w-3.5" aria-hidden />
-              {n} tahun
+              {t("admin.years", { n })}
             </Button>
           ))}
         </div>
@@ -80,7 +82,7 @@ export function AturLangganan({
 
       <div className="space-y-2">
         <Label htmlFor="habis" className="text-xs">
-          Atau tetapkan tanggal habis
+          {t("admin.orSetDate")}
         </Label>
         <div className="flex flex-wrap gap-2">
           <Input
@@ -92,7 +94,7 @@ export function AturLangganan({
           />
           <Button size="sm" disabled={busy || !tanggal} onClick={tetapkan}>
             <CalendarDays className="h-3.5 w-3.5" aria-hidden />
-            Tetapkan
+            {t("admin.setDate")}
           </Button>
         </div>
         {error && <p className="text-xs text-error">{error}</p>}
@@ -106,7 +108,7 @@ export function AturLangganan({
           onClick={() => onPilih({ action: "lifetime" })}
         >
           <InfinityIcon className="h-3.5 w-3.5" aria-hidden />
-          Selamanya
+          {t("admin.forever")}
         </Button>
         {aktif && (
           <Button
@@ -115,7 +117,7 @@ export function AturLangganan({
             disabled={busy}
             onClick={() => onPilih({ action: "deactivate" })}
           >
-            Nonaktifkan
+            {t("admin.deactivate")}
           </Button>
         )}
       </div>

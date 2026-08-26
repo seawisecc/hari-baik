@@ -3,15 +3,17 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
+import { useT } from "@/lib/content/LangProvider";
 import { NAV_MOBILE } from "@/lib/nav";
 
 /** Bottom nav, hanya di bawah lg; di desktop digantikan Sidebar. */
 export function MobileNav() {
+  const t = useT();
   const pathname = usePathname();
 
   return (
     <nav
-      aria-label="Navigasi utama"
+      aria-label={t("nav.mainLabel")}
       className="fixed inset-x-0 bottom-0 z-20 border-t border-border-soft bg-surface pb-[env(safe-area-inset-bottom)] lg:hidden"
     >
       <ul className="mx-auto flex max-w-md items-stretch justify-around px-2 py-1.5">
@@ -37,7 +39,7 @@ export function MobileNav() {
                 >
                   <Icon className="h-[18px] w-[18px]" aria-hidden />
                 </span>
-                <span className="text-[10px] font-medium leading-none">{item.short}</span>
+                <span className="text-[10px] font-medium leading-none">{t(item.shortKey)}</span>
               </Link>
             </li>
           );

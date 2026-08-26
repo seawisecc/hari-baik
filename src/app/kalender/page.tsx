@@ -10,7 +10,7 @@ import { ButuhTanggalLahir, Memuat } from "@/components/ProGate";
 import { PageContainer } from "@/components/shell/AppShell";
 import { Button } from "@/components/ui/Button";
 import { Card, CardBody } from "@/components/ui/Card";
-import { useLang } from "@/lib/content/LangProvider";
+import { useLang, useT } from "@/lib/content/LangProvider";
 import { useUserData } from "@/lib/useUserData";
 import { toDateString } from "@/lib/wariga";
 
@@ -20,6 +20,7 @@ const POLA_TANGGAL = /^\d{4}-\d{2}-\d{2}$/;
 function KalenderView() {
   const { birthDate, loading } = useUserData();
   const { lang } = useLang();
+  const t = useT();
   const params = useSearchParams();
   const today = toDateString(new Date());
 
@@ -47,7 +48,7 @@ function KalenderView() {
   };
 
   if (loading) return <Memuat />;
-  if (!birthDate) return <ButuhTanggalLahir title="Kalender" />;
+  if (!birthDate) return <ButuhTanggalLahir title={t("nav.calendar")} />;
 
   const labelBulan = new Date(cursor.year, cursor.month, 1).toLocaleDateString(
     lang === "en" ? "en-GB" : "id-ID",
@@ -67,7 +68,7 @@ function KalenderView() {
                   variant="ghost"
                   size="icon"
                   onClick={() => geserBulan(-1)}
-                  aria-label="Bulan sebelumnya"
+                  aria-label={t("calendar.prevMonth")}
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -78,7 +79,7 @@ function KalenderView() {
                   variant="ghost"
                   size="icon"
                   onClick={() => geserBulan(1)}
-                  aria-label="Bulan berikutnya"
+                  aria-label={t("calendar.nextMonth")}
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
@@ -94,7 +95,7 @@ function KalenderView() {
 
               <div className="mt-5 flex justify-center">
                 <Button variant="ghost" size="sm" onClick={keHariIni}>
-                  Kembali ke hari ini
+                  {t("calendar.backToToday")}
                 </Button>
               </div>
 

@@ -1,4 +1,4 @@
-import type { Lang } from "@/lib/content/i18n";
+import { translate, type Lang } from "@/lib/content/i18n";
 
 const LOCALE: Record<Lang, string> = { id: "id-ID", en: "en-GB" };
 
@@ -33,8 +33,8 @@ export function tanggalBulan(dateStr: string) {
 
 /** "Hari ini", "Besok", lalu nama hari. */
 export function labelRelatif(offset: number, dateStr: string, lang: Lang) {
-  if (offset === 0) return lang === "en" ? "Today" : "Hari ini";
-  if (offset === 1) return lang === "en" ? "Tomorrow" : "Besok";
+  if (offset === 0) return translate(lang, "today.relative.today");
+  if (offset === 1) return translate(lang, "today.relative.tomorrow");
   return namaHariPendek(dateStr, lang);
 }
 

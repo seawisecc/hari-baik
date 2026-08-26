@@ -42,27 +42,27 @@ export default function ExpiredPage() {
 
         <CardBody className="space-y-6">
           <div className="rounded-md bg-surface-sunk px-6 py-5 text-center hb-sink">
-            <p className="font-heading text-3xl font-bold text-ink">Rp 150.000</p>
-            <p className="mt-1 text-sm text-ink-soft">per tahun</p>
-            <p className="mt-0.5 text-xs text-ink-faint">setara Rp 12.500 per bulan</p>
+            <p className="font-heading text-3xl font-bold text-ink">{t("expired.price")}</p>
+            <p className="mt-1 text-sm text-ink-soft">{t("expired.perYear")}</p>
+            <p className="mt-0.5 text-xs text-ink-faint">{t("expired.perMonth")}</p>
           </div>
 
           <div>
             <p className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-ink-faint">
-              Cara berlangganan
+              {t("expired.howTo")}
             </p>
             <ol className="space-y-2 text-sm leading-relaxed text-ink-soft">
               <li className="flex gap-2.5">
                 <span className="font-semibold text-ink">1.</span>
-                Hubungi admin lewat WhatsApp di nomor di bawah.
+                {t("expired.step1")}
               </li>
               <li className="flex gap-2.5">
                 <span className="font-semibold text-ink">2.</span>
-                Lakukan pembayaran sesuai petunjuk admin.
+                {t("expired.step2")}
               </li>
               <li className="flex gap-2.5">
                 <span className="font-semibold text-ink">3.</span>
-                Akunmu diaktifkan, dan seluruh fitur langsung terbuka lagi.
+                {t("expired.step3")}
               </li>
             </ol>
           </div>
@@ -74,11 +74,11 @@ export default function ExpiredPage() {
             className="flex h-13 w-full items-center justify-center gap-2 rounded-pill bg-accent text-[15px] font-medium text-accent-ink hb-raise-2 transition-colors hover:bg-accent-strong"
           >
             <MessageCircle className="h-4 w-4" aria-hidden />
-            Chat admin {ADMIN_WA_DISPLAY}
+            {t("expired.chatAdmin")} {ADMIN_WA_DISPLAY}
           </a>
 
           <p className="text-center text-xs leading-relaxed text-ink-faint">
-            Aktivasi dilakukan manual oleh admin setelah pembayaran dikonfirmasi.
+            {t("expired.manualNote")}
           </p>
         </CardBody>
       </Card>
@@ -90,7 +90,7 @@ export default function ExpiredPage() {
         }}
         className="mt-6 text-center text-sm text-ink-faint underline underline-offset-2 hover:text-ink-soft"
       >
-        Keluar
+        {t("nav.logout")}
       </button>
     </main>
   );

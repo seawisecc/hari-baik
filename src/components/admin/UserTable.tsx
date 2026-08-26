@@ -5,6 +5,7 @@ import { Fragment, useState } from "react";
 import { AturLangganan, type AksiLangganan } from "./AturLangganan";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
+import { useT } from "@/lib/content/LangProvider";
 import type { SubscriptionStatus, UserProfile } from "@/types";
 
 const STATUS_STYLE: Record<SubscriptionStatus, string> = {
@@ -15,12 +16,12 @@ const STATUS_STYLE: Record<SubscriptionStatus, string> = {
   expired: "bg-pati/20 text-ink",
 };
 
-const STATUS_LABEL: Record<SubscriptionStatus, string> = {
-  lifetime: "Selamanya",
-  active: "Aktif",
-  trial: "Trial",
-  pending: "Menunggu",
-  expired: "Habis",
+const STATUS_KEY: Record<SubscriptionStatus, string> = {
+  lifetime: "admin.filter.lifetime",
+  active: "admin.filter.active",
+  trial: "admin.filter.trial",
+  pending: "admin.filter.pending",
+  expired: "admin.filter.expired",
 };
 
 function tanggal(iso: string | null) {
@@ -44,6 +45,7 @@ export function UserTable({
   users: UserProfile[];
   onAction: (uid: string, aksi: AksiLangganan) => Promise<void>;
 }) {
+  const t = useT();
   const [busy, setBusy] = useState<string | null>(null);
   const [terbuka, setTerbuka] = useState<string | null>(null);
 
@@ -58,7 +60,7 @@ export function UserTable({
   };
 
   if (users.length === 0) {
-    return <p className="py-10 text-center text-sm text-ink-faint">Tidak ada pengguna.</p>;
+    return <p className="py-10 text-center text-sm text-ink-faint">{t("admin.noUsers")}</p>;
   }
 
   return (
@@ -67,11 +69,11 @@ export function UserTable({
       <table className="w-full min-w-[680px] text-sm">
         <thead>
           <tr className="text-left text-[11px] uppercase tracking-wider text-ink-faint">
-            <th className="px-3 py-2 font-semibold">Pengguna</th>
-            <th className="px-3 py-2 font-semibold">Status</th>
-            <th className="px-3 py-2 font-semibold">Berlaku s/d</th>
-            <th className="px-3 py-2 font-semibold">Lahir</th>
-            <th className="px-3 py-2 text-right font-semibold">Aksi</th>
+            <th className="px-3 py-2 font-semibold">{t("admin.col.user")}</th>
+            <th className="px-3 py-2 font-semibold">{t("admin.col.status")}</th>
+            <th className="px-3 py-2 font-semibold">{t("admin.col.validUntil")}</th>
+            <th className="px-3 py-2 font-semibold">{t("admin.col.birth")}</th>
+            <th className="px-3 py-2 text-right font-semibold">{t("admin.col.action")}</th>
           </tr>
         </thead>
         <tbody>
@@ -86,7 +88,7 @@ export function UserTable({
               <Fragment key={u.uid}>
                 <tr className="border-t border-border-soft align-middle">
                   <td className="px-3 py-3">
-                    <p className="font-medium text-ink">{u.nama || "(belum diisi)"}</p>
+                    <p className="font-medium text-ink">{u.nama || t("profile.noName")}</p>
                     <p className="text-xs text-ink-faint">{u.email}</p>
                     {u.phoneNumber && (
                       <a
@@ -107,13 +109,13 @@ export function UserTable({
                         STATUS_STYLE[u.subscriptionStatus],
                       )}
                     >
-                      {STATUS_LABEL[u.subscriptionStatus]}
+                      {t(STATUS_KEY[u.subscriptionStatus])}
                     </span>
                   </td>
 
                   <td className="px-3 py-3 text-ink-soft">
                     {seumurHidup ? (
-                      <span className="text-ink">Tanpa batas</span>
+                      <span className="text-ink">{t("admin.noExpiry")}</span>
                     ) : (
                       tanggal(u.subscriptionExpiresAt)
                     )}
@@ -135,7 +137,7 @@ export function UserTable({
                         onClick={() => setTerbuka(dibuka ? null : u.uid)}
                       >
                         <Settings2 className="h-3.5 w-3.5" aria-hidden />
-                        Atur
+                        {t("admin.manage")}
                       </Button>
                     </div>
                   </td>

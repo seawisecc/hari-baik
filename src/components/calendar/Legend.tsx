@@ -24,15 +24,15 @@ export function Legend() {
           aria-hidden
           className="h-2.5 w-2.5 rounded-full border border-ink-faint bg-surface"
         />
-        Purnama
+        {t("calendar.legend.purnama")}
       </span>
       <span className="flex items-center gap-2 text-xs text-ink-soft">
         <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-ink-faint" />
-        Tilem
+        {t("calendar.legend.tilem")}
       </span>
       <span className="flex items-center gap-2 text-xs text-ink-soft">
         <span aria-hidden className="h-0.5 w-3.5 rounded-full bg-accent-strong" />
-        Hari raya
+        {t("calendar.legend.holiday")}
       </span>
     </div>
   );

@@ -6,10 +6,12 @@ import { AuthShell, BelumDikonfigurasi, Bidang } from "../AuthShell";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
+import { useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
 import { pesanAuth } from "@/lib/firebase/errors";
 
 export default function LupaSandiPage() {
+  const t = useT();
   const { resetPassword, configured } = useAuth();
   const [email, setEmail] = useState("");
   const [terkirim, setTerkirim] = useState(false);
@@ -18,11 +20,11 @@ export default function LupaSandiPage() {
 
   return (
     <AuthShell
-      title="Lupa kata sandi"
-      subtitle="Masukkan emailmu, kami kirimkan tautan untuk membuat kata sandi baru."
+      title={t("auth.forgotTitle")}
+      subtitle={t("auth.forgotSubtitle")}
       footer={
         <Link href="/login" className="font-medium text-ink underline underline-offset-2">
-          Kembali ke halaman masuk
+          {t("auth.backToLogin")}
         </Link>
       }
     >
@@ -30,7 +32,7 @@ export default function LupaSandiPage() {
         <BelumDikonfigurasi />
       ) : terkirim ? (
         <div className="space-y-4">
-          <Alert tone="success">Tautan sudah dikirim ke {email}.</Alert>
+          <Alert tone="success">{`${t("auth.forgotSent")} ${email}.`}</Alert>
           <p className="text-sm leading-relaxed text-ink-soft">
             Buka email itu dan ikuti tautannya. Kalau tidak ada di kotak masuk, periksa folder
             spam atau promosi.
@@ -55,7 +57,7 @@ export default function LupaSandiPage() {
         >
           {error && <Alert tone="error">{error}</Alert>}
 
-          <Bidang label={<Label htmlFor="email">Email</Label>}>
+          <Bidang label={<Label htmlFor="email">{t("auth.email")}</Label>}>
             <Input
               id="email"
               type="email"
@@ -67,7 +69,7 @@ export default function LupaSandiPage() {
           </Bidang>
 
           <Button type="submit" block size="lg" disabled={busy || !email}>
-            {busy ? "Mengirim…" : "Kirim tautan"}
+            {busy ? t("auth.forgotSending") : t("auth.forgotSend")}
           </Button>
         </form>
       )}

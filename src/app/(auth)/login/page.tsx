@@ -7,10 +7,12 @@ import { AuthShell, BelumDikonfigurasi, Bidang } from "../AuthShell";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
+import { useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
 import { pesanAuth } from "@/lib/firebase/errors";
 
 export default function LoginPage() {
+  const t = useT();
   const { login, configured } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -20,12 +22,12 @@ export default function LoginPage() {
 
   return (
     <AuthShell
-      title="Masuk"
+      title={t("auth.login")}
       footer={
         <>
-          Belum punya akun?{" "}
+          {t("auth.noAccount")}{" "}
           <Link href="/register" className="font-medium text-ink underline underline-offset-2">
-            Daftar
+            {t("auth.register")}
           </Link>
         </>
       }
@@ -51,7 +53,7 @@ export default function LoginPage() {
         >
           {error && <Alert tone="error">{error}</Alert>}
 
-          <Bidang label={<Label htmlFor="email">Email</Label>}>
+          <Bidang label={<Label htmlFor="email">{t("auth.email")}</Label>}>
             <Input
               id="email"
               type="email"
@@ -65,12 +67,12 @@ export default function LoginPage() {
           <Bidang
             label={
               <div className="flex items-baseline justify-between gap-3">
-                <Label htmlFor="password">Kata sandi</Label>
+                <Label htmlFor="password">{t("auth.password")}</Label>
                 <Link
                   href="/lupa-sandi"
                   className="text-xs text-ink-faint underline underline-offset-2 hover:text-ink-soft"
                 >
-                  Lupa?
+                  {t("auth.forgot")}
                 </Link>
               </div>
             }
@@ -86,7 +88,7 @@ export default function LoginPage() {
           </Bidang>
 
           <Button type="submit" block size="lg" disabled={busy || !email || !password}>
-            {busy ? "Memproses…" : "Masuk"}
+            {busy ? t("common.processing") : t("auth.login")}
           </Button>
         </form>
       )}

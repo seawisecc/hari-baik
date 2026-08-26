@@ -20,24 +20,25 @@ export function Sorotan({
   terbaik: HariPerkiraan | null;
   terberat: HariPerkiraan | null;
 }) {
+  const t = useT();
   if (!terbaik && !terberat) return null;
 
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       {terbaik && (
         <Kartu
-          judul="Paling mendukung"
+          judul={t("today.mostSupportive")}
           icon={TrendingUp}
           hari={terbaik}
-          catatan="Cocok untuk agenda yang butuh momentum."
+          catatan={t("today.supportiveNote")}
         />
       )}
       {terberat && terberat.date !== terbaik?.date && (
         <Kartu
-          judul="Paling perlu hati-hati"
+          judul={t("today.mostCareful")}
           icon={TriangleAlert}
           hari={terberat}
-          catatan="Hindari menjadwalkan keputusan besar di sini."
+          catatan={t("today.carefulNote")}
         />
       )}
     </div>

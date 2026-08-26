@@ -9,19 +9,21 @@ import { PageContainer } from "@/components/shell/AppShell";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
 import type { SubscriptionStatus, UserProfile } from "@/types";
 
-const FILTER: { key: SubscriptionStatus | "all"; label: string }[] = [
-  { key: "all", label: "Semua" },
-  { key: "pending", label: "Menunggu" },
-  { key: "active", label: "Aktif" },
-  { key: "lifetime", label: "Selamanya" },
-  { key: "trial", label: "Trial" },
-  { key: "expired", label: "Habis" },
+const FILTER: { key: SubscriptionStatus | "all"; labelKey: string }[] = [
+  { key: "all", labelKey: "admin.filter.all" },
+  { key: "pending", labelKey: "admin.filter.pending" },
+  { key: "active", labelKey: "admin.filter.active" },
+  { key: "lifetime", labelKey: "admin.filter.lifetime" },
+  { key: "trial", labelKey: "admin.filter.trial" },
+  { key: "expired", labelKey: "admin.filter.expired" },
 ];
 
 export default function AdminPage() {
+  const t = useT();
   const { user, profile, loading, configured } = useAuth();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [filter, setFilter] = useState<SubscriptionStatus | "all">("pending");
@@ -46,12 +48,12 @@ export default function AdminPage() {
         });
         const data = await res.json();
         if (batal) return;
-        if (!res.ok) throw new Error(data.error ?? "Gagal memuat.");
+        if (!res.ok) throw new Error(data.error ?? t("admin.loadFailed"));
         setUsers(data.users);
         setError(null);
       } catch (err) {
         if (batal) return;
-        setError(err instanceof Error ? err.message : "Gagal memuat.");
+        setError(err instanceof Error ? err.message : t("admin.loadFailed"));
       } finally {
         if (!batal) setMemuat(false);
       }
@@ -60,7 +62,7 @@ export default function AdminPage() {
     return () => {
       batal = true;
     };
-  }, [user, filter, refresh]);
+  }, [user, filter, refresh, t]);
 
   const aksi = async (uid: string, perintah: AksiLangganan) => {
     if (!user) return;
@@ -73,11 +75,11 @@ export default function AdminPage() {
         body: JSON.stringify({ uid, ...perintah }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Gagal.");
+      if (!res.ok) throw new Error(data.error ?? t("admin.actionFailed"));
       setMemuat(true);
       setRefresh((n) => n + 1);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal.");
+      setError(err instanceof Error ? err.message : t("admin.actionFailed"));
     }
   };
 
@@ -90,11 +92,9 @@ export default function AdminPage() {
       <PageContainer>
         <Card>
           <CardHeader>
-            <CardTitle>Tidak punya akses</CardTitle>
+            <CardTitle>{t("admin.noAccess")}</CardTitle>
           </CardHeader>
-          <CardBody>
-            <p className="text-[15px] text-ink-soft">Halaman ini hanya untuk admin.</p>
-          </CardBody>
+          <CardBody>{t("admin.adminOnly")}</CardBody>
         </Card>
       </PageContainer>
     );
@@ -104,11 +104,13 @@ export default function AdminPage() {
     <PageContainer wide>
       <div className="space-y-6">
         <PageHeader
-          title="Kelola Pengguna"
+          title={t("admin.title")}
           subtitle={
             memuat
-              ? "Memuat…"
-              : `${users.length} pengguna${filter === "all" ? "" : " pada filter ini"}`
+              ? t("common.loading")
+              : t(filter === "all" ? "admin.count" : "admin.countFiltered", {
+                  n: users.length,
+                })
           }
         />
 
@@ -126,7 +128,7 @@ export default function AdminPage() {
                 setFilter(f.key);
               }}
             >
-              {f.label}
+              {t(f.labelKey)}
             </Chip>
           ))}
         </div>
@@ -134,7 +136,7 @@ export default function AdminPage() {
         <Card elevation={2}>
           <CardBody className="pt-6">
             {memuat ? (
-              <p className="py-10 text-center text-sm text-ink-faint">Memuat…</p>
+              <p className="py-10 text-center text-sm text-ink-faint">{t("common.loading")}</p>
             ) : (
               <UserTable users={users} onAction={aksi} />
             )}

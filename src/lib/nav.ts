@@ -14,26 +14,47 @@ import { RUTE_PRO } from "./gate";
 
 export interface NavItem {
   href: string;
-  label: string;
-  /** Label pendek untuk bottom nav di layar sempit. */
-  short: string;
+  /** Kunci terjemahan, bukan teks jadi: label diterjemahkan saat dirender. */
+  labelKey: string;
+  /** Kunci label pendek untuk bottom nav di layar sempit. */
+  shortKey: string;
   icon: LucideIcon;
 }
 
 /** Urutan mengikuti alur pemakaian harian: hari ini dulu, kalender kedua. */
 export const NAV_UTAMA: NavItem[] = [
-  { href: "/hari-ini", label: "Hari Ini", short: "Hari Ini", icon: Sun },
-  { href: "/kalender", label: "Kalender", short: "Kalender", icon: CalendarDays },
-  { href: "/kepribadian", label: "Kepribadian", short: "Watak", icon: User },
+  { href: "/hari-ini", labelKey: "nav.today", shortKey: "nav.short.today", icon: Sun },
+  {
+    href: "/kalender",
+    labelKey: "nav.calendar",
+    shortKey: "nav.short.calendar",
+    icon: CalendarDays,
+  },
+  {
+    href: "/kepribadian",
+    labelKey: "nav.personality",
+    shortKey: "nav.short.personality",
+    icon: User,
+  },
 ];
 
 export const NAV_PRO: NavItem[] = [
-  { href: "/nama-makna", label: "Makna Nama", short: "Nama", icon: Sparkles },
-  { href: "/kecocokan", label: "Kecocokan", short: "Cocok", icon: Heart },
+  {
+    href: "/nama-makna",
+    labelKey: "pro.nama.title",
+    shortKey: "nav.short.name",
+    icon: Sparkles,
+  },
+  {
+    href: "/kecocokan",
+    labelKey: "pro.petemon.title",
+    shortKey: "nav.short.match",
+    icon: Heart,
+  },
   {
     href: "/perjalanan-hidup",
-    label: "Perjalanan Hidup",
-    short: "Hidup",
+    labelKey: "pro.nasib.title",
+    shortKey: "nav.short.journey",
     icon: Route,
   },
 ];
@@ -42,13 +63,18 @@ export const NAV_PRO: NavItem[] = [
 export const butuhPro = (href: string) => href in RUTE_PRO;
 
 export const NAV_AKUN: NavItem[] = [
-  { href: "/profil", label: "Profil", short: "Profil", icon: UserCircle },
+  {
+    href: "/profil",
+    labelKey: "nav.profile",
+    shortKey: "nav.short.profile",
+    icon: UserCircle,
+  },
 ];
 
 export const NAV_ADMIN: NavItem = {
   href: "/admin",
-  label: "Admin",
-  short: "Admin",
+  labelKey: "nav.admin",
+  shortKey: "nav.admin",
   icon: Shield,
 };
 

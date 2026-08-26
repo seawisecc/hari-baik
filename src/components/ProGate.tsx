@@ -40,6 +40,7 @@ export function ProLocked({ titleKey, descKey }: { titleKey: string; descKey: st
 
 /** Ajakan mengisi tanggal lahir, dipakai semua halaman yang membutuhkannya. */
 export function ButuhTanggalLahir({ title }: { title: string }) {
+  const t = useT();
   const { editable } = useUserData();
   // Mode lokal: formnya ada di kalender. Sudah login: lewat onboarding.
   const href = editable ? "/kalender" : "/onboarding";
@@ -54,14 +55,12 @@ export function ButuhTanggalLahir({ title }: { title: string }) {
             <span className="mb-4 grid h-12 w-12 place-items-center rounded-pill bg-accent-wash hb-raise-1">
               <CalendarPlus className="h-4.5 w-4.5 text-accent-deep" aria-hidden />
             </span>
-            <CardTitle>Tanggal lahir belum diisi</CardTitle>
+            <CardTitle>{t("birth.needed")}</CardTitle>
           </CardHeader>
           <CardBody className="space-y-6">
-            <p className="text-[15px] leading-relaxed text-ink-soft">
-              Kalender siklusmu dihitung dari tanggal lahir, jadi itu harus diisi lebih dulu.
-            </p>
+            <p className="text-[15px] leading-relaxed text-ink-soft">{t("birth.neededDesc")}</p>
             <Link href={href} className="block">
-              <Button block>Isi tanggal lahir</Button>
+              <Button block>{t("birth.fill")}</Button>
             </Link>
           </CardBody>
         </Card>
@@ -72,9 +71,10 @@ export function ButuhTanggalLahir({ title }: { title: string }) {
 
 /** Placeholder saat data masih dimuat. */
 export function Memuat() {
+  const t = useT();
   return (
     <PageContainer>
-      <div className="py-20 text-center text-sm text-ink-faint">Memuat…</div>
+      <div className="py-20 text-center text-sm text-ink-faint">{t("common.loading")}</div>
     </PageContainer>
   );
 }

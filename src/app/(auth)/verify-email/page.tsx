@@ -5,9 +5,11 @@ import { useState } from "react";
 import { AuthShell } from "../AuthShell";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
+import { useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
 
 export default function VerifyEmailPage() {
+  const t = useT();
   const { user, resendVerification, refreshUser, logout } = useAuth();
   const router = useRouter();
   const [terkirim, setTerkirim] = useState(false);
@@ -16,11 +18,9 @@ export default function VerifyEmailPage() {
 
   return (
     <AuthShell
-      title="Cek emailmu"
+      title={t("verify.title")}
       subtitle={
-        user?.email
-          ? `Kami mengirim tautan verifikasi ke ${user.email}. Buka tautan itu, lalu kembali ke sini.`
-          : "Kami mengirim tautan verifikasi ke emailmu."
+        user?.email ? t("verify.subtitleWith", { email: user.email }) : t("verify.subtitle")
       }
       footer={
         <button
@@ -30,12 +30,12 @@ export default function VerifyEmailPage() {
           }}
           className="underline underline-offset-2 hover:text-ink"
         >
-          Keluar
+          {t("nav.logout")}
         </button>
       }
     >
       <div className="space-y-4">
-        {terkirim && <Alert tone="success">Tautan verifikasi dikirim ulang.</Alert>}
+        {terkirim && <Alert tone="success">{t("verify.resent")}</Alert>}
         {belumTerverifikasi && (
           <Alert tone="warning">
             Emailmu belum terverifikasi. Buka tautan di email lalu coba lagi.
@@ -59,7 +59,7 @@ export default function VerifyEmailPage() {
             }
           }}
         >
-          {busy === "cek" ? "Memeriksa…" : "Saya sudah verifikasi"}
+          {busy === "cek" ? t("verify.checking") : t("verify.done")}
         </Button>
 
         <Button
@@ -77,7 +77,7 @@ export default function VerifyEmailPage() {
             }
           }}
         >
-          {busy === "kirim" ? "Mengirim…" : "Kirim ulang tautan"}
+          {busy === "kirim" ? t("auth.forgotSending") : t("verify.resend")}
         </Button>
 
         <p className="text-xs leading-relaxed text-ink-faint">
