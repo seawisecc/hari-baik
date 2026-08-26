@@ -1,7 +1,6 @@
 "use client";
 
 import { Check, Sparkles } from "lucide-react";
-import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 import { useLang, useT } from "@/lib/content/LangProvider";
 import {
@@ -16,14 +15,19 @@ import {
 /**
  * Daftar harga yang dilihat pengguna.
  *
- * Dibaca dari pengaturan, bukan ditulis di kode, supaya admin bisa mengubah
- * harga tanpa perlu deploy ulang.
+ * Harganya diterima sebagai prop, bukan diambil sendiri lewat fetch. Dulu
+ * komponen ini mengembalikan null sampai fetch-nya selesai, jadi seluruh
+ * blok harga kosong selama beberapa detik setiap kali halaman dibuka.
+ * Sekarang pemanggilnya membacanya di server dan menurunkannya ke sini,
+ * sehingga daftar sudah lengkap pada render pertama.
  */
 export function DaftarHarga({
+  data,
   dipilih,
   onPilih,
   tanpaAddOn = false,
 }: {
+  data: PengaturanHarga;
   /** Id paket yang sedang dipilih; diberi tanda di daftar. */
   dipilih?: string | null;
   onPilih?: (paket: PaketLangganan) => void;
@@ -32,26 +36,6 @@ export function DaftarHarga({
 }) {
   const t = useT();
   const { lang } = useLang();
-  const [data, setData] = useState<PengaturanHarga | null>(null);
-
-  useEffect(() => {
-    let batal = false;
-    void (async () => {
-      try {
-        const res = await fetch("/api/admin/harga");
-        const d = (await res.json()) as PengaturanHarga;
-        if (!batal) setData(d);
-      } catch {
-        // Daftar harga gagal dimuat bukan alasan menghalangi halaman;
-        // kontak admin di bawahnya tetap berguna.
-      }
-    })();
-    return () => {
-      batal = true;
-    };
-  }, []);
-
-  if (!data) return null;
 
   const paket = data.paket.filter((p) => p.aktif);
   const addOn = data.addOn.filter((a) => a.aktif);
@@ -96,7 +80,7 @@ export function DaftarHarga({
                     <p className="mt-0.5 text-xs text-ink-soft">
                       {rupiah(perTahun(p))} {t("price.perYear")}
                       {diskon > 0 && (
-                        <span className="ml-2 font-medium text-guru">
+                        <span className="ml-2 font-medium text-guru-teks">
                           {t("price.saveShort", { n: diskon })}
                         </span>
                       )}

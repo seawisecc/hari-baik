@@ -8,7 +8,7 @@ export const Input = forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTML
     <input
       ref={ref}
       className={cn(
-        "h-12 w-full rounded-pill bg-surface-sunk px-5 text-[15px] text-ink hb-sink",
+        "h-12 w-full min-w-0 max-w-full rounded-pill bg-surface-sunk px-5 text-[15px] text-ink hb-sink",
         "placeholder:text-ink-faint",
         "transition-shadow duration-150 focus:hb-ring",
         "disabled:opacity-55",

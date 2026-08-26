@@ -153,39 +153,32 @@ function Kotak({ label, nilai }: { label: string; nilai: string }) {
 }
 
 function StatusPill({ access }: { access: AccessState }) {
-  const { label, nada } =
+  const t = useT();
+  const { kunci, nada } =
     access.type === "lifetime"
-      ? { label: "Selamanya", nada: "border-accent-strong/50 text-accent-deep" }
+      ? { kunci: "lifetime", nada: "border-accent-strong/50 text-accent-deep" }
       : access.type === "subscription"
-        ? { label: "Aktif", nada: "border-guru/45 text-guru" }
+        ? { kunci: "active", nada: "border-guru/45 text-guru-teks" }
         : access.type === "trial"
-          ? { label: "Trial", nada: "border-ratu/45 text-ratu" }
-          : { label: "Habis", nada: "border-pati/45 text-pati" };
+          ? { kunci: "trial", nada: "border-ratu/45 text-ratu-teks" }
+          : { kunci: "expired", nada: "border-pati/45 text-pati-teks" };
 
   return (
     <span className={cn("rounded-pill border px-3.5 py-1.5 text-xs font-medium", nada)}>
-      {label}
+      {t(`profile.status.${kunci}`)}
     </span>
   );
 }
 
 function RingkasanLangganan({ access, lang }: { access: AccessState; lang: "id" | "en" }) {
+  const t = useT();
+
   if (access.type === "lifetime") {
-    return (
-      <Ringkasan
-        utama="Tanpa batas waktu"
-        keterangan="Akses penuh ke semua fitur, tidak perlu diperpanjang."
-      />
-    );
+    return <Ringkasan utama={t("profile.lifetime")} keterangan={t("profile.lifetimeDesc")} />;
   }
 
   if (!access.expiresAt) {
-    return (
-      <Ringkasan
-        utama="Tidak aktif"
-        keterangan="Aktifkan langganan untuk membuka kembali seluruh fitur."
-      />
-    );
+    return <Ringkasan utama={t("profile.inactive")} keterangan={t("profile.inactiveDesc")} />;
   }
 
   const sisa = access.daysLeft ?? 0;
@@ -197,8 +190,8 @@ function RingkasanLangganan({ access, lang }: { access: AccessState; lang: "id" 
   if (sisa <= 45) {
     return (
       <Ringkasan
-        utama={`${sisa} hari lagi`}
-        keterangan={`${trial ? "Masa coba berakhir" : "Berlaku sampai"} ${tanggal}`}
+        utama={t("profile.daysLeft", { n: sisa })}
+        keterangan={`${trial ? t("profile.trialEnds") : t("profile.validUntil")} ${tanggal}`}
         mendesak={sisa <= 7}
       />
     );
@@ -207,7 +200,10 @@ function RingkasanLangganan({ access, lang }: { access: AccessState; lang: "id" 
   return (
     <Ringkasan
       utama={tanggal}
-      keterangan={`${trial ? "Akhir masa coba" : "Berlaku sampai tanggal ini"}, ${sisa} hari lagi`}
+      keterangan={`${trial ? t("profile.trialEndDate") : t("profile.validUntilThis")}, ${t(
+        "profile.daysLeft",
+        { n: sisa },
+      )}`}
     />
   );
 }
@@ -226,7 +222,7 @@ function Ringkasan({
       <p
         className={cn(
           "font-heading text-2xl font-semibold",
-          mendesak ? "text-lara" : "text-ink",
+          mendesak ? "text-lara-teks" : "text-ink",
         )}
       >
         {utama}

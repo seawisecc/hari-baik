@@ -20,7 +20,7 @@
   --hb-ink-soft: #6b6660; /* teks sekunder */
   /* Digelapkan dari #9c968e: yang lama hanya mencapai 2,8:1 di atas
      permukaan, di bawah ambang yang masih terbaca. */
-  --hb-ink-faint: #78736d;
+  --hb-ink-faint: #6c6862; /* 4,6:1 bahkan di atas surface-sunk */
 
   /* Kedalaman.
      Elemen digambar sebagai benda yang punya ketebalan, bukan permukaan
@@ -60,6 +60,17 @@
   --hb-lara-pekat: #936e43;
   --hb-pati-pekat: #9e5a5a;
 
+  /* Varian teks: kebalikan dari yang di atas. Dipakai ketika warna kategori
+     menjadi TULISAN di atas bidang terang, bukan bidang di belakang tulisan.
+     Warna aslinya hanya 2,5 sampai 3,3:1 terhadap surface dan surface-sunk,
+     terlalu tipis untuk teks kecil seperti label status dan angka diskon.
+     Penanda kalender tetap memakai warna asli, supaya bahasa warnanya sama
+     persis dengan aplikasi sebelumnya. */
+  --hb-guru-teks: #556f58;
+  --hb-ratu-teks: #5c6b77;
+  --hb-lara-teks: #83623c;
+  --hb-pati-teks: #985656;
+
   /* Radius & spacing */
   --hb-r-sm: 10px;
   --hb-r-md: 16px;
@@ -73,7 +84,7 @@
 :root[data-theme="mint"] {
   --hb-accent: #a8ddc4;
   --hb-accent-strong: #6fbf95;
-  --hb-accent-deep: #4a9c73;
+  --hb-accent-deep: #377355; /* dipakai sebagai teks, jadi wajib 4,5:1 */
   --hb-accent-ink: #1f4634; /* teks di atas aksen */
   --hb-accent-wash: #eef8f3; /* latar sangat tipis */
   --hb-focus: #6fd6ac;
@@ -84,7 +95,7 @@
 :root[data-theme="senja"] {
   --hb-accent: #f3c39a;
   --hb-accent-strong: #e0975a;
-  --hb-accent-deep: #bf7434;
+  --hb-accent-deep: #955a29;
   --hb-accent-ink: #4a2a11;
   --hb-accent-wash: #fdf3ea;
   --hb-focus: #f0a463;
@@ -120,6 +131,10 @@
   --color-ratu-pekat: var(--hb-ratu-pekat);
   --color-lara-pekat: var(--hb-lara-pekat);
   --color-pati-pekat: var(--hb-pati-pekat);
+  --color-guru-teks: var(--hb-guru-teks);
+  --color-ratu-teks: var(--hb-ratu-teks);
+  --color-lara-teks: var(--hb-lara-teks);
+  --color-pati-teks: var(--hb-pati-teks);
 
   --radius-sm: var(--hb-r-sm);
   --radius-md: var(--hb-r-md);
@@ -213,6 +228,44 @@ body {
   font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/*
+ * Input tanggal di iOS.
+ *
+ * Safari iOS memberi `input[type=date]` lebar intrinsik dari isi tanggalnya
+ * dan tidak mau menyusut, jadi di layar sempit kotaknya menembus tepi kanan
+ * kartu dan ikut mendorong lebar halaman. Reset appearance-nya, izinkan
+ * menyusut lewat min-width, lalu ratakan nilainya ke kiri: tanpa itu iOS
+ * menaruh margin sendiri pada bagian nilai dan teksnya keluar dari padding.
+ */
+input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+  min-width: 0;
+  max-width: 100%;
+}
+
+input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+  margin: 0;
+  min-width: 0;
+}
+
+/* Ikon pemilih tetap menempel di kanan, tidak ikut melebarkan kotak. */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  margin-inline-start: auto;
+  flex-shrink: 0;
+}
+
+/*
+ * Jaring pengaman: tidak ada satu pun elemen yang boleh membuat halaman
+ * bergeser ke samping. `clip` dipakai, bukan `hidden`, supaya `position:
+ * sticky` di dalamnya tetap bekerja.
+ */
+html,
+body {
+  overflow-x: clip;
 }
 
 h1,

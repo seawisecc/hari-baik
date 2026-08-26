@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAuth } from "@/lib/firebase/AuthProvider";
 import { ProLocked } from "@/components/ProGate";
-import { RUTE_PRO, RUTE_TUJUAN, tentukanAlihan } from "@/lib/gate";
+import { RUTE_PRO, RUTE_TUJUAN, perluLayarTunggu, tentukanAlihan } from "@/lib/gate";
 
 /**
  * Satu tempat yang memutuskan siapa boleh melihat apa.
@@ -33,7 +33,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     if (alihkan) router.replace(alihkan);
   }, [alihkan, router]);
 
-  if (configured && loading) return <LayarTunggu />;
+  if (perluLayarTunggu({ pathname, configured, loading })) return <LayarTunggu />;
 
   // Jangan tampilkan isi halaman yang sebentar lagi ditinggalkan; itu membuat
   // konten terkunci sempat terlihat sekejap.

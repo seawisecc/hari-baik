@@ -1,14 +1,9 @@
 import type { NextRequest } from "next/server";
 import { adminAuth, adminDb } from "@/lib/firebase/admin";
-import { HARGA_BAWAAN, type PengaturanHarga } from "@/lib/harga";
+import { bacaHarga } from "@/lib/harga-server";
 import type { Aktivasi, UserProfile } from "@/types";
 
 const CATATAN_MAKS = 400;
-
-async function bacaHarga(): Promise<PengaturanHarga> {
-  const snap = await adminDb().collection("pengaturan").doc("harga").get();
-  return snap.exists ? { ...HARGA_BAWAAN, ...snap.data() } : HARGA_BAWAAN;
-}
 
 /**
  * Ajukan permintaan aktivasi setelah membayar.

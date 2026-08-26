@@ -1,5 +1,6 @@
 /** Keputusan pengalihan rute: siapa boleh melihat apa. */
-import { tentukanAlihan, type KondisiAkses } from "../gate";
+import { RUTE_PRO, perluLayarTunggu, tentukanAlihan, type KondisiAkses } from "../gate";
+import { NAV_AKUN, NAV_MOBILE, NAV_MOBILE_LAINNYA, NAV_PRO, NAV_UTAMA } from "../nav";
 
 let fail = 0;
 const eq = (label: string, expected: unknown, actual: unknown) => {
@@ -95,6 +96,46 @@ eq(
   null,
   tentukanAlihan(k({ onboardingComplete: null, canView: false })),
 );
+
+// Layar tunggu. Halaman publik harus langsung tampil: menahannya sampai
+// Firebase siap membuat pengunjung pertama dan perayap tautan cuma melihat
+// kata "Memuat…", bukan isi halamannya.
+for (const jalur of ["/", "/login", "/register", "/lupa-sandi"]) {
+  eq(
+    `publik tanpa layar tunggu: ${jalur}`,
+    false,
+    perluLayarTunggu({ pathname: jalur, configured: true, loading: true }),
+  );
+}
+eq(
+  "halaman terjaga tetap menunggu",
+  true,
+  perluLayarTunggu({ pathname: "/hari-ini", configured: true, loading: true }),
+);
+eq(
+  "tanpa firebase tidak ada layar tunggu",
+  false,
+  perluLayarTunggu({ pathname: "/hari-ini", configured: false, loading: true }),
+);
+eq(
+  "selesai memuat, tidak menunggu",
+  false,
+  perluLayarTunggu({ pathname: "/hari-ini", configured: true, loading: false }),
+);
+
+// Semua rute aplikasi harus terjangkau dari ponsel. Bilah bawah hanya muat
+// beberapa, sisanya wajib ada di lembar "Lainnya": pernah terjadi dua fitur
+// berbayar hilang sama sekali dari ponsel karena tidak ada yang memeriksa ini.
+const semuaRute = [...NAV_UTAMA, ...NAV_PRO, ...NAV_AKUN].map((i) => i.href);
+const terjangkau = new Set([...NAV_MOBILE, ...NAV_MOBILE_LAINNYA].map((i) => i.href));
+for (const href of semuaRute) {
+  eq(`terjangkau dari ponsel: ${href}`, true, terjangkau.has(href));
+}
+
+// Setiap rute Pro harus punya penanda di navigasi, dan sebaliknya.
+for (const href of Object.keys(RUTE_PRO)) {
+  eq(`rute pro ada di navigasi: ${href}`, true, semuaRute.includes(href));
+}
 
 console.log(fail === 0 ? "✓ gate: semua lolos" : `✗ gate: ${fail} gagal`);
 if (fail) process.exit(1);

@@ -1,9 +1,12 @@
+import { revalidatePath } from "next/cache";
 import type { NextRequest } from "next/server";
 import { adminDb } from "@/lib/firebase/admin";
 import { AdminError, handleAdminError, requireAdmin } from "@/lib/firebase/requireAdmin";
-import { HARGA_BAWAAN, type AddOn, type PaketLangganan } from "@/lib/harga";
+import { DOKUMEN_HARGA as DOKUMEN, bacaHarga } from "@/lib/harga-server";
+import type { AddOn, PaketLangganan } from "@/lib/harga";
 
-const DOKUMEN = ["pengaturan", "harga"] as const;
+/** Halaman yang menampilkan harga hasil render server dan harus ikut segar. */
+const HALAMAN_BERHARGA = ["/", "/expired"];
 
 /** Rupiah penuh. Batas atas mencegah salah ketik nol jadi harga miliaran. */
 const HARGA_MAKS = 100_000_000;
@@ -94,9 +97,7 @@ function bersihkanAddOn(masuk: unknown): AddOn[] {
 /** Baca pengaturan harga. Terbuka untuk siapa pun: ini daftar harga publik. */
 export async function GET() {
   try {
-    const snap = await ref().get();
-    if (!snap.exists) return Response.json(HARGA_BAWAAN);
-    return Response.json({ ...HARGA_BAWAAN, ...snap.data() });
+    return Response.json(await bacaHarga());
   } catch (err) {
     return handleAdminError(err);
   }
@@ -115,6 +116,11 @@ export async function PUT(req: NextRequest) {
     };
 
     await ref().set(data);
+
+    // Halaman harga dirender di server dan disimpan sebagai statis. Tanpa ini
+    // pengguna masih melihat harga lama sampai masa kedaluwarsanya lewat.
+    for (const jalur of HALAMAN_BERHARGA) revalidatePath(jalur);
+
     return Response.json({ ok: true, ...data });
   } catch (err) {
     return handleAdminError(err);

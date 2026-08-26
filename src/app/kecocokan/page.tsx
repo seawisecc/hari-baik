@@ -35,7 +35,7 @@ export default function KecocokanPage() {
   const [hasil, setHasil] = useState<HasilPetemon | null>(null);
 
   if (loading) return <Memuat />;
-  if (!birthDate) return <ButuhTanggalLahir title="Kecocokan" />;
+  if (!birthDate) return <ButuhTanggalLahir title={t("pro.petemon.title")} />;
 
   return (
     <PageContainer>
@@ -78,7 +78,11 @@ export default function KecocokanPage() {
                   {hasil.panca.name} · {hasil.sad.name}
                 </CardTitle>
                 <p className="mt-1 text-sm text-ink-soft">
-                  Total urip {hasil.total} · sisa 5 = {hasil.sisa5} · sisa 16 = {hasil.sisa16}
+                  {t("pro.petemon.totals", {
+                    total: hasil.total,
+                    s5: hasil.sisa5,
+                    s16: hasil.sisa16,
+                  })}
                 </p>
               </CardHeader>
               <CardBody className="space-y-4">
@@ -102,8 +106,8 @@ export default function KecocokanPage() {
             </Card>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <RincianUrip label="Kamu" u={hasil.orang1} />
-              <RincianUrip label="Pasangan" u={hasil.orang2} />
+              <RincianUrip label={t("pro.petemon.you")} u={hasil.orang1} />
+              <RincianUrip label={t("pro.petemon.partner")} u={hasil.orang2} />
             </div>
 
             <Wisdom>{t("wisdom.petemon")}</Wisdom>

@@ -22,10 +22,10 @@ export const KATEGORI_BG: Record<KategoriName, string> = {
 };
 
 export const KATEGORI_TEKS: Record<KategoriName, string> = {
-  GURU: "text-guru",
-  RATU: "text-ratu",
-  LARA: "text-lara",
-  PATI: "text-pati",
+  GURU: "text-guru-teks",
+  RATU: "text-ratu-teks",
+  LARA: "text-lara-teks",
+  PATI: "text-pati-teks",
 };
 
 /** Latar tipis untuk kartu: cukup untuk memberi nada tanpa menenggelamkan teks. */

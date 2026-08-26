@@ -10,6 +10,7 @@ import { Input, Label } from "@/components/ui/Input";
 import { useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
 import { pesanAuth } from "@/lib/firebase/errors";
+import { HARI_TRIAL } from "@/lib/subscription";
 
 export default function RegisterPage() {
   const t = useT();
@@ -29,7 +30,7 @@ export default function RegisterPage() {
   return (
     <AuthShell
       title={t("auth.register")}
-      subtitle={t("auth.registerSubtitle")}
+      subtitle={t("auth.registerSubtitle", { n: HARI_TRIAL })}
       footer={
         <>
           {t("auth.haveAccount")}{" "}

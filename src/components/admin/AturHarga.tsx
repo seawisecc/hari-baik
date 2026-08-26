@@ -166,7 +166,7 @@ export function AturHarga() {
                     {rupiah(perTahun(p))} {t("price.perYear")}
                   </p>
                   {hemat(p, data.paket) > 0 && (
-                    <p className="text-xs font-medium text-guru">
+                    <p className="text-xs font-medium text-guru-teks">
                       {t("price.saveShort", { n: hemat(p, data.paket) })}
                     </p>
                   )}

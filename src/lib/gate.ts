@@ -57,3 +57,14 @@ export function tentukanAlihan(k: KondisiAkses): string | null {
   // Sudah berada di tujuan berarti tidak perlu ke mana-mana.
   return tujuan === k.pathname ? null : tujuan;
 }
+
+/**
+ * Haruskah layar tunggu ditampilkan sementara sesi dipulihkan?
+ *
+ * Rute publik tidak menunggu: tidak ada keputusan yang bergantung pada siapa
+ * pengunjungnya, jadi menahan halaman depan di layar "Memuat…" hanya membuat
+ * pengunjung pertama dan perayap tautan melihat kata itu, bukan isinya.
+ */
+export function perluLayarTunggu(k: Pick<KondisiAkses, "pathname" | "configured" | "loading">) {
+  return k.configured && k.loading && !RUTE_PUBLIK.has(k.pathname);
+}

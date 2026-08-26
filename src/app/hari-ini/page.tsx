@@ -142,8 +142,8 @@ function StatusLangganan({ access }: { access: AccessState }) {
     access.type === "lifetime"
       ? { kunci: "admin.filter.lifetime", nada: "border-accent-strong/50 text-accent-deep" }
       : access.type === "subscription"
-        ? { kunci: "admin.filter.active", nada: "border-guru/45 text-guru" }
-        : { kunci: "admin.filter.trial", nada: "border-ratu/45 text-ratu" };
+        ? { kunci: "admin.filter.active", nada: "border-guru/45 text-guru-teks" }
+        : { kunci: "admin.filter.trial", nada: "border-ratu/45 text-ratu-teks" };
 
   return (
     <span className={`rounded-pill border px-3 py-1 text-xs font-medium ${nada}`}>

@@ -23,13 +23,13 @@ export function PanduanCard({ kategori }: { kategori: KategoriName }) {
             label={t("assist.supported")}
             items={panduan.supported}
             icon={Check}
-            iconClass="text-guru"
+            iconClass="text-guru-teks"
           />
           <Daftar
             label={t("assist.postpone")}
             items={panduan.postpone}
             icon={X}
-            iconClass="text-pati"
+            iconClass="text-pati-teks"
           />
         </div>
 

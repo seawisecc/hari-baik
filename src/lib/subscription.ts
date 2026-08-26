@@ -57,9 +57,19 @@ export function evaluateAccess(
   return { canView: false, isPro: false, type: "none", daysLeft: null, expiresAt: null };
 }
 
-/** Akhir trial 3 hari sejak onboarding. */
+/**
+ * Lama masa coba, dalam hari.
+ *
+ * Satu-satunya sumber angka ini. Sebelumnya "3" ditulis ulang di kode trial,
+ * di salinan teks landing, dan di subjudul halaman daftar, jadi mengubah
+ * panjang masa coba berarti berburu angka yang sama di empat tempat dan
+ * pasti ada yang terlewat.
+ */
+export const HARI_TRIAL = 3;
+
+/** Akhir masa coba sejak onboarding. */
 export function trialEnd(from: Date = new Date()): string {
-  return new Date(from.getTime() + 3 * MS_PER_DAY).toISOString();
+  return new Date(from.getTime() + HARI_TRIAL * MS_PER_DAY).toISOString();
 }
 
 /** Perpanjang langganan setahun. Kalau masih aktif, ditumpuk dari tanggal habis. */
