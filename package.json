@@ -16,7 +16,9 @@
     "authorize-domains": "tsx scripts/authorize-domains.ts",
     "revoke-domain": "tsx scripts/revoke-domain.ts",
     "protection": "tsx scripts/deployment-protection.ts",
-    "build-assets": "tsx scripts/build-assets.ts"
+    "build-assets": "tsx scripts/build-assets.ts",
+    "smoke": "tsx scripts/smoke-api.ts",
+    "verify": "npm run lint && npm test && npm run build && npm run smoke"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
@@ -46,5 +48,8 @@
     "tailwindcss": "^4",
     "tsx": "^4.23.12",
     "typescript": "^5"
+  },
+  "overrides": {
+    "jose": "^5.10.0"
   }
 }

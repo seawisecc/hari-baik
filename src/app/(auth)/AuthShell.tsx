@@ -26,7 +26,7 @@ export function AuthShell({
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-6 py-14">
       <div className="mb-9 flex items-center justify-between gap-4">
         <Wordmark size={28} textClassName="text-2xl" />
-        <ThemeToggle />
+        <ThemeToggle compact />
       </div>
 
       <Card elevation={3}>

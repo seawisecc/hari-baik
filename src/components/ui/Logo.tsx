@@ -23,11 +23,11 @@ export function Wordmark({
   textClassName?: string;
 }) {
   return (
-    <span className={cn("inline-flex items-center gap-2.5", className)}>
+    <span className={cn("inline-flex shrink-0 items-center gap-2.5", className)}>
       <Logo size={size} />
       <span
         className={cn(
-          "font-heading text-xl font-bold italic leading-none text-ink",
+          "whitespace-nowrap font-heading text-xl font-bold italic leading-none text-ink",
           textClassName,
         )}
       >

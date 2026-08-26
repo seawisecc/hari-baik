@@ -87,14 +87,19 @@ export default function LandingPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-6 pb-24 sm:px-8">
-      <header className="flex items-center justify-between gap-3 py-6">
+      {/* Di layar sempit toggle dipadatkan jadi ikon dan boleh turun baris.
+          Sebelumnya keempat elemen dipaksa satu baris, dan wordmark-nya patah
+          dua baris lalu tertimpa toggle di sebelahnya. */}
+      <header className="flex flex-wrap items-center justify-between gap-x-3 gap-y-3 py-6">
         <Wordmark size={26} />
         <div className="flex items-center gap-2">
-          <LangToggle />
-          <ThemeToggle />
+          <LangToggle compact className="sm:hidden" />
+          <ThemeToggle compact className="sm:hidden" />
+          <LangToggle className="hidden sm:inline-flex" />
+          <ThemeToggle className="hidden sm:inline-flex" />
           <Link href="/login">
             <Button variant="surface" size="sm">
-              Masuk
+              {t("auth.login")}
             </Button>
           </Link>
         </div>
