@@ -27,6 +27,8 @@ interface AuthContextValue {
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   resendVerification: () => Promise<void>;
+  /** Ambil ulang status akun dari server; kembalikan true bila email sudah terverifikasi. */
+  refreshUser: () => Promise<boolean>;
 }
 
 const LOCKED: AccessState = {
@@ -115,6 +117,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (current) await sendEmailVerification(current);
   }, []);
 
+  const refreshUser = useCallback(async () => {
+    const current = getFirebaseAuth().currentUser;
+    if (!current) return false;
+    // emailVerified ikut token, jadi baru berubah setelah ditarik ulang.
+    await current.reload();
+    await current.getIdToken(true);
+    // Salin ke state supaya penjaga rute ikut melihat nilai barunya.
+    setUser({ ...current, emailVerified: current.emailVerified } as User);
+    return current.emailVerified;
+  }, []);
+
   const access = useMemo(() => (profile ? evaluateAccess(profile) : LOCKED), [profile]);
 
   const value = useMemo(
@@ -129,6 +142,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       logout,
       resetPassword,
       resendVerification,
+      refreshUser,
     }),
     [
       user,
@@ -140,6 +154,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       logout,
       resetPassword,
       resendVerification,
+      refreshUser,
     ],
   );
 

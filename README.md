@@ -52,10 +52,16 @@ Pro dikunci sesuai status langganan.
 
 ## Rute
 
+Semua rute selain yang publik dijaga terpusat oleh `AuthGate`, dengan urutan
+dari syarat paling dasar: masuk, verifikasi email, lengkapi profil, lalu
+status langganan. Keputusannya ada di `src/lib/gate.ts` sebagai fungsi murni
+yang diuji terpisah, jadi halaman baru otomatis ikut terjaga.
+
 | Rute | Isi | Akses |
 |---|---|---|
 | `/` | Landing page | publik |
-| `/login`, `/register`, `/verify-email` | Autentikasi | publik |
+| `/login`, `/register`, `/lupa-sandi` | Autentikasi | publik |
+| `/verify-email` | Menunggu verifikasi email | login |
 | `/onboarding` | Nama + tanggal lahir, mulai trial 3 hari | login |
 | `/hari-ini` | **Halaman utama** — insight hari ini + perkiraan 7 hari | login |
 | `/kalender` | Grid bulanan + panduan hari terpilih | login |
@@ -64,7 +70,7 @@ Pro dikunci sesuai status langganan.
 | `/kecocokan` | Petemon Lanang Istri | Pro |
 | `/perjalanan-hidup` | Peta rejeki & kesehatan per periode usia | Pro |
 | `/profil` | Profil & status langganan | login |
-| `/expired` | Ajakan aktivasi langganan | login |
+| `/expired` | Layar terkunci + kontak admin | login |
 | `/admin` | Kelola pengguna & langganan | admin |
 | `/styleguide` | Sistem desain | dev |
 | `/debug-wariga` | Self-test engine (41 tes) | dev |
@@ -163,7 +169,9 @@ memakai hex langsung, jadi menambah tema ketiga cukup satu blok
 - [x] Layout desktop & mobile terpisah, beranda = insight hari ini
 - [x] Diuji terhadap project Firebase sungguhan (`hari-baik-7e56c`)
 - [ ] Deploy ke Vercel
+- [x] Gerbang akses terpusat: trial habis mengunci total ke `/expired`
+- [x] Verifikasi email diwajibkan
+- [x] Lupa kata sandi
 - [ ] Poles halaman auth, onboarding, profil, admin
 - [ ] Alur langganan dalam aplikasi (sekarang lewat WhatsApp)
-- [ ] Verifikasi email belum diwajibkan
 - [ ] Tabel libur nasional baru terisi 2026–2027 (`src/lib/wariga/holidays.ts`)

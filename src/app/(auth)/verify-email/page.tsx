@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AuthShell } from "../AuthShell";
 import { Alert } from "@/components/ui/Alert";
@@ -8,21 +8,26 @@ import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/lib/firebase/AuthProvider";
 
 export default function VerifyEmailPage() {
-  const { user, resendVerification, logout } = useAuth();
+  const { user, resendVerification, refreshUser, logout } = useAuth();
+  const router = useRouter();
   const [terkirim, setTerkirim] = useState(false);
-  const [busy, setBusy] = useState(false);
+  const [belumTerverifikasi, setBelumTerverifikasi] = useState(false);
+  const [busy, setBusy] = useState<"cek" | "kirim" | null>(null);
 
   return (
     <AuthShell
       title="Cek emailmu"
       subtitle={
         user?.email
-          ? `Kami sudah mengirim tautan verifikasi ke ${user.email}. Klik tautan itu, lalu lanjut.`
-          : "Kami sudah mengirim tautan verifikasi ke emailmu."
+          ? `Kami mengirim tautan verifikasi ke ${user.email}. Buka tautan itu, lalu kembali ke sini.`
+          : "Kami mengirim tautan verifikasi ke emailmu."
       }
       footer={
         <button
-          onClick={() => logout()}
+          onClick={async () => {
+            await logout();
+            router.push("/");
+          }}
           className="underline underline-offset-2 hover:text-ink"
         >
           Keluar
@@ -31,26 +36,48 @@ export default function VerifyEmailPage() {
     >
       <div className="space-y-4">
         {terkirim && <Alert tone="success">Tautan verifikasi dikirim ulang.</Alert>}
+        {belumTerverifikasi && (
+          <Alert tone="warning">
+            Emailmu belum terverifikasi. Buka tautan di email lalu coba lagi.
+          </Alert>
+        )}
 
-        <Link href="/onboarding" className="block">
-          <Button block>Sudah saya verifikasi</Button>
-        </Link>
+        <Button
+          block
+          disabled={busy !== null}
+          onClick={async () => {
+            setBusy("cek");
+            setBelumTerverifikasi(false);
+            try {
+              // Status verifikasi tersimpan di token, jadi harus diambil ulang
+              // dari server: tanpa ini nilainya tetap yang lama selamanya.
+              const verified = await refreshUser();
+              if (verified) router.replace("/onboarding");
+              else setBelumTerverifikasi(true);
+            } finally {
+              setBusy(null);
+            }
+          }}
+        >
+          {busy === "cek" ? "Memeriksa…" : "Saya sudah verifikasi"}
+        </Button>
 
         <Button
           variant="surface"
           block
-          disabled={busy}
+          disabled={busy !== null}
           onClick={async () => {
-            setBusy(true);
+            setBusy("kirim");
+            setBelumTerverifikasi(false);
             try {
               await resendVerification();
               setTerkirim(true);
             } finally {
-              setBusy(false);
+              setBusy(null);
             }
           }}
         >
-          Kirim ulang tautan
+          {busy === "kirim" ? "Mengirim…" : "Kirim ulang tautan"}
         </Button>
 
         <p className="text-xs leading-relaxed text-ink-faint">

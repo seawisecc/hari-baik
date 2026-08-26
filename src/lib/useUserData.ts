@@ -6,7 +6,14 @@ import type { AccessState } from "@/types";
 
 const STORAGE_KEY = "hb_birthdate";
 
-/** Tanpa Firebase, akses dibuka penuh: kalau tidak, aplikasi tidak bisa dicoba. */
+/**
+ * Mode lokal: dipakai HANYA saat Firebase belum dikonfigurasi, supaya
+ * aplikasi masih bisa dijalankan sebelum kredensial dipasang.
+ *
+ * Syaratnya sengaja `!configured`, bukan "belum login". Kalau dikaitkan ke
+ * status login, situs yang sudah live akan memberi akses penuh kepada
+ * pengunjung yang belum masuk.
+ */
 const AKSES_LOKAL: AccessState = {
   canView: true,
   isPro: true,
@@ -33,16 +40,26 @@ export function useUserData(): {
   access: AccessState;
   loading: boolean;
 } {
-  const { profile, access, loading: authLoading, configured, user } = useAuth();
+  const { profile, access, loading: authLoading, configured } = useAuth();
   const [local, setLocal] = useStoredValue(STORAGE_KEY);
 
-  const signedIn = configured && !!user;
+  // Begitu Firebase terpasang, profil pengguna jadi satu-satunya sumber:
+  // tanggal lahir di localStorage tidak boleh lagi memberi akses apa pun.
+  if (configured) {
+    return {
+      birthDate: profile?.tanggalLahir ?? null,
+      setBirthDate: setLocal,
+      editable: false,
+      access,
+      loading: authLoading,
+    };
+  }
 
   return {
-    birthDate: signedIn ? (profile?.tanggalLahir ?? null) : local,
+    birthDate: local,
     setBirthDate: setLocal,
-    editable: !signedIn,
-    access: signedIn ? access : AKSES_LOKAL,
-    loading: signedIn ? authLoading : false,
+    editable: true,
+    access: AKSES_LOKAL,
+    loading: false,
   };
 }

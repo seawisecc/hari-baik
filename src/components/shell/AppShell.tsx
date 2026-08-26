@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { AuthGate } from "@/components/AuthGate";
 import { MobileNav } from "./MobileNav";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
@@ -19,14 +20,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const telanjang = RUTE_TELANJANG.includes(pathname);
 
-  if (telanjang) return <>{children}</>;
+  if (telanjang) return <AuthGate>{children}</AuthGate>;
 
   return (
     <div className="lg:pl-64">
       <Sidebar />
       <TopBar />
       {/* Padding bawah menyediakan ruang untuk bottom nav di mobile. */}
-      <div className="pb-24 lg:pb-10">{children}</div>
+      <div className="pb-24 lg:pb-10">
+        <AuthGate>{children}</AuthGate>
+      </div>
       <MobileNav />
     </div>
   );

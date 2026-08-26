@@ -60,4 +60,13 @@ export const NAV_MOBILE: NavItem[] = [
 ];
 
 /** Rute yang tampil tanpa shell aplikasi. */
-export const RUTE_TELANJANG = ["/", "/login", "/register", "/verify-email", "/onboarding"];
+export const RUTE_TELANJANG = [
+  "/",
+  "/login",
+  "/register",
+  "/lupa-sandi",
+  "/verify-email",
+  "/onboarding",
+  // Terkunci berarti terkunci: jangan tampilkan menu yang tidak bisa dibuka.
+  "/expired",
+];
