@@ -8,7 +8,7 @@ export interface Wara {
   urip: number;
 }
 
-/** Saptawara — siklus 7 hari, diambil langsung dari hari Masehi (Minggu = Redite). */
+/** Saptawara: siklus 7 hari, diambil langsung dari hari Masehi (Minggu = Redite). */
 export const SAPTAWARA: Wara[] = [
   { name: "Redite", urip: 5 },
   { name: "Soma", urip: 4 },
@@ -19,7 +19,7 @@ export const SAPTAWARA: Wara[] = [
   { name: "Saniscara", urip: 9 },
 ];
 
-/** Pancawara — siklus 5 hari (pasaran). */
+/** Pancawara: siklus 5 hari (pasaran). */
 export const PANCAWARA: Wara[] = [
   { name: "Umanis", urip: 5 },
   { name: "Pahing", urip: 9 },
@@ -30,7 +30,7 @@ export const PANCAWARA: Wara[] = [
 export const PANCAWARA_EPOCH = "1993-06-30";
 export const PANCAWARA_EPOCH_INDEX = 4; // 1993-06-30 = Kliwon
 
-/** Wuku — 30 wuku x 7 hari = siklus 210 hari. */
+/** Wuku: 30 wuku x 7 hari = siklus 210 hari. */
 export const WUKU: string[] = [
   "Sinta",
   "Landep",
@@ -66,15 +66,15 @@ export const WUKU: string[] = [
 /** Hari ke-0 dari wuku Sinta. Siklus pawukon dihitung dari sini. */
 export const PAWUKON_EPOCH = "1993-06-27";
 
-/** Triwara — siklus 3 hari, diturunkan dari posisi dalam pawukon. */
+/** Triwara: siklus 3 hari, diturunkan dari posisi dalam pawukon. */
 export const TRIWARA = ["Pasah", "Beteng", "Kajeng"] as const;
 
-/** Caturwara — siklus 4 hari. */
+/** Caturwara: siklus 4 hari. */
 export const CATURWARA = ["Sri", "Laba", "Jaya", "Menala"] as const;
 export const CATURWARA_EPOCH = "2000-01-01";
 export const CATURWARA_EPOCH_INDEX = 3;
 
-/** Sadwara — siklus 6 hari, punya urip sendiri (dipakai di perhitungan petemon). */
+/** Sadwara: siklus 6 hari, punya urip sendiri (dipakai di perhitungan petemon). */
 export const SADWARA = ["Tungleh", "Aryang", "Urukung", "Paniron", "Was", "Maulu"] as const;
 export const SADWARA_URIP: Record<string, number> = {
   Tungleh: 7,
@@ -87,7 +87,7 @@ export const SADWARA_URIP: Record<string, number> = {
 export const SADWARA_EPOCH = "1993-06-30";
 export const SADWARA_EPOCH_INDEX = 3;
 
-/** Astawara — siklus 8 hari. */
+/** Astawara: siklus 8 hari. */
 export const ASTAWARA = [
   "Sri",
   "Indra",
@@ -101,7 +101,7 @@ export const ASTAWARA = [
 export const ASTAWARA_EPOCH = "2000-01-01";
 export const ASTAWARA_EPOCH_INDEX = 7;
 
-/** Sangawara — siklus 9 hari. */
+/** Sangawara: siklus 9 hari. */
 export const SANGAWARA = [
   "Dangu",
   "Jangur",
@@ -115,7 +115,7 @@ export const SANGAWARA = [
 ] as const;
 export const SANGAWARA_EPOCH = "2000-01-01";
 
-/** Dasawara — dipilih dari jumlah urip Saptawara + Pancawara. */
+/** Dasawara: dipilih dari jumlah urip Saptawara + Pancawara. */
 export const DASAWARA = [
   "Pandita",
   "Pati",
@@ -129,7 +129,7 @@ export const DASAWARA = [
   "Raksasa",
 ] as const;
 
-/** Lintang — 35 lintang, siklus dari posisi pawukon. */
+/** Lintang: 35 lintang, siklus dari posisi pawukon. */
 export const LINTANG: string[] = [
   "Gajah",
   "Kiriman",
@@ -168,7 +168,7 @@ export const LINTANG: string[] = [
   "Bade",
 ];
 
-/** Watek — gabungan watek Pancawara (madya) dan Saptawara (alit). */
+/** Watek: gabungan watek Pancawara (madya) dan Saptawara (alit). */
 export const WATEK_PANCAWARA: Record<string, string> = {
   Umanis: "Bhuta",
   Pahing: "Singa",
@@ -214,7 +214,7 @@ export const MS_PER_DAY = 86_400_000;
 /**
  * Ambang penanggal→panglong. Sengaja dibulatkan ke 14.765 (bukan
  * SYNODIC_MONTH_DAYS / 2) supaya hasilnya identik dengan versi aplikasi
- * sebelumnya — selisihnya hanya ~25 detik, tapi cukup untuk menggeser
+ * sebelumnya: selisihnya hanya ~25 detik, tapi cukup untuk menggeser
  * satu hari di kasus batas.
  */
 export const HALF_SYNODIC = 14.765;

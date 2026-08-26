@@ -1,4 +1,4 @@
-/** Kategori siklus personal — hasil pertemuan urip lahir dengan urip hari berjalan. */
+/** Kategori siklus personal: hasil pertemuan urip lahir dengan urip hari berjalan. */
 export type KategoriName = "GURU" | "RATU" | "LARA" | "PATI";
 
 export interface KategoriHari {
@@ -67,7 +67,7 @@ export interface WarigaDay {
   dewasaAyu: boolean;
 }
 
-/** Ringkasan penanda hari untuk sel kalender — lebih murah daripada WarigaDay penuh. */
+/** Ringkasan penanda hari untuk sel kalender: lebih murah daripada WarigaDay penuh. */
 export interface DayMarkers {
   isLiburNasional: boolean;
   namaLibur: string | null;

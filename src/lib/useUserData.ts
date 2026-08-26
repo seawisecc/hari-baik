@@ -6,7 +6,7 @@ import type { AccessState } from "@/types";
 
 const STORAGE_KEY = "hb_birthdate";
 
-/** Tanpa Firebase, akses dibuka penuh — kalau tidak, aplikasi tidak bisa dicoba. */
+/** Tanpa Firebase, akses dibuka penuh: kalau tidak, aplikasi tidak bisa dicoba. */
 const AKSES_LOKAL: AccessState = {
   canView: true,
   isPro: true,
@@ -22,7 +22,7 @@ const AKSES_LOKAL: AccessState = {
  * belum dikonfigurasi (mis. pengembangan lokal sebelum kredensial dipasang),
  * jatuh ke localStorage supaya aplikasi tetap bisa dijalankan.
  *
- * `setBirthDate` hanya berlaku di mode lokal — setelah login, perubahan
+ * `setBirthDate` hanya berlaku di mode lokal: setelah login, perubahan
  * tanggal lahir harus lewat onboarding atau admin.
  */
 export function useUserData(): {

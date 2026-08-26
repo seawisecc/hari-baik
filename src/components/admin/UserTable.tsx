@@ -20,7 +20,7 @@ const STATUS_LABEL: Record<SubscriptionStatus, string> = {
 };
 
 function tanggal(iso: string | null) {
-  if (!iso) return "—";
+  if (!iso) return "-";
   return new Date(iso).toLocaleDateString("id-ID", {
     day: "numeric",
     month: "short",
@@ -92,7 +92,7 @@ export function UserTable({
               </td>
               <td className="px-3 py-3 text-ink-soft">{tanggal(u.subscriptionExpiresAt)}</td>
               <td className="px-3 py-3 text-ink-soft">
-                {u.tanggalLahir ?? "—"}
+                {u.tanggalLahir ?? "-"}
                 {u.uripLahir !== null && (
                   <span className="block text-xs text-ink-faint">urip {u.uripLahir}</span>
                 )}

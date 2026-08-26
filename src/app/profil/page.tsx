@@ -63,18 +63,18 @@ export default function ProfilPage() {
           </CardHeader>
           <CardBody>
             <dl className="divide-y divide-border-soft">
-              <Baris label="Tanggal lahir" value={profile.tanggalLahir ?? "—"} />
+              <Baris label="Tanggal lahir" value={profile.tanggalLahir ?? "-"} />
               <Baris
                 label="Weton"
                 value={
                   profile.saptaWaraLahir && profile.pancaWaraLahir
                     ? `${profile.saptaWaraLahir} ${profile.pancaWaraLahir}`
-                    : "—"
+                    : "-"
                 }
               />
-              <Baris label="Wuku" value={profile.wukuLahir ?? "—"} />
-              <Baris label="Urip" value={profile.uripLahir?.toString() ?? "—"} />
-              <Baris label="WhatsApp" value={profile.phoneNumber ?? "—"} />
+              <Baris label="Wuku" value={profile.wukuLahir ?? "-"} />
+              <Baris label="Urip" value={profile.uripLahir?.toString() ?? "-"} />
+              <Baris label="WhatsApp" value={profile.phoneNumber ?? "-"} />
             </dl>
             <p className="mt-3 text-xs italic text-ink-faint">{t("profile.dob.readonly")}</p>
           </CardBody>

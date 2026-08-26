@@ -113,7 +113,7 @@ export default function LandingPage() {
         <div className="mt-10 flex flex-col items-center gap-4">
           <Link href="/register">
             <Button size="lg">
-              Daftar di sini — gratis 3 hari
+              Daftar di sini: gratis 3 hari
               <ArrowRight className="h-4 w-4" aria-hidden />
             </Button>
           </Link>
@@ -188,7 +188,7 @@ export default function LandingPage() {
                 <p className="text-[15px] italic leading-relaxed text-ink-soft">
                   &ldquo;{tm.teks}&rdquo;
                 </p>
-                <p className="mt-auto pt-3 text-sm font-medium text-ink">— {tm.nama}</p>
+                <p className="mt-auto pt-3 text-sm font-medium text-ink">{tm.nama}</p>
               </Card>
             ))}
           </div>
@@ -206,7 +206,7 @@ export default function LandingPage() {
             </p>
             <Link href="/register" className="mt-6 inline-block">
               <Button size="lg">
-                Daftar di sini — gratis 3 hari
+                Daftar di sini: gratis 3 hari
                 <ArrowRight className="h-4 w-4" aria-hidden />
               </Button>
             </Link>

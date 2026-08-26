@@ -114,6 +114,18 @@ Satu kerangka (`AppShell`) dengan dua bentuk:
 Landing dan halaman auth sengaja tidak memakai shell — di sana navigasi
 aplikasi belum relevan.
 
+## Tipografi
+
+- **Source Serif 4** untuk judul. Dipilih karena punya berat tebal yang
+  sebenarnya, jadi `font-bold` tidak dipalsukan browser seperti pada serif
+  satu-berat.
+- **Inter** untuk teks dan antarmuka. Dirancang untuk layar, sehingga label
+  11-13px yang banyak dipakai di sini tetap jernih.
+
+Teks aplikasi tidak memakai em dash. Pemisah yang dipakai: koma untuk klausa
+penghubung, titik dua untuk penjelasan, titik untuk kalimat baru, dan titik
+tengah (·) untuk memisah label inline.
+
 ## Tema
 
 Dua tema aksen di atas dasar netral off-white yang sama:

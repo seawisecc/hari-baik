@@ -2,10 +2,10 @@ export type Role = "user" | "admin";
 
 /**
  * Status langganan.
- * - `trial`   — 3 hari pertama sejak onboarding, otomatis
- * - `pending` — sudah minta aktivasi, menunggu approval admin
- * - `active`  — berbayar, aktif sampai `subscriptionExpiresAt`
- * - `expired` — trial atau langganan sudah lewat
+ * - `trial`   : 3 hari pertama sejak onboarding, otomatis
+ * - `pending`: sudah minta aktivasi, menunggu approval admin
+ * - `active`: berbayar, aktif sampai `subscriptionExpiresAt`
+ * - `expired`: trial atau langganan sudah lewat
  */
 export type SubscriptionStatus = "trial" | "pending" | "active" | "expired";
 
@@ -34,7 +34,7 @@ export interface UserProfile {
   uripPetemonLahir: number | null;
 }
 
-/** Hasil evaluasi akses — dipakai untuk mengunci fitur Pro. */
+/** Hasil evaluasi akses: dipakai untuk mengunci fitur Pro. */
 export interface AccessState {
   /** Boleh melihat kalender sama sekali. */
   canView: boolean;

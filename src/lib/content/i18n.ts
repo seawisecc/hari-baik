@@ -2,7 +2,7 @@
  * Kamus ID/EN. Diambil utuh dari aplikasi sebelumnya agar teks yang sudah
  * dikenal pengguna tidak berubah.
  *
- * Kunci memakai notasi bertitik ("day.guru.long") — bukan objek bersarang —
+ * Kunci memakai notasi bertitik ("day.guru.long"), bukan objek bersarang,
  * supaya `t()` tetap satu lookup dan kunci yang hilang mudah terlihat.
  */
 
@@ -20,7 +20,7 @@ const dict = {
     "day.lara": "Hari Mawas",
     "day.pati": "Hari Istirahat",
     "day.guru.tagline": "Energi mendukung, langkah terasa ringan.",
-    "day.ratu.tagline": "Stabil dan produktif — jalankan yang sudah dimulai.",
+    "day.ratu.tagline": "Stabil dan produktif. Jalankan yang sudah dimulai.",
     "day.lara.tagline": "Kurangi tergesa, perbanyak pertimbangan.",
     "day.pati.tagline": "Hari terbaik untuk memulihkan diri dan merefleksikan perjalanan.",
     "day.guru.desc":
@@ -30,13 +30,13 @@ const dict = {
     "day.lara.desc":
       "Hari ini mengundang kamu untuk lebih cermat. Tunda keputusan besar dan fokuslah pada hal-hal yang sudah pasti.",
     "day.pati.desc":
-      "Hari ini mengajakmu untuk berhenti sejenak. Bukan untuk berhenti selamanya — tapi untuk mengisi ulang energi dan menata perspektif.",
+      "Hari ini mengajakmu untuk berhenti sejenak. Bukan untuk berhenti selamanya, tapi untuk mengisi ulang energi dan menata perspektif.",
     "day.guru.long":
-      "Hari Guru adalah momen di mana kondisi internal dan eksternal cenderung harmonis. Gunakan hari ini untuk hal-hal yang membutuhkan keberanian dan kejernihan pikiran — memulai proyek baru, membuat keputusan penting, menjalin relasi baru, atau melakukan percakapan yang selama ini tertunda.",
+      "Hari Guru adalah momen di mana kondisi internal dan eksternal cenderung harmonis. Gunakan hari ini untuk hal-hal yang membutuhkan keberanian dan kejernihan pikiran: memulai proyek baru, membuat keputusan penting, menjalin relasi baru, atau melakukan percakapan yang selama ini tertunda.",
     "day.ratu.long":
       "Hari Ratu bukan hari untuk ekspansi besar, melainkan untuk memelihara. Selesaikan yang belum tuntas, perkuat pondasi, dan nikmati ritme kerja yang stabil. Hari yang baik untuk meeting rutin, komunikasi bisnis, dan aktivitas yang memerlukan ketelitian.",
     "day.lara.long":
-      "Hari Lara bukan pertanda buruk — ini adalah pengingat untuk melambat. Hindari mengambil risiko besar atau memulai sesuatu yang memerlukan komitmen jangka panjang. Gunakan hari ini untuk riset, persiapan, evaluasi, dan memperbaiki hal-hal kecil. Energi terbaik hari ini ada pada pekerjaan di belakang layar.",
+      "Hari Lara bukan pertanda buruk. Ini adalah pengingat untuk melambat. Hindari mengambil risiko besar atau memulai sesuatu yang memerlukan komitmen jangka panjang. Gunakan hari ini untuk riset, persiapan, evaluasi, dan memperbaiki hal-hal kecil. Energi terbaik hari ini ada pada pekerjaan di belakang layar.",
     "day.pati.long":
       "Hari Pati adalah waktu untuk introspeksi, bukan larangan. Hindari memaksa hal-hal besar terjadi hari ini. Sebaliknya, gunakan waktu ini untuk berdiam, bersyukur, berolahraga ringan, beres-beres, atau sekadar beristirahat dengan penuh kesadaran. Banyak keputusan terbaik lahir setelah periode istirahat yang berkualitas.",
     "assist.title": "Panduan Hari Ini",
@@ -68,7 +68,7 @@ const dict = {
     "expired.title": "Waktunya Isi Ulang Energi",
     "expired.desc":
       "Akses kalender siklus personalmu telah berakhir. Aktifkan kembali untuk melanjutkan perjalananmu.",
-    "expired.cta": "Aktifkan Kembali — Rp 150.000 / Tahun",
+    "expired.cta": "Aktifkan Kembali: Rp 150.000 / Tahun",
     "pro.nama.title": "Makna Nama",
     "pro.nama.input": "Masukkan nama lengkap",
     "pro.nama.cta": "Hitung Makna",
@@ -85,19 +85,19 @@ const dict = {
     "pro.lock.cta": "Aktifkan Langganan",
     "pro.lock.tagline": "Akses semua fitur tanpa batas.",
     "pro.lock.desc.nama":
-      "Analisis makna nama berdasarkan aksara Bali — tersedia untuk subscriber.",
+      "Analisis makna nama berdasarkan aksara Bali, tersedia untuk subscriber.",
     "pro.lock.desc.nasib":
-      "Gambaran perjalanan rejeki & kesehatan per periode usia — tersedia untuk subscriber.",
+      "Gambaran perjalanan rejeki & kesehatan per periode usia, tersedia untuk subscriber.",
     "pro.lock.desc.petemon":
-      "Perhitungan kecocokan Petemon Lanang Istri — tersedia untuk subscriber.",
+      "Perhitungan kecocokan Petemon Lanang Istri, tersedia untuk subscriber.",
     "trial.calendar.banner":
       "Navigasi kalender multi-bulan tersedia untuk subscriber. Aktifkan langganan untuk melihat hari baik di bulan-bulan berikutnya.",
     "wisdom.name":
       "Nama adalah doa dan harapan. Karakter dan kebaikan yang kamu lakukan jauh lebih menentukan perjalanan hidupmu.",
     "wisdom.nasib":
-      "Gambaran ini adalah panduan refleksi — bukan ramalan pasti. Karma baik, pasangan hidup, rejeki anak, kerja keras, dan doa sangat menentukan perjalananmu.",
+      "Gambaran ini adalah panduan refleksi, bukan ramalan pasti. Karma baik, pasangan hidup, rejeki anak, kerja keras, dan doa sangat menentukan perjalananmu.",
     "wisdom.petemon":
-      "Cinta, komitmen, dan komunikasi adalah fondasi utama hubungan yang langgeng. Petemon Lanang Istri bukan penentu jodoh — gunakan sebagai panduan kebijaksanaan.",
+      "Cinta, komitmen, dan komunikasi adalah fondasi utama hubungan yang langgeng. Petemon Lanang Istri bukan penentu jodoh. Gunakan sebagai panduan kebijaksanaan.",
   },
   en: {
     "app.tagline": "Everyone has their own perfect timing",
@@ -107,7 +107,7 @@ const dict = {
     "day.lara": "Mindful Day",
     "day.pati": "Rest Day",
     "day.guru.tagline": "Energy flows, steps feel light.",
-    "day.ratu.tagline": "Stable and productive — keep the momentum.",
+    "day.ratu.tagline": "Stable and productive. Keep the momentum.",
     "day.lara.tagline": "Slow down, think it through.",
     "day.pati.tagline": "The best day to rest and reflect.",
     "day.guru.desc":
@@ -117,13 +117,13 @@ const dict = {
     "day.lara.desc":
       "Today invites you to be more careful. Postpone big decisions and focus on what is already certain.",
     "day.pati.desc":
-      "Today invites you to pause. Not to stop forever — but to recharge and gain perspective.",
+      "Today invites you to pause. Not to stop forever, but to recharge and gain perspective.",
     "day.guru.long":
-      "A Flow Day is a moment when your inner and outer conditions tend to be in harmony. Use today for things that require courage and clarity — starting new projects, making important decisions, building new relationships, or having conversations you have been putting off.",
+      "A Flow Day is a moment when your inner and outer conditions tend to be in harmony. Use today for things that require courage and clarity: starting new projects, making important decisions, building new relationships, or having conversations you have been putting off.",
     "day.ratu.long":
       "A Calm Day is not for big expansion, but for nurturing. Finish what is unfinished, strengthen foundations, and enjoy a stable work rhythm. Great for regular meetings, business communication, and detail-oriented work.",
     "day.lara.long":
-      "A Mindful Day is not a bad sign — it is a reminder to slow down. Avoid taking big risks or starting something that requires long-term commitment. Use today for research, preparation, evaluation, and fixing small things. The best energy today is for behind-the-scenes work.",
+      "A Mindful Day is not a bad sign. It is a reminder to slow down. Avoid taking big risks or starting something that requires long-term commitment. Use today for research, preparation, evaluation, and fixing small things. The best energy today is for behind-the-scenes work.",
     "day.pati.long":
       "A Rest Day is time for introspection, not a restriction. Avoid forcing big things to happen today. Instead, use this time to be still, be grateful, exercise lightly, tidy up, or simply rest with full awareness. Many of the best decisions are born after a quality rest period.",
     "assist.title": "Today's Guide",
@@ -155,7 +155,7 @@ const dict = {
     "expired.title": "Time to Recharge",
     "expired.desc":
       "Your access to the personal cycle calendar has ended. Reactivate to continue your journey.",
-    "expired.cta": "Reactivate — Rp 150,000 / Year",
+    "expired.cta": "Reactivate: Rp 150,000 / Year",
     "pro.nama.title": "Name Meaning",
     "pro.nama.input": "Enter full name",
     "pro.nama.cta": "Analyze Name",
@@ -171,17 +171,17 @@ const dict = {
     "pro.lock.title": "Pro Feature",
     "pro.lock.cta": "Activate Subscription",
     "pro.lock.tagline": "Access all features without limits.",
-    "pro.lock.desc.nama": "Name analysis based on Balinese script — available for subscribers.",
+    "pro.lock.desc.nama": "Name analysis based on Balinese script, available for subscribers.",
     "pro.lock.desc.nasib":
-      "Fortune & health journey overview per age period — available for subscribers.",
+      "Fortune & health journey overview per age period, available for subscribers.",
     "pro.lock.desc.petemon":
-      "Petemon Lanang Istri compatibility calculation — available for subscribers.",
+      "Petemon Lanang Istri compatibility calculation, available for subscribers.",
     "trial.calendar.banner":
       "Multi-month calendar navigation is available for subscribers. Activate your subscription to see lucky days in upcoming months.",
     "wisdom.name":
       "A name is a prayer and a hope. Your character and kindness determine your path far more than any calculation.",
     "wisdom.nasib":
-      "This is a guide for reflection — not a fixed prediction. Good karma, your partner, children's blessings, hard work, and prayer greatly shape your journey.",
+      "This is a guide for reflection, not a fixed prediction. Good karma, your partner, children's blessings, hard work, and prayer greatly shape your journey.",
     "wisdom.petemon":
       "Love, commitment, and communication are the true foundations of a lasting relationship. Petemon is a guide for wisdom, not a verdict.",
   },

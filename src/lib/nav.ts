@@ -16,7 +16,7 @@ export interface NavItem {
   /** Label pendek untuk bottom nav di layar sempit. */
   short: string;
   icon: LucideIcon;
-  /** Fitur Pro — diberi penanda di navigasi. */
+  /** Fitur Pro: diberi penanda di navigasi. */
   pro?: boolean;
 }
 

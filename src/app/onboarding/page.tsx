@@ -65,7 +65,7 @@ export default function OnboardingPage() {
         <CardHeader>
           <CardTitle>Lengkapi profil</CardTitle>
           <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
-            Kalender siklusmu dihitung dari tanggal lahir, jadi pastikan benar — setelah ini
+            Kalender siklusmu dihitung dari tanggal lahir, jadi pastikan benar: setelah ini
             hanya admin yang bisa mengubahnya.
           </p>
         </CardHeader>

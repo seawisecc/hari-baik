@@ -1,7 +1,7 @@
 import { getPancawara, getSadwara, getSaptawara, uripSadwara } from "@/lib/wariga";
 
 /**
- * Petemon Lanang Istri — kecocokan dua tanggal lahir.
+ * Petemon Lanang Istri: kecocokan dua tanggal lahir.
  *
  * Urip petemon berbeda dari urip harian biasa: Sadwara ikut dihitung.
  * Total kedua orang lalu dibaca lewat dua tabel sekaligus (mod 5 dan mod 16).
@@ -36,7 +36,7 @@ const PANCA_PETEMON: Record<number, Tafsir> = {
   "2": {
     name: "Gedong",
     interp:
-      "Hubungan yang terlindungi — seperti berada dalam gedung yang kokoh. Ada rasa aman dan stabilitas dalam hubungan ini.",
+      "Hubungan yang terlindungi, seperti berada dalam gedung yang kokoh. Ada rasa aman dan stabilitas dalam hubungan ini.",
   },
   "3": {
     name: "Peta",
@@ -59,7 +59,7 @@ const SAD_PETEMON: Record<number, Tafsir> = {
   "1": {
     name: "Ala-Ayu Panes-Tis",
     interp:
-      "Hubungan yang bergejolak — naik turun, panas dingin. Dibutuhkan ketahanan dan kesiapan mental untuk terus bertumbuh bersama.",
+      "Hubungan yang bergejolak: naik turun, panas dingin. Dibutuhkan ketahanan dan kesiapan mental untuk terus bertumbuh bersama.",
   },
   "2": {
     name: "Durbala",
@@ -79,7 +79,7 @@ const SAD_PETEMON: Record<number, Tafsir> = {
   "5": {
     name: "Melah Lunas-Lanus",
     interp:
-      "Hubungan yang terus meningkat — rejeki, keharmonisan, dan kebahagiaan tumbuh bersama seiring waktu.",
+      "Hubungan yang terus meningkat: rejeki, keharmonisan, dan kebahagiaan tumbuh bersama seiring waktu.",
   },
   "6": {
     name: "Kemeranan",
@@ -94,7 +94,7 @@ const SAD_PETEMON: Record<number, Tafsir> = {
   "8": {
     name: "Doyan Terak",
     interp:
-      "Sering merasa serba kurang — baik materi maupun emosional. Bersyukur dan mengelola harapan bersama sangat penting.",
+      "Sering merasa serba kurang: baik materi maupun emosional. Bersyukur dan mengelola harapan bersama sangat penting.",
   },
   "9": {
     name: "Sekita Tong Ada Tuna",
@@ -114,7 +114,7 @@ const SAD_PETEMON: Record<number, Tafsir> = {
   "12": {
     name: "Sedana Lulus",
     interp:
-      "Murah rejeki — keberkahan materi mengalir dalam hubungan ini. Bersama, pasangan ini cenderung lebih mudah meraih kemakmuran.",
+      "Murah rejeki: keberkahan materi mengalir dalam hubungan ini. Bersama, pasangan ini cenderung lebih mudah meraih kemakmuran.",
   },
   "13": {
     name: "Ageng Lama",
@@ -124,7 +124,7 @@ const SAD_PETEMON: Record<number, Tafsir> = {
   "14": {
     name: "Dahating Bagia",
     interp:
-      "Sangat berbahagia. Ini adalah salah satu kombinasi terbaik — penuh kebahagiaan dan keberkahan.",
+      "Sangat berbahagia. Ini adalah salah satu kombinasi terbaik: penuh kebahagiaan dan keberkahan.",
   },
   "15": {
     name: "Dahating Ala",

@@ -28,7 +28,7 @@ const KATEGORI = [
   {
     key: "ratu",
     nama: "Hari Tenang",
-    tagline: "Stabil dan produktif — jalankan yang sudah dimulai.",
+    tagline: "Stabil dan produktif: jalankan yang sudah dimulai.",
     cls: "bg-ratu",
   },
   {
@@ -54,7 +54,7 @@ export default function StyleguidePage() {
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="font-heading text-4xl font-bold text-ink">Styleguide</h1>
-          <p className="mt-1 text-ink-soft">Hari Baik — sistem desain</p>
+          <p className="mt-1 text-ink-soft">Hari Baik: sistem desain</p>
         </div>
         <ThemeToggle />
       </header>
@@ -88,9 +88,9 @@ export default function StyleguidePage() {
         <Card className="space-y-4 p-7">
           <p className="font-heading text-5xl font-bold text-ink">Display</p>
           <p className="font-heading text-3xl font-semibold text-ink">Heading</p>
-          <p className="text-lg text-ink">Body large — teks paragraf utama.</p>
-          <p className="text-[15px] text-ink-soft">Body — teks pendukung.</p>
-          <p className="text-sm text-ink-faint">Caption — keterangan kecil.</p>
+          <p className="text-lg text-ink">Body large: teks paragraf utama.</p>
+          <p className="text-[15px] text-ink-soft">Body: teks pendukung.</p>
+          <p className="text-sm text-ink-faint">Caption: keterangan kecil.</p>
         </Card>
       </Section>
 

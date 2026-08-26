@@ -16,7 +16,7 @@ const eq = (label: string, expected: unknown, actual: unknown) => {
   }
 };
 
-// Petemon — nilai acuan dari self-test aplikasi lama.
+// Petemon: nilai acuan dari self-test aplikasi lama.
 const p = hitungPetemon("1993-06-30", "1997-09-07");
 eq("petemon orang1", 23, p.orang1.totalUrip);
 eq("petemon orang2", 21, p.orang2.totalUrip);

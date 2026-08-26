@@ -16,7 +16,7 @@ const button = cva(
           "bg-accent text-accent-ink hb-raise-2 hover:bg-accent-strong active:hb-sink-sm",
         // Aksi sekunder: permukaan netral timbul.
         surface: "bg-surface text-ink hb-raise-1 hover:bg-surface-sunk active:hb-sink-sm",
-        // Tanpa elevasi — untuk aksi tersier di dalam kartu.
+        // Tanpa elevasi: untuk aksi tersier di dalam kartu.
         ghost: "bg-transparent text-ink-soft hover:bg-surface-sunk hover:text-ink",
         danger: "bg-error/85 text-white hb-raise-1 hover:bg-error active:hb-sink-sm",
       },

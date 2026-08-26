@@ -1,6 +1,6 @@
 /**
  * Tes aturan akses. Dijalankan dengan: npm run test
- * Sengaja tanpa framework — logikanya kecil dan hanya butuh perbandingan nilai.
+ * Sengaja tanpa framework: logikanya kecil dan hanya butuh perbandingan nilai.
  */
 import { evaluateAccess, extendOneYear, trialEnd } from "../subscription";
 
@@ -41,7 +41,7 @@ s = evaluateAccess(
 eq("langganan aktif: pro", true, s.isPro);
 eq("langganan aktif: type", "subscription", s.type);
 
-// Bayar saat trial hampir habis — trial yang lewat tidak boleh menutup akses.
+// Bayar saat trial hampir habis: trial yang lewat tidak boleh menutup akses.
 s = evaluateAccess(
   {
     subscriptionStatus: "active",
@@ -52,7 +52,7 @@ s = evaluateAccess(
 );
 eq("bayar setelah trial lewat: tetap pro", true, s.isPro);
 
-// Langganan kedaluwarsa tapi trial belum — jatuh balik ke trial, bukan terkunci.
+// Langganan kedaluwarsa tapi trial belum: jatuh balik ke trial, bukan terkunci.
 s = evaluateAccess(
   {
     subscriptionStatus: "active",

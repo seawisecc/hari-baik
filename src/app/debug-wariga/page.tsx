@@ -1,7 +1,7 @@
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { runWarigaSelfTest } from "@/lib/wariga";
 
-export const metadata = { title: "Debug Wariga — Hari Baik" };
+export const metadata = { title: "Debug Wariga | Hari Baik" };
 
 export default function DebugWarigaPage() {
   const results = runWarigaSelfTest();

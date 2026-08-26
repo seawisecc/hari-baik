@@ -1,7 +1,7 @@
 /**
  * Dua sistem pembacaan watak dari weton lahir:
- * - Pangarasan (11 tipe) — cara seseorang bergerak di dunia
- * - Pancasuda  (7 tipe)  — bekal/nasib bawaan
+ * - Pangarasan (11 tipe): cara seseorang bergerak di dunia
+ * - Pancasuda  (7 tipe): bekal/nasib bawaan
  *
  * `icon` adalah nama ikon lucide-react.
  */
@@ -34,7 +34,7 @@ export const PANGARASAN: Record<string, ProfilWatak> = {
       "Perlu belajar mendelegasikan dan meminta bantuan",
     ],
     saran:
-      "Percayai kemampuanmu — kemampuan yang kamu miliki bukan kebetulan. Namun ingat, kamu tidak harus menanggung segalanya sendiri. Belajarlah untuk berbagi peran dan membangun tim yang kuat di sekitarmu.",
+      "Percayai kemampuanmu: kemampuan yang kamu miliki bukan kebetulan. Namun ingat, kamu tidak harus menanggung segalanya sendiri. Belajarlah untuk berbagi peran dan membangun tim yang kuat di sekitarmu.",
   },
   "Aras Kembang": {
     nama: "Aras Kembang",
@@ -53,14 +53,14 @@ export const PANGARASAN: Record<string, ProfilWatak> = {
       "Perlu menjaga batasan yang sehat dalam hubungan",
     ],
     saran:
-      "Daya tarikmu adalah karunia — gunakan untuk menginspirasi dan menyembuhkan orang-orang di sekitarmu. Namun jangan lupa merawat dirimu sendiri, karena kamu tidak bisa menuangkan air dari gelas yang kosong.",
+      "Daya tarikmu adalah karunia. Gunakan untuk menginspirasi dan menyembuhkan orang-orang di sekitarmu. Namun jangan lupa merawat dirimu sendiri, karena kamu tidak bisa menuangkan air dari gelas yang kosong.",
   },
   "Lakuning Lintang": {
     nama: "Lakuning Lintang",
     simbol: "Bintang",
     icon: "star",
     kepribadian:
-      "Kamu adalah jiwa yang bersinar — tekun, cerdas, dan memiliki kepekaan tinggi terhadap hal-hal di sekitarmu. Kamu cenderung lebih nyaman bekerja sendiri atau dalam keheningan, dan sering kali mampu melihat detail yang luput dari perhatian orang lain.",
+      "Kamu adalah jiwa yang bersinar: tekun, cerdas, dan memiliki kepekaan tinggi terhadap hal-hal di sekitarmu. Kamu cenderung lebih nyaman bekerja sendiri atau dalam keheningan, dan sering kali mampu melihat detail yang luput dari perhatian orang lain.",
     kekuatan: [
       "Tekun dan teliti dalam pekerjaan",
       "Kepekaan bahasa dan komunikasi yang tinggi",
@@ -72,7 +72,7 @@ export const PANGARASAN: Record<string, ProfilWatak> = {
       "Perlu lebih aktif membangun koneksi sosial agar tidak merasa terisolasi",
     ],
     saran:
-      "Bintang bersinar paling terang di langit malam — dan cahayamu sungguh nyata. Tantanganmu adalah membiarkan dirimu terlihat. Buka diri, bagikan pemikiranmu, dan biarkan orang lain juga merasakan cahayamu.",
+      "Bintang bersinar paling terang di langit malam, dan cahayamu sungguh nyata. Tantanganmu adalah membiarkan dirimu terlihat. Buka diri, bagikan pemikiranmu, dan biarkan orang lain juga merasakan cahayamu.",
   },
   "Lakuning Rembulan": {
     nama: "Lakuning Rembulan",
@@ -91,7 +91,7 @@ export const PANGARASAN: Record<string, ProfilWatak> = {
       "Perlu membangun disiplin diri yang lebih konsisten",
     ],
     saran:
-      "Kelembutan bukannya kelemahan — itu adalah kekuatanmu yang paling dalam. Namun agar cahayamu terus bersinar, disiplin dan konsistensi adalah bahan bakarnya. Sedikit dorongan diri setiap hari akan membawamu jauh.",
+      "Kelembutan bukannya kelemahan. Itu adalah kekuatanmu yang paling dalam. Namun agar cahayamu terus bersinar, disiplin dan konsistensi adalah bahan bakarnya. Sedikit dorongan diri setiap hari akan membawamu jauh.",
   },
   "Lakuning Srengenge": {
     nama: "Lakuning Srengenge",
@@ -110,7 +110,7 @@ export const PANGARASAN: Record<string, ProfilWatak> = {
       "Perlu lebih percaya diri dalam mengekspresikan diri di depan umum",
     ],
     saran:
-      "Cahayamu sudah ada — yang dibutuhkan hanya keberanian untuk menyalakannya lebih terang. Setiap kali kamu merasa malu, ingat bahwa dunia membutuhkan ide-idemu. Latih keberanian tampil sedikit demi sedikit, dan lihat betapa orang akan tergerak olehmu.",
+      "Cahayamu sudah ada: yang dibutuhkan hanya keberanian untuk menyalakannya lebih terang. Setiap kali kamu merasa malu, ingat bahwa dunia membutuhkan ide-idemu. Latih keberanian tampil sedikit demi sedikit, dan lihat betapa orang akan tergerak olehmu.",
   },
   "Lakuning Banyu": {
     nama: "Lakuning Banyu",
@@ -129,7 +129,7 @@ export const PANGARASAN: Record<string, ProfilWatak> = {
       "Perlu melatih kepekaan terhadap kebutuhan dan perasaan orang lain",
     ],
     saran:
-      "Air yang mengalir selalu menemukan jalannya — itulah kekuatanmu. Tetap fleksibel, tetap bergerak. Namun sesekali berhentilah untuk mendengar kebutuhan orang-orang yang bersamamu dalam perjalanan ini.",
+      "Air yang mengalir selalu menemukan jalannya. Itulah kekuatanmu. Tetap fleksibel, tetap bergerak. Namun sesekali berhentilah untuk mendengar kebutuhan orang-orang yang bersamamu dalam perjalanan ini.",
   },
   "Lakuning Bumi": {
     nama: "Lakuning Bumi",
@@ -148,14 +148,14 @@ export const PANGARASAN: Record<string, ProfilWatak> = {
       "Perlu belajar mengatakan tidak dengan baik",
     ],
     saran:
-      "Menjadi tempat berpijak bagi orang lain adalah peran yang mulia — dan kamu melakukannya dengan luar biasa. Pastikan juga kamu memiliki tempatmu sendiri untuk beristirahat dan dipulihkan. Dirimu sama pentingnya dengan orang-orang yang kamu jaga.",
+      "Menjadi tempat berpijak bagi orang lain adalah peran yang mulia, dan kamu melakukannya dengan luar biasa. Pastikan juga kamu memiliki tempatmu sendiri untuk beristirahat dan dipulihkan. Dirimu sama pentingnya dengan orang-orang yang kamu jaga.",
   },
   "Lakuning Geni": {
     nama: "Lakuning Geni",
     simbol: "Api",
     icon: "flame",
     kepribadian:
-      "Kamu memiliki semangat yang membara dan energi yang kuat. Seperti api, kamu bisa menghangatkan dan menerangi — namun juga perlu dijaga agar tidak membakar. Passion-mu adalah asetmu yang paling besar.",
+      "Kamu memiliki semangat yang membara dan energi yang kuat. Seperti api, kamu bisa menghangatkan dan menerangi, namun juga perlu dijaga agar tidak membakar. Passion-mu adalah asetmu yang paling besar.",
     kekuatan: [
       "Bersemangat tinggi dan penuh energi",
       "Berani dan tegas dalam bertindak",
@@ -167,7 +167,7 @@ export const PANGARASAN: Record<string, ProfilWatak> = {
       "Perlu melatih kesabaran dan menghitung sebelum bereaksi",
     ],
     saran:
-      "Api yang terkendali adalah sumber kehangatan dan cahaya — itulah dirimu saat berada di momen terbaikmu. Latih napas, latih jeda sebelum bereaksi. Ketika emosimu terarah dengan baik, tidak ada yang tidak bisa kamu capai.",
+      "Api yang terkendali adalah sumber kehangatan dan cahaya. Itulah dirimu saat berada di momen terbaikmu. Latih napas, latih jeda sebelum bereaksi. Ketika emosimu terarah dengan baik, tidak ada yang tidak bisa kamu capai.",
   },
   "Lakuning Angin": {
     nama: "Lakuning Angin",
@@ -186,14 +186,14 @@ export const PANGARASAN: Record<string, ProfilWatak> = {
       "Perlu menjaga konsistensi antara kata-kata dan tindakan",
     ],
     saran:
-      "Kemampuanmu memenangkan hati orang adalah karunia luar biasa — gunakan untuk membangun, bukan sekadar untuk dinikmati. Dan ingat, pujian paling berarti adalah yang kamu berikan kepada dirimu sendiri berdasarkan integritas tindakanmu.",
+      "Kemampuanmu memenangkan hati orang adalah karunia luar biasa. Gunakan untuk membangun, bukan sekadar untuk dinikmati. Dan ingat, pujian paling berarti adalah yang kamu berikan kepada dirimu sendiri berdasarkan integritas tindakanmu.",
   },
   "Lakuning Pandita Sakti": {
     nama: "Lakuning Pandita Sakti",
     simbol: "Pendeta Sakti",
     icon: "book",
     kepribadian:
-      "Kamu adalah jiwa yang dalam — bijaksana, cerdas, dan memiliki kemampuan memahami hal-hal yang tidak semua orang bisa lihat. Perjalanan hidupmu mungkin tidak selalu mudah, namun justru dari situ lahir kebijaksanaan yang membuatmu begitu unik.",
+      "Kamu adalah jiwa yang dalam: bijaksana, cerdas, dan memiliki kemampuan memahami hal-hal yang tidak semua orang bisa lihat. Perjalanan hidupmu mungkin tidak selalu mudah, namun justru dari situ lahir kebijaksanaan yang membuatmu begitu unik.",
     kekuatan: [
       "Kecerdasan tinggi dan kemampuan analisis yang mendalam",
       "Kebijaksanaan yang tumbuh dari pengalaman hidup",
@@ -224,7 +224,7 @@ export const PANGARASAN: Record<string, ProfilWatak> = {
       "Perlu lebih berani mengungkapkan pendapat dan posisi",
     ],
     saran:
-      "Kejernihan pikiranmu adalah hadiah yang langka. Gunakan untuk membantu orang lain melihat situasi dengan lebih jelas. Dan ingat — air yang tenang pun bisa membentuk grand canyon. Konsistensi dan ketekunanmu bisa mengubah hal-hal besar.",
+      "Kejernihan pikiranmu adalah hadiah yang langka. Gunakan untuk membantu orang lain melihat situasi dengan lebih jelas. Dan ingat. Air yang tenang pun bisa membentuk grand canyon. Konsistensi dan ketekunanmu bisa mengubah hal-hal besar.",
   },
 };
 
@@ -237,14 +237,14 @@ export const PANCASUDA: Record<string, ProfilWatak> = {
       "Seluas samudra, begitulah kedermawanan dan kebesaran hatimu. Kamu adalah pribadi yang pemurah, pemaaf, dan memiliki wibawa alami yang membuat orang lain merasa dihormati di hadapanmu.",
     kekuatan: [
       "Pemurah dan tidak pelit dalam berbagi",
-      "Pemaaf — tidak menyimpan dendam lama",
+      "Pemaaf. Tidak menyimpan dendam lama",
       "Berwibawa dan bertanggung jawab",
       "Lurus dan konsisten dalam menjalankan prinsip hidup",
       "Rejeki dan usaha cenderung berhasil dengan ketekunan",
     ],
     tantangan: ["Kadang terlalu mudah memberi sehingga perlu menjaga batas"],
     saran:
-      "Kebesaran hatimu adalah kekuatanmu. Teruslah memberi dengan ikhlas — namun pastikan kamu juga memberi ruang bagi dirimu sendiri untuk berkembang dan dipulihkan.",
+      "Kebesaran hatimu adalah kekuatanmu. Teruslah memberi dengan ikhlas, namun pastikan kamu juga memberi ruang bagi dirimu sendiri untuk berkembang dan dipulihkan.",
   },
   "Tunggak Semi": {
     nama: "Tunggak Semi",
@@ -263,14 +263,14 @@ export const PANCASUDA: Record<string, ProfilWatak> = {
       "Sedikit angkuh bisa menjadi penghalang hubungan yang lebih dalam",
     ],
     saran:
-      "Ketangguhanmu adalah aset luar biasa — kamu selalu bisa bangkit. Lengkapi kekuatan itu dengan kelenturan: mau mendengar dan membuka diri pada perspektif yang berbeda. Gabungan ketangguhan dan kefleksibelan akan membawamu sangat jauh.",
+      "Ketangguhanmu adalah aset luar biasa. Kamu selalu bisa bangkit. Lengkapi kekuatan itu dengan kelenturan: mau mendengar dan membuka diri pada perspektif yang berbeda. Gabungan ketangguhan dan kefleksibelan akan membawamu sangat jauh.",
   },
   "Satria Wibawa": {
     nama: "Satria Wibawa",
     simbol: "Kesatria Mulia",
     icon: "shield",
     kepribadian:
-      "Kamu adalah pribadi yang membawa kemuliaan dalam setiap langkahmu. Kejujuran dan keluhuran budimu membuat orang lain secara alami menghormatimu — bukan karena pangkat atau jabatan, tapi karena karakter aslimu.",
+      "Kamu adalah pribadi yang membawa kemuliaan dalam setiap langkahmu. Kejujuran dan keluhuran budimu membuat orang lain secara alami menghormatimu, bukan karena pangkat atau jabatan, tapi karena karakter aslimu.",
     kekuatan: [
       "Dihormati karena kemuliaan dan keluhuran budi",
       "Jujur dan berprinsip",
@@ -279,14 +279,14 @@ export const PANCASUDA: Record<string, ProfilWatak> = {
     ],
     tantangan: ["Standar yang tinggi kadang membuat frustrasi bila orang lain tidak sejalan"],
     saran:
-      "Integritasmu adalah mahkotamu yang sesungguhnya — tidak ada yang bisa mengambilnya darimu. Teruslah berjalan dengan kepala tegak dan hati yang lurus, karena jejak yang kamu tinggalkan menginspirasi banyak orang yang bahkan tidak kamu sadari.",
+      "Integritasmu adalah mahkotamu yang sesungguhnya. Tidak ada yang bisa mengambilnya darimu. Teruslah berjalan dengan kepala tegak dan hati yang lurus, karena jejak yang kamu tinggalkan menginspirasi banyak orang yang bahkan tidak kamu sadari.",
   },
   "Sumur Sinaba": {
     nama: "Sumur Sinaba",
     simbol: "Sumur yang Selalu Dicari",
     icon: "circle-dot",
     kepribadian:
-      "Kamu adalah sumber kebijaksanaan yang dicari banyak orang. Seperti sumur di tengah padang — orang datang kepadamu untuk mencari petunjuk, nasihat, dan ketenangan. Kelembutan dan kedermawananmu membuat semua orang merasa diterima.",
+      "Kamu adalah sumber kebijaksanaan yang dicari banyak orang. Seperti sumur di tengah padang: orang datang kepadamu untuk mencari petunjuk, nasihat, dan ketenangan. Kelembutan dan kedermawananmu membuat semua orang merasa diterima.",
     kekuatan: [
       "Dicari orang karena petuah dan nasihatnya yang bijak",
       "Lemah lembut dalam bertutur dan bersikap",
@@ -297,14 +297,14 @@ export const PANCASUDA: Record<string, ProfilWatak> = {
       "Perlu menjaga energi agar tidak terkuras oleh banyaknya orang yang mengandalkan dirimu",
     ],
     saran:
-      "Sumur yang selalu mengeluarkan air pun perlu diisi kembali. Jaga waktu untuk dirimu — istirahat, refleksi, dan pemulihan. Semakin kamu merawat dirimu, semakin jernih dan dalam nasihat yang bisa kamu berikan kepada orang lain.",
+      "Sumur yang selalu mengeluarkan air pun perlu diisi kembali. Jaga waktu untuk dirimu: istirahat, refleksi, dan pemulihan. Semakin kamu merawat dirimu, semakin jernih dan dalam nasihat yang bisa kamu berikan kepada orang lain.",
   },
   "Bumi Kapetak": {
     nama: "Bumi Kapetak",
     simbol: "Bumi yang Tersembunyi",
     icon: "layers",
     kepribadian:
-      "Kamu adalah pribadi yang sungguh-sungguh — suka bekerja, rapi, bersih, dan memiliki ketahanan luar biasa dalam menghadapi cobaan hidup. Kekuatanmu sering tidak terlihat oleh orang lain, namun justru itulah fondasi yang membuatmu kokoh.",
+      "Kamu adalah pribadi yang sungguh-sungguh: suka bekerja, rapi, bersih, dan memiliki ketahanan luar biasa dalam menghadapi cobaan hidup. Kekuatanmu sering tidak terlihat oleh orang lain, namun justru itulah fondasi yang membuatmu kokoh.",
     kekuatan: [
       "Rajin dan suka bekerja keras",
       "Kuat menanggung cobaan dan kekecewaan",
@@ -316,14 +316,14 @@ export const PANCASUDA: Record<string, ProfilWatak> = {
       "Perlu belajar melepaskan dan memaafkan untuk ketenangan jiwa",
     ],
     saran:
-      "Kekuatanmu yang tersembunyi adalah emas murni — tidak semua orang bisa melihatnya, tapi dampaknya nyata. Pelajaran terpentingmu adalah melepaskan: melepaskan dendam, melepaskan kekecewaan, melepaskan hal-hal yang tidak lagi bisa kamu kendalikan. Dalam keikhlasan itu, kamu akan menemukan kebebasan yang sesungguhnya.",
+      "Kekuatanmu yang tersembunyi adalah emas murni. Tidak semua orang bisa melihatnya, tapi dampaknya nyata. Pelajaran terpentingmu adalah melepaskan: melepaskan dendam, melepaskan kekecewaan, melepaskan hal-hal yang tidak lagi bisa kamu kendalikan. Dalam keikhlasan itu, kamu akan menemukan kebebasan yang sesungguhnya.",
   },
   "Satria Wirang": {
     nama: "Satria Wirang",
     simbol: "Kesatria yang Tangguh dalam Ujian",
     icon: "swords",
     kepribadian:
-      "Perjalanan hidupmu mengajarkan ketangguhan dengan cara yang unik — melalui berbagai ujian yang membentukmu menjadi pribadi yang lebih dalam dan bijaksana. Keluhuran budimu tidak pernah hilang, meski kadang kamu merasa kurang dihargai.",
+      "Perjalanan hidupmu mengajarkan ketangguhan dengan cara yang unik: melalui berbagai ujian yang membentukmu menjadi pribadi yang lebih dalam dan bijaksana. Keluhuran budimu tidak pernah hilang, meski kadang kamu merasa kurang dihargai.",
     kekuatan: [
       "Luhur budi dan memiliki nilai-nilai hidup yang kuat",
       "Ketangguhan yang terbentuk dari pengalaman",
@@ -342,7 +342,7 @@ export const PANCASUDA: Record<string, ProfilWatak> = {
     simbol: "Debu yang Bertransformasi",
     icon: "wind",
     kepribadian:
-      "Perjalanan hidupmu mungkin terasa penuh ketidakpastian — seperti debu yang dibawa angin. Namun justru dalam perjalanan itulah kamu mengembangkan kelenturan dan ketangguhan yang luar biasa. Setiap langkahmu adalah kesempatan untuk menabung karma baik.",
+      "Perjalanan hidupmu mungkin terasa penuh ketidakpastian, seperti debu yang dibawa angin. Namun justru dalam perjalanan itulah kamu mengembangkan kelenturan dan ketangguhan yang luar biasa. Setiap langkahmu adalah kesempatan untuk menabung karma baik.",
     kekuatan: [
       "Kelenturan dan kemampuan beradaptasi dengan berbagai kondisi",
       "Pengalaman hidup yang kaya dan beragam",
@@ -354,7 +354,7 @@ export const PANCASUDA: Record<string, ProfilWatak> = {
       "Perlu membangun fondasi yang konsisten melalui kebiasaan baik setiap hari",
     ],
     saran:
-      "Debu pun bisa menjadi tanah yang subur jika ditempatkan di tempat yang tepat. Kunci perjalananmu adalah konsistensi dalam kebaikan — jangan pernah berhenti menabung karma baik, sekecil apapun. Setiap perbuatan baik adalah benih yang kelak akan berbuah. Jauhi kemalasan, jaga semangat, dan percayalah bahwa setiap usahamu tidak pernah sia-sia.",
+      "Debu pun bisa menjadi tanah yang subur jika ditempatkan di tempat yang tepat. Kunci perjalananmu adalah konsistensi dalam kebaikan. Jangan pernah berhenti menabung karma baik, sekecil apapun. Setiap perbuatan baik adalah benih yang kelak akan berbuah. Jauhi kemalasan, jaga semangat, dan percayalah bahwa setiap usahamu tidak pernah sia-sia.",
   },
 };
 

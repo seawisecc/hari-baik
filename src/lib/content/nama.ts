@@ -1,7 +1,7 @@
 /**
  * Makna nama lewat aksara Bali.
  *
- * Hanya konsonan yang dihitung — vokal tidak punya nilai aksara sendiri.
+ * Hanya konsonan yang dihitung: vokal tidak punya nilai aksara sendiri.
  * Digraf "ng" (Nga) dan "ny" (Nya) dibaca sebagai satu aksara, jadi harus
  * dicek lebih dulu sebelum huruf tunggal.
  */
@@ -106,7 +106,7 @@ const VOKAL = new Set(["a", "i", "u", "e", "o"]);
 export const UNSUR_NAMA = ["Sri", "Bhuana", "Peta", "Lara", "Pati"] as const;
 export type UnsurNama = (typeof UNSUR_NAMA)[number];
 
-/** Nada visual tiap unsur — dipetakan ke token warna kategori. */
+/** Nada visual tiap unsur: dipetakan ke token warna kategori. */
 export const UNSUR_TONE: Record<UnsurNama, "accent" | "guru" | "ratu" | "lara" | "pati"> = {
   Sri: "accent",
   Bhuana: "guru",
@@ -120,7 +120,7 @@ export const UNSUR_INTERP: Record<UnsurNama, string> = {
   Bhuana:
     "Baik. Nama ini mendukung kedudukan dan kemakmuran. Perjalanan hidup cenderung positif, meski kadang ada dinamika kecil di sisi kesehatan atau keharmonisan rumah tangga yang perlu dijaga.",
   Peta: "Baik. Nama ini membawa keberuntungan dalam karier dan ekonomi. Terdapat potensi besar untuk berkembang, dengan catatan untuk senantiasa menjaga keseimbangan hubungan dan kesehatan.",
-  Lara: "Perlu perhatian. Nama ini menandakan perjalanan hidup yang penuh dinamika — mungkin ada periode yang terasa berat atau tantangan berulang. Dengan kesadaran dan karma baik, tantangan ini bisa dilewati dan menjadi pelajaran berharga.",
+  Lara: "Perlu perhatian. Nama ini menandakan perjalanan hidup yang penuh dinamika: mungkin ada periode yang terasa berat atau tantangan berulang. Dengan kesadaran dan karma baik, tantangan ini bisa dilewati dan menjadi pelajaran berharga.",
   Pati: "Perlu perhatian lebih. Nama ini secara tradisional dianggap memerlukan keseimbangan ekstra dalam menjalani hidup. Ini bukan takdir, melainkan pengingat untuk lebih berhati-hati, menjaga kesehatan, dan menabung karma baik melalui perbuatan positif.",
 };
 

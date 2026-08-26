@@ -36,7 +36,7 @@ export function AuthShell({
   );
 }
 
-/** Pesan yang muncul kalau .env.local belum diisi — supaya tidak terlihat "rusak". */
+/** Pesan yang muncul kalau .env.local belum diisi, supaya tidak terlihat "rusak". */
 export function BelumDikonfigurasi() {
   return (
     <div className="rounded-md bg-warning/25 px-5 py-4 text-sm leading-relaxed text-ink">

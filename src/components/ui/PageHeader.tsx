@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Judul halaman. Kontrol tema/bahasa TIDAK di sini — di desktop letaknya
+ * Judul halaman. Kontrol tema/bahasa TIDAK di sini: di desktop letaknya
  * di sidebar, di mobile di top bar; menaruhnya di tiap halaman membuatnya
  * muncul dua kali.
  */
@@ -29,7 +29,7 @@ export function PageHeader({
   );
 }
 
-/** Kutipan penyeimbang — mengingatkan bahwa hasil hitungan bukan vonis. */
+/** Kutipan penyeimbang: mengingatkan bahwa hasil hitungan bukan vonis. */
 export function Wisdom({ children }: { children: React.ReactNode }) {
   return (
     <div className="rounded-md bg-surface-sunk px-5 py-4 hb-sink">

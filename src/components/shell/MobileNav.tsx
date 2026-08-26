@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
 import { NAV_MOBILE } from "@/lib/nav";
 
-/** Bottom nav — hanya di bawah lg; di desktop digantikan Sidebar. */
+/** Bottom nav, hanya di bawah lg; di desktop digantikan Sidebar. */
 export function MobileNav() {
   const pathname = usePathname();
 

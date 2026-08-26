@@ -1,5 +1,5 @@
 /**
- * Perjalanan hidup — peta rejeki & kesehatan per periode usia 6-tahunan.
+ * Perjalanan hidup: peta rejeki & kesehatan per periode usia 6-tahunan.
  *
  * Matriks dibaca dengan kolom = urip lahir − 7. Urip lahir hanya bisa
  * bernilai 7–18 (Saptawara 3–9 + Pancawara 4–9), jadi kolom selalu 0–11.
@@ -90,11 +90,11 @@ export const NASIB_LABEL: Record<number, { label: string; tone: NasibTone }> = {
 export const NASIB_REJEKI: Record<number, string> = {
   "0": "Periode ini mengajakmu untuk memperkuat diri dari dalam. Ujian terberat sering kali adalah guru terbaik. Fokus pada kesehatan, doa, dan menabung karma baik.",
   "1": "Rezeki mengalir dalam takaran yang cukup. Ini adalah waktu yang baik untuk membangun kebiasaan keuangan yang sehat dan bersyukur atas yang ada.",
-  "2": "Kondisi yang cukup dan stabil — fondasi terbaik untuk bertumbuh. Gunakan periode ini untuk membangun dan memperluas apa yang sudah ada.",
+  "2": "Kondisi yang cukup dan stabil: fondasi terbaik untuk bertumbuh. Gunakan periode ini untuk membangun dan memperluas apa yang sudah ada.",
   "3": "Energi dan rezeki mengalir dengan baik. Manfaatkan momentum ini untuk hal-hal yang sudah lama ingin kamu wujudkan.",
-  "4": "Periode penuh dukungan — rezeki, kesehatan, dan kondisi umum cenderung menguntungkan. Bergeraklah dengan percaya diri.",
+  "4": "Periode penuh dukungan: rezeki, kesehatan, dan kondisi umum cenderung menguntungkan. Bergeraklah dengan percaya diri.",
   "5": "Ketenangan dan kebahagiaan hadir dalam periode ini. Nikmati, bagikan, dan jadikan ini bahan bakar untuk memberi lebih banyak ke orang sekitarmu.",
-  "7": "Kelimpahan dalam berbagai bentuk hadir di periode ini. Gunakan dengan bijak — rezeki yang disyukuri dan dibagi cenderung terus bertumbuh.",
+  "7": "Kelimpahan dalam berbagai bentuk hadir di periode ini. Gunakan dengan bijak: rezeki yang disyukuri dan dibagi cenderung terus bertumbuh.",
   "8": "Ini adalah periode terbaik dalam siklus hidupmu. Ambil langkah-langkah besar yang sudah lama kamu persiapkan. Puncak dicapai bukan hanya dengan kerja keras, tapi juga dengan syukur.",
 };
 

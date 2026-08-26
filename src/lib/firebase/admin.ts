@@ -5,7 +5,7 @@ import { getAuth, type Auth } from "firebase-admin/auth";
 import { getFirestore, type Firestore } from "firebase-admin/firestore";
 
 /**
- * Firebase Admin SDK — hanya boleh dipakai di server.
+ * Firebase Admin SDK, hanya boleh dipakai di server.
  * Import "server-only" di atas membuat build gagal kalau file ini
  * tidak sengaja ikut ter-bundle ke klien.
  *

@@ -115,7 +115,7 @@ export function CalendarGrid({ year, month, birthDate, selected, onSelect }: Pro
                 {d.day}
               </span>
 
-              {/* Titik kategori — penanda utama, selalu dirender bila
+              {/* Titik kategori: penanda utama, selalu dirender bila
                   tanggal lahir sudah diketahui. */}
               {d.kategori && (
                 <span

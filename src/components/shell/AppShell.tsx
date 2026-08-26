@@ -12,7 +12,7 @@ import { RUTE_TELANJANG } from "@/lib/nav";
  * Desktop (≥lg): sidebar tetap di kiri, konten di sisanya.
  * Mobile: top bar + bottom nav, konten selebar layar.
  *
- * Landing dan halaman auth tidak memakai shell — di sana navigasi aplikasi
+ * Landing dan halaman auth tidak memakai shell: di sana navigasi aplikasi
  * belum relevan dan justru membingungkan.
  */
 export function AppShell({ children }: { children: React.ReactNode }) {

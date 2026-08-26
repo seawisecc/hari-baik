@@ -3,7 +3,7 @@ import { getAuth, type Auth } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
 
 /**
- * Firebase sisi klien. Nilai NEXT_PUBLIC_* memang ikut ter-bundle ke browser —
+ * Firebase sisi klien. Nilai NEXT_PUBLIC_* memang ikut ter-bundle ke browser;
  * itu wajar untuk Firebase; pengamanannya ada di Security Rules, bukan di
  * kerahasiaan config.
  */
@@ -16,7 +16,7 @@ const config = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-/** True bila env sudah diisi — dipakai untuk memberi pesan yang jelas saat belum. */
+/** True bila env sudah diisi: dipakai untuk memberi pesan yang jelas saat belum. */
 export const firebaseConfigured = Boolean(config.apiKey && config.projectId);
 
 let app: FirebaseApp | null = null;

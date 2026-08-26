@@ -51,7 +51,7 @@ export function useStoredValue(
         if (next === null) localStorage.removeItem(key);
         else localStorage.setItem(key, next);
       } catch {
-        /* storage diblokir — perubahan tidak bertahan, tapi jangan sampai crash */
+        /* storage diblokir: perubahan tidak bertahan, tapi jangan sampai crash */
       }
       notify();
     },

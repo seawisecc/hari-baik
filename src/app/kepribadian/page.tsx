@@ -39,16 +39,16 @@ export default function KepribadianPage() {
           {weton && (
             <CardBody>
               <p className="text-[15px] leading-relaxed text-ink-soft">
-                <strong className="text-ink">{weton.energi}</strong> — {weton.tema}
+                <strong className="text-ink">{weton.energi}</strong>
+                {" · "}
+                {weton.tema}
               </p>
             </CardBody>
           )}
         </Card>
 
-        {pangarasan && (
-          <WatakCard label="Pangarasan — cara kamu bergerak" profil={pangarasan} />
-        )}
-        {pancasuda && <WatakCard label="Pancasuda — bekal bawaan" profil={pancasuda} />}
+        {pangarasan && <WatakCard label="Pangarasan: cara kamu bergerak" profil={pangarasan} />}
+        {pancasuda && <WatakCard label="Pancasuda: bekal bawaan" profil={pancasuda} />}
       </div>
     </PageContainer>
   );

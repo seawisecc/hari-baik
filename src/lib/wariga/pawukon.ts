@@ -35,7 +35,7 @@ import type { LunarInfo, PatraInfo, WukuInfo } from "./types";
 
 /**
  * Semua perhitungan memakai string tanggal "YYYY-MM-DD" dan aritmetika UTC,
- * supaya bebas dari zona waktu dan DST — satu tanggal selalu memberi hasil
+ * supaya bebas dari zona waktu dan DST: satu tanggal selalu memberi hasil
  * yang sama di perangkat manapun.
  */
 
@@ -120,7 +120,7 @@ export function getLintang(dateStr: string): string {
   return LINTANG[pawukonIndex(dateStr) % 35];
 }
 
-/** Urip Sadwara — komponen tambahan khusus perhitungan petemon. */
+/** Urip Sadwara: komponen tambahan khusus perhitungan petemon. */
 export function uripSadwara(dateStr: string): number {
   return SADWARA_URIP[getSadwara(dateStr)] ?? 0;
 }
@@ -141,7 +141,7 @@ export function getPatra(dateStr: string): PatraInfo {
   return { name: WUKU[i], number: i + 1, label: `Mintuna Rasi ke-${i + 1}` };
 }
 
-/** Total urip hari — dasar perhitungan kategori siklus personal. */
+/** Total urip hari: dasar perhitungan kategori siklus personal. */
 export function uripHari(dateStr: string): number {
   return getSaptawara(dateStr).urip + getPancawara(dateStr).urip;
 }

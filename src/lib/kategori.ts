@@ -4,7 +4,7 @@ import type { KategoriName } from "@/lib/wariga";
  * Pemetaan kategori ke kelas Tailwind.
  *
  * Ditulis penuh, bukan disusun dari string (`bg-${k}`), karena Tailwind
- * memindai kode sumber secara statis — kelas yang dirakit saat runtime
+ * memindai kode sumber secara statis: kelas yang dirakit saat runtime
  * tidak akan ikut ter-generate.
  */
 export const KATEGORI_KEY: Record<KategoriName, string> = {
@@ -28,7 +28,7 @@ export const KATEGORI_TEKS: Record<KategoriName, string> = {
   PATI: "text-pati",
 };
 
-/** Latar tipis untuk kartu — cukup untuk memberi nada tanpa menenggelamkan teks. */
+/** Latar tipis untuk kartu: cukup untuk memberi nada tanpa menenggelamkan teks. */
 export const KATEGORI_WASH: Record<KategoriName, string> = {
   GURU: "bg-guru/12",
   RATU: "bg-ratu/12",
@@ -41,4 +41,24 @@ export const KATEGORI_RING: Record<KategoriName, string> = {
   RATU: "ring-ratu/35",
   LARA: "ring-lara/35",
   PATI: "ring-pati/35",
+};
+
+/** Huruf tunggal untuk sel kalender dan strip perkiraan yang sempit. */
+export const KATEGORI_HURUF: Record<KategoriName, string> = {
+  GURU: "G",
+  RATU: "R",
+  LARA: "L",
+  PATI: "P",
+};
+
+/**
+ * Kartu hero memakai warna kategori sebagai latar penuh dengan teks putih.
+ * Keempat warna sudah cukup gelap untuk menopang teks putih, jadi tidak
+ * perlu varian terang/gelap terpisah.
+ */
+export const KATEGORI_SOLID: Record<KategoriName, string> = {
+  GURU: "bg-guru text-white",
+  RATU: "bg-ratu text-white",
+  LARA: "bg-lara text-white",
+  PATI: "bg-pati text-white",
 };

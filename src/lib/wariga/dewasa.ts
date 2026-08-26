@@ -49,7 +49,7 @@ export function isKajengKliwon(dateStr: string): boolean {
   return getTriwara(dateStr) === "Kajeng" && pancawaraName(dateStr) === "Kliwon";
 }
 
-/** Tumpek: Saniscara Kliwon — jatuh tiap 35 hari. */
+/** Tumpek: Saniscara Kliwon: jatuh tiap 35 hari. */
 export function isTumpek(dateStr: string): boolean {
   return saptawaraName(dateStr) === "Saniscara" && pancawaraName(dateStr) === "Kliwon";
 }
@@ -110,7 +110,7 @@ export function getKategoriHari(birthDate: string, dateStr: string): KategoriHar
 }
 
 /**
- * Dewasa ayu — penanda hari terbaik: kategori GURU yang jatuh di
+ * Dewasa ayu: penanda hari terbaik: kategori GURU yang jatuh di
  * Wraspati atau Sukra, dan bukan Kliwon.
  */
 export function isDewasaAyu(birthDate: string, dateStr: string): boolean {
@@ -124,7 +124,7 @@ export function isDewasaAyu(birthDate: string, dateStr: string): boolean {
 
 // ── Agregat ───────────────────────────────────────────────────────────────
 
-/** Seluruh atribut wariga satu tanggal. `birthDate` opsional — tanpa itu `kategori` null. */
+/** Seluruh atribut wariga satu tanggal. `birthDate` opsional: tanpa itu `kategori` null. */
 export function getWarigaDay(dateStr: string, birthDate?: string | null): WarigaDay {
   const sapta = getSaptawara(dateStr);
   const panca = getPancawara(dateStr);

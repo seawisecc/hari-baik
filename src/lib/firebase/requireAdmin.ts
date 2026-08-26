@@ -11,7 +11,7 @@ export interface AdminCaller {
 /**
  * Verifikasi bahwa pemanggil benar-benar admin.
  *
- * Sumber kebenarannya adalah custom claim `admin: true` pada ID token —
+ * Sumber kebenarannya adalah custom claim `admin: true` pada ID token,
  * bukan field di Firestore, yang bisa dibaca/ditulis lewat jalur lain.
  * Token diverifikasi ulang di server tiap permintaan; tidak ada yang
  * dipercaya dari body request.

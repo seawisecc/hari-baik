@@ -19,7 +19,7 @@ export function tanggalPlus(dateStr: string, hari: number): string {
 
 /**
  * Perkiraan `jumlah` hari mulai dari `mulai` (default hari ini).
- * Butuh tanggal lahir — tanpa itu kategori tidak bisa dihitung.
+ * Butuh tanggal lahir: tanpa itu kategori tidak bisa dihitung.
  */
 export function buatPerkiraan(
   birthDate: string,
@@ -34,7 +34,7 @@ export function buatPerkiraan(
 }
 
 /**
- * Hari terbaik dalam rentang, tidak termasuk hari ini — gunanya untuk
+ * Hari terbaik dalam rentang, tidak termasuk hari ini: gunanya untuk
  * merencanakan ke depan, bukan mengulang yang sudah berjalan.
  * Kalau ada seri, yang paling dekat menang.
  */

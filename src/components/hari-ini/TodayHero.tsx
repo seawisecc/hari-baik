@@ -1,94 +1,86 @@
 "use client";
 
-import { Moon, Sparkles, Sun } from "lucide-react";
+import { Sparkles, Star } from "lucide-react";
 import { cn } from "@/lib/cn";
-import { useLang, useT } from "@/lib/content/LangProvider";
-import { KATEGORI_BG, KATEGORI_KEY, KATEGORI_WASH } from "@/lib/kategori";
-import { tanggalPanjang } from "@/lib/tanggal";
+import { useT } from "@/lib/content/LangProvider";
+import { KATEGORI_KEY, KATEGORI_SOLID } from "@/lib/kategori";
 import type { WarigaDay } from "@/lib/wariga";
 
-/** Kartu utama: kategori hari ini, ditulis besar dan tanpa perlu digulir. */
-export function TodayHero({ hari, nama }: { hari: WarigaDay; nama?: string | null }) {
+/**
+ * Kartu utama hari ini: satu blok warna kategori, teks putih, tanpa hal lain
+ * yang bersaing. Ini yang pertama dilihat pengguna tiap membuka aplikasi.
+ */
+export function TodayHero({
+  hari,
+  onLihatPanduan,
+}: {
+  hari: WarigaDay;
+  onLihatPanduan: () => void;
+}) {
   const t = useT();
-  const { lang } = useLang();
   const kategori = hari.kategori!.name;
   const key = KATEGORI_KEY[kategori];
 
-  const salam = nama ? `Halo, ${nama.split(" ")[0]}` : "Hari ini";
-
   return (
-    <section className={cn("overflow-hidden rounded-xl hb-raise-3", KATEGORI_WASH[kategori])}>
-      <div className="px-6 py-7 sm:px-9 sm:py-9">
-        <p className="text-sm text-ink-soft">{salam}</p>
-        <p className="mt-0.5 text-sm text-ink-faint">{tanggalPanjang(hari.date, lang)}</p>
+    <section
+      className={cn(
+        "relative overflow-hidden rounded-xl px-7 py-8 hb-raise-3 sm:px-10 sm:py-10",
+        KATEGORI_SOLID[kategori],
+      )}
+    >
+      {/* Bintang besar sebagai tekstur latar, sengaja terpotong di tepi. */}
+      <Star
+        className="pointer-events-none absolute -right-8 -top-6 h-56 w-56 text-white/10"
+        strokeWidth={1.5}
+        aria-hidden
+      />
 
-        <div className="mt-6 flex items-start gap-4">
-          <span
-            aria-hidden
-            className={cn(
-              "mt-1.5 h-12 w-12 shrink-0 rounded-pill hb-raise-2 sm:h-14 sm:w-14",
-              KATEGORI_BG[kategori],
-            )}
-          />
-          <div className="min-w-0">
-            <h1 className="font-heading text-3xl font-bold leading-tight text-ink sm:text-4xl">
-              {t(`day.${key}`)}
-            </h1>
-            <p className="mt-1.5 text-[15px] leading-relaxed text-ink-soft">
-              {t(`day.${key}.tagline`)}
-            </p>
-          </div>
-        </div>
-
-        <p className="mt-6 max-w-prose text-[15px] leading-relaxed text-ink-soft">
-          {t(`day.${key}.desc`)}
+      <div className="relative max-w-xl">
+        <p className="flex items-center gap-2 text-sm font-medium text-white/85">
+          <Star className="h-4 w-4" aria-hidden />
+          {t("energy")}
         </p>
 
-        {/* Penanda khusus hari ini — hanya muncul kalau memang ada. */}
-        {(hari.hariRayaHindu || hari.hariLibur || hari.isPurnama || hari.isTilem) && (
-          <div className="mt-6 flex flex-wrap gap-2">
-            {hari.hariLibur && <Penanda icon={Sparkles}>{hari.hariLibur}</Penanda>}
-            {hari.hariRayaHindu?.map((r) => (
-              <Penanda key={r} icon={Sparkles}>
-                {r}
-              </Penanda>
-            ))}
-            {hari.isPurnama && <Penanda icon={Sun}>Purnama {hari.sasih}</Penanda>}
-            {hari.isTilem && <Penanda icon={Moon}>Tilem {hari.sasih}</Penanda>}
-          </div>
-        )}
-      </div>
+        <h1 className="mt-3 font-heading text-4xl font-bold italic leading-tight sm:text-5xl">
+          {t(`day.${key}`)}
+        </h1>
 
-      {/* Baris wariga ringkas — konteks Bali tanpa mengalahkan pesan utama. */}
-      <dl className="grid grid-cols-2 gap-px border-t border-border-soft bg-border-soft sm:grid-cols-4">
-        {(
-          [
-            ["Weton", `${hari.saptaWara} ${hari.pancaWara}`],
-            ["Wuku", hari.wuku],
-            ["Sasih", hari.sasih],
-            ["Penanggal", hari.lunarDay],
-          ] as const
-        ).map(([k, v]) => (
-          <div key={k} className="bg-surface px-5 py-4">
-            <dt className="text-[11px] uppercase tracking-wide text-ink-faint">{k}</dt>
-            <dd className="mt-0.5 text-sm font-medium text-ink">{v}</dd>
-          </div>
-        ))}
-      </dl>
+        <p className="mt-2 text-[15px] leading-relaxed text-white/85 sm:text-base">
+          {t(`day.${key}.tagline`)}
+        </p>
+
+        <div className="mt-5 flex flex-wrap gap-2">
+          <Pil>
+            {hari.saptaWara} {hari.pancaWara}
+          </Pil>
+          <Pil>Wuku {hari.wuku}</Pil>
+          {hari.isPurnama && <Pil>Purnama {hari.sasih}</Pil>}
+          {hari.isTilem && <Pil>Tilem {hari.sasih}</Pil>}
+        </div>
+
+        <p className="mt-6 text-[15px] leading-relaxed text-white/90">{t(`day.${key}.desc`)}</p>
+
+        <button
+          type="button"
+          onClick={onLihatPanduan}
+          className={cn(
+            "mt-7 inline-flex items-center gap-2 rounded-pill bg-white/20 px-5 py-3",
+            "text-[15px] font-medium text-white backdrop-blur-sm",
+            "transition-colors duration-150 hover:bg-white/30",
+            "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/70",
+          )}
+        >
+          <Sparkles className="h-4 w-4" aria-hidden />
+          {t("assist.btn")}
+        </button>
+      </div>
     </section>
   );
 }
 
-function Penanda({
-  icon: Icon,
-  children,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  children: React.ReactNode;
-}) {
+function Pil({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-pill bg-surface px-3 py-1.5 text-xs font-medium text-ink hb-raise-1">
-      <Icon className="h-3.5 w-3.5 text-accent-deep" aria-hidden />
+    <span className="rounded-pill bg-white/20 px-3.5 py-1.5 text-[13px] font-medium text-white">
       {children}
     </span>
   );

@@ -2,7 +2,7 @@
  * 35 kombinasi Saptawara × Pancawara.
  *
  * Di aplikasi lama data ini terpecah dua tabel (karakter hari + profil
- * pangarasan/pancasuda) yang selalu dibaca bersamaan — di sini digabung
+ * pangarasan/pancasuda) yang selalu dibaca bersamaan: di sini digabung
  * jadi satu entri supaya tidak ada kemungkinan keduanya tidak sinkron.
  */
 
@@ -84,7 +84,7 @@ const WETON: Record<string, WetonProfil> = {
       "Komunikasi profesional",
     ],
     hindari: ["Menunda keputusan"],
-    afirmasi: "Langkah pertama selalu yang terberat — dan terpenting.",
+    afirmasi: "Langkah pertama selalu yang terberat, dan terpenting.",
     warnaMakna: "Putih Bersih",
     urip: 9,
     pangarasan: "Lakuning Angin",
@@ -155,7 +155,7 @@ const WETON: Record<string, WetonProfil> = {
       "Ambil keputusan tegas",
     ],
     hindari: ["Keputusan emosional dan reaktif"],
-    afirmasi: "Keberanian bukan absennya rasa takut — tapi bertindak meski takut.",
+    afirmasi: "Keberanian bukan absennya rasa takut, tapi bertindak meski takut.",
     warnaMakna: "Oranye Keberanian",
     urip: 12,
     pangarasan: "Aras Kembang",
@@ -325,7 +325,7 @@ const WETON: Record<string, WetonProfil> = {
     tema: "Afeksi dan koneksi",
     cocokUntuk: ["Kencan", "Rekonsiliasi", "Kolaborasi kreatif", "Mempererat hubungan"],
     hindari: ["Isolasi diri"],
-    afirmasi: "Buka hatimu — hari ini koneksi tulus mudah terjalin.",
+    afirmasi: "Buka hatimu: hari ini koneksi tulus mudah terjalin.",
     warnaMakna: "Merah Muda",
     urip: 15,
     pangarasan: "Lakuning Srengenge",

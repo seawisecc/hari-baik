@@ -2,7 +2,7 @@
  * Hari libur nasional & hari raya Hindu Bali yang tanggalnya tidak bisa
  * diturunkan murni dari perhitungan (mengikuti SKB / penetapan tahunan).
  *
- * Galungan, Kuningan, Purnama, dan Tilem TIDAK perlu didaftarkan di sini —
+ * Galungan, Kuningan, Purnama, dan Tilem TIDAK perlu didaftarkan di sini;
  * semuanya dihitung otomatis di `dewasa.ts`. Tabel ini hanya untuk tanggal
  * yang ditetapkan, dan perlu ditambah tiap tahun.
  */

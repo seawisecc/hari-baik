@@ -93,7 +93,7 @@ export default function PerjalananHidupPage() {
                     {p.ageMin}–{p.ageMax}
                   </span>
                   <span className="flex-1 text-[15px] font-medium text-ink">
-                    {p.label ?? "—"}
+                    {p.label ?? "-"}
                   </span>
                   {aktif && (
                     <span className="shrink-0 rounded-pill bg-accent px-2.5 py-1 text-[11px] font-medium text-accent-ink">

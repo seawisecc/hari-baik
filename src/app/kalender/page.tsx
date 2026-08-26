@@ -14,7 +14,7 @@ import { useLang } from "@/lib/content/LangProvider";
 import { useUserData } from "@/lib/useUserData";
 import { toDateString } from "@/lib/wariga";
 
-/** "YYYY-MM-DD" — dipakai untuk memvalidasi ?tanggal= dari URL. */
+/** "YYYY-MM-DD": dipakai untuk memvalidasi ?tanggal= dari URL. */
 const POLA_TANGGAL = /^\d{4}-\d{2}-\d{2}$/;
 
 function KalenderView() {
@@ -57,7 +57,7 @@ function KalenderView() {
   return (
     <PageContainer wide>
       {/* Desktop: kalender menempel di kiri sementara detail hari digulir
-          di kanan — tidak perlu bolak-balik menggulung untuk mengganti hari. */}
+          di kanan. Tidak perlu bolak-balik menggulung untuk mengganti hari. */}
       <div className="grid gap-6 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)] lg:items-start">
         <div className="lg:sticky lg:top-6">
           <Card elevation={2}>

@@ -84,7 +84,7 @@ export default function NamaMaknaPage() {
               <CardHeader>
                 <CardTitle>{t("pro.nama.breakdown")}</CardTitle>
                 <p className="mt-1 text-sm text-ink-faint">
-                  Hanya konsonan yang dihitung — vokal tidak punya nilai aksara sendiri.
+                  Hanya konsonan yang dihitung: vokal tidak punya nilai aksara sendiri.
                 </p>
               </CardHeader>
               <CardBody>

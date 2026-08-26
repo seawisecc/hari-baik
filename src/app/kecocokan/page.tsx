@@ -87,7 +87,7 @@ export default function KecocokanPage() {
               <CardBody className="space-y-4">
                 <div>
                   <p className="mb-1 text-xs font-medium uppercase tracking-wide text-ink-faint">
-                    Pancapetemon — {hasil.panca.name}
+                    Pancapetemon · {hasil.panca.name}
                   </p>
                   <p className="text-[15px] leading-relaxed text-ink-soft">
                     {hasil.panca.interp}
@@ -95,7 +95,7 @@ export default function KecocokanPage() {
                 </div>
                 <div>
                   <p className="mb-1 text-xs font-medium uppercase tracking-wide text-ink-faint">
-                    Sadpetemon — {hasil.sad.name}
+                    Sadpetemon · {hasil.sad.name}
                   </p>
                   <p className="text-[15px] leading-relaxed text-ink-soft">
                     {hasil.sad.interp}

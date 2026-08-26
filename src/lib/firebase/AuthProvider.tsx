@@ -16,7 +16,7 @@ import type { AccessState, UserProfile } from "@/types";
 import { firebaseConfigured, getDb, getFirebaseAuth } from "./client";
 
 interface AuthContextValue {
-  /** null = belum login. undefined tidak dipakai — cek `loading` dulu. */
+  /** null = belum login. undefined tidak dipakai: cek `loading` dulu. */
   user: User | null;
   profile: UserProfile | null;
   access: AccessState;
