@@ -50,7 +50,7 @@ export default function OnboardingPage() {
   }
 
   if (profile?.onboardingComplete) {
-    router.replace("/kalender");
+    router.replace("/hari-ini");
     return null;
   }
 
@@ -92,7 +92,7 @@ export default function OnboardingPage() {
                   uripLahir: uripHari(tanggalLahir),
                   uripPetemonLahir: petemon.totalUrip,
                 });
-                router.push("/kalender");
+                router.push("/hari-ini");
               } catch {
                 setError("Gagal menyimpan. Periksa koneksi lalu coba lagi.");
               } finally {

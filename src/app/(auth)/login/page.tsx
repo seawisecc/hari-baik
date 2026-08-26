@@ -41,7 +41,7 @@ export default function LoginPage() {
             setBusy(true);
             try {
               await login(email, password);
-              router.push("/kalender");
+              router.push("/hari-ini");
             } catch (err) {
               setError(pesanAuth(err));
             } finally {

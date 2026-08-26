@@ -85,7 +85,7 @@ export default function LandingPage() {
   const t = useT();
 
   return (
-    <div className="mx-auto max-w-3xl px-6 pb-20">
+    <div className="mx-auto max-w-5xl px-6 pb-24 sm:px-8">
       <header className="flex items-center justify-between gap-3 py-6">
         <p className="font-heading text-xl font-bold italic text-ink">Hari Baik</p>
         <div className="flex items-center gap-2">
@@ -99,14 +99,14 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <section className="py-16 text-center sm:py-24">
+      <section className="py-16 text-center sm:py-28">
         <h1 className="font-heading text-5xl font-bold italic text-ink sm:text-7xl">
           Hari Baik
         </h1>
-        <p className="mx-auto mt-6 max-w-md font-heading text-lg font-semibold text-ink sm:text-xl">
+        <p className="mx-auto mt-6 max-w-xl font-heading text-lg font-semibold text-ink sm:text-2xl">
           &ldquo;{t("app.tagline")}&rdquo;
         </p>
-        <p className="mx-auto mt-4 max-w-md leading-relaxed text-ink-soft">
+        <p className="mx-auto mt-4 max-w-lg leading-relaxed text-ink-soft">
           {t("app.subtitle")} Temukan waktu terbaik untuk setiap keputusan hidupmu.
         </p>
 
@@ -123,7 +123,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <div className="space-y-20">
+      <div className="space-y-24">
         <Section title="Cara kerja kalender siklus personal">
           <div className="grid gap-5 sm:grid-cols-3">
             {LANGKAH.map((l, i) => (
@@ -142,9 +142,9 @@ export default function LandingPage() {
         </Section>
 
         <Section title={t("energy")}>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {KATEGORI.map((k) => (
-              <Card key={k} className="flex items-start gap-4 p-6">
+              <Card key={k} className="flex items-start gap-4 p-6 lg:flex-col lg:gap-3">
                 <span
                   aria-hidden
                   className={`mt-0.5 h-8 w-8 shrink-0 rounded-pill hb-raise-1 ${KATEGORI_BG[k]}`}
@@ -163,7 +163,7 @@ export default function LandingPage() {
         </Section>
 
         <Section title="Fitur unggulan">
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {FITUR.map((f) => (
               <Card key={f.title} className="p-6">
                 <span className="mb-4 grid h-11 w-11 place-items-center rounded-pill bg-accent-wash hb-raise-1">
@@ -177,7 +177,7 @@ export default function LandingPage() {
         </Section>
 
         <Section title="Apa kata mereka">
-          <div className="space-y-4">
+          <div className="grid gap-4 lg:grid-cols-3">
             {TESTIMONI.map((tm) => (
               <Card key={tm.nama} className="p-6">
                 <div className="mb-2 flex gap-0.5" aria-hidden>
@@ -188,14 +188,14 @@ export default function LandingPage() {
                 <p className="text-[15px] italic leading-relaxed text-ink-soft">
                   &ldquo;{tm.teks}&rdquo;
                 </p>
-                <p className="mt-3 text-sm font-medium text-ink">— {tm.nama}</p>
+                <p className="mt-auto pt-3 text-sm font-medium text-ink">— {tm.nama}</p>
               </Card>
             ))}
           </div>
         </Section>
 
         <Section title="Harga terjangkau">
-          <Card elevation={3} className="p-8 text-center">
+          <Card elevation={3} className="mx-auto max-w-lg p-10 text-center">
             <p className="font-heading text-4xl font-bold text-ink">Rp 150.000</p>
             <p className="mt-1.5 text-sm text-ink-soft">per tahun · ≈ Rp 12.500 per bulan</p>
             <p className="mt-4 text-sm text-ink-soft">
@@ -213,7 +213,9 @@ export default function LandingPage() {
           </Card>
         </Section>
 
-        <WhatsAppCard />
+        <div className="mx-auto max-w-lg">
+          <WhatsAppCard />
+        </div>
       </div>
 
       <footer className="mt-16 text-center text-xs text-ink-faint">

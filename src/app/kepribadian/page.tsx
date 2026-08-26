@@ -3,6 +3,7 @@
 import { WatakCard } from "@/components/WatakCard";
 import { ButuhTanggalLahir, Memuat } from "@/components/ProGate";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
+import { PageContainer } from "@/components/shell/AppShell";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { getPancasuda, getPangarasan } from "@/lib/content/kepribadian";
 import { getWeton } from "@/lib/content/weton";
@@ -23,28 +24,32 @@ export default function KepribadianPage() {
   const pancasuda = weton ? getPancasuda(weton.pancasuda) : null;
 
   return (
-    <main className="mx-auto max-w-2xl space-y-6 px-6 py-10">
-      <PageHeader title="Kepribadian" subtitle="Dibaca dari weton kelahiranmu" />
+    <PageContainer>
+      <div className="space-y-6">
+        <PageHeader title="Kepribadian" subtitle="Dibaca dari weton kelahiranmu" />
 
-      <Card elevation={3}>
-        <CardHeader>
-          <p className="text-sm text-ink-faint">Weton lahir</p>
-          <CardTitle className="mt-1">
-            {sapta} {panca}
-          </CardTitle>
-          <p className="mt-1 text-sm text-ink-soft">Urip {uripHari(birthDate)}</p>
-        </CardHeader>
-        {weton && (
-          <CardBody>
-            <p className="text-[15px] leading-relaxed text-ink-soft">
-              <strong className="text-ink">{weton.energi}</strong> — {weton.tema}
-            </p>
-          </CardBody>
+        <Card elevation={3}>
+          <CardHeader>
+            <p className="text-sm text-ink-faint">Weton lahir</p>
+            <CardTitle className="mt-1">
+              {sapta} {panca}
+            </CardTitle>
+            <p className="mt-1 text-sm text-ink-soft">Urip {uripHari(birthDate)}</p>
+          </CardHeader>
+          {weton && (
+            <CardBody>
+              <p className="text-[15px] leading-relaxed text-ink-soft">
+                <strong className="text-ink">{weton.energi}</strong> — {weton.tema}
+              </p>
+            </CardBody>
+          )}
+        </Card>
+
+        {pangarasan && (
+          <WatakCard label="Pangarasan — cara kamu bergerak" profil={pangarasan} />
         )}
-      </Card>
-
-      {pangarasan && <WatakCard label="Pangarasan — cara kamu bergerak" profil={pangarasan} />}
-      {pancasuda && <WatakCard label="Pancasuda — bekal bawaan" profil={pancasuda} />}
-    </main>
+        {pancasuda && <WatakCard label="Pancasuda — bekal bawaan" profil={pancasuda} />}
+      </div>
+    </PageContainer>
   );
 }

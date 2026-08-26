@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Manrope } from "next/font/google";
-import { BottomNav } from "@/components/BottomNav";
+import { AppShell } from "@/components/shell/AppShell";
 import { LangProvider } from "@/lib/content/LangProvider";
 import { AuthProvider } from "@/lib/firebase/AuthProvider";
 import { ThemeProvider, themeInitScript } from "@/lib/theme/ThemeProvider";
@@ -41,8 +41,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <ThemeProvider>
           <LangProvider>
             <AuthProvider>
-              {children}
-              <BottomNav />
+              <AppShell>{children}</AppShell>
             </AuthProvider>
           </LangProvider>
         </ThemeProvider>

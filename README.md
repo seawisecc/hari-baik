@@ -47,6 +47,7 @@ Pro dikunci sesuai status langganan.
 | `/` | Landing page | publik |
 | `/login`, `/register`, `/verify-email` | Autentikasi | publik |
 | `/onboarding` | Nama + tanggal lahir, mulai trial 3 hari | login |
+| `/hari-ini` | **Halaman utama** — insight hari ini + perkiraan 7 hari | login |
 | `/kalender` | Grid bulanan + panduan hari terpilih | login |
 | `/kepribadian` | Pangarasan & Pancasuda dari weton lahir | login |
 | `/nama-makna` | Makna nama lewat aksara Bali | Pro |
@@ -100,6 +101,19 @@ Tiga lapis, dan lapisan klien **bukan** yang menentukan:
 Role admin datang dari custom claim, bukan field Firestore, supaya tidak bisa
 diubah dari klien.
 
+## Layout
+
+Satu kerangka (`AppShell`) dengan dua bentuk:
+
+- **Desktop (≥1024px)** — sidebar tetap di kiri berisi navigasi bergrup
+  (Harian / Analisis / Akun) plus kontrol tema & bahasa. Kalender memakai
+  dua kolom: grid menempel di kiri, detail hari digulir di kanan.
+- **Mobile** — top bar tipis + bottom nav lima item. Perkiraan tujuh hari
+  digulir mendatar.
+
+Landing dan halaman auth sengaja tidak memakai shell — di sana navigasi
+aplikasi belum relevan.
+
 ## Tema
 
 Dua tema aksen di atas dasar netral off-white yang sama:
@@ -124,6 +138,7 @@ memakai hex langsung, jadi menambah tema ketiga cukup satu blok
 - [x] Fitur Pro: nama, kecocokan, perjalanan hidup, kepribadian
 - [x] Firebase Auth + Firestore + security rules
 - [x] Admin + approval langganan
+- [x] Layout desktop & mobile terpisah, beranda = insight hari ini
 - [ ] **Diuji terhadap project Firebase sungguhan** — kode auth/admin belum
       pernah dijalankan dengan kredensial nyata
 - [ ] Deploy ke Vercel

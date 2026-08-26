@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { UserTable } from "@/components/admin/UserTable";
 import { Alert } from "@/components/ui/Alert";
+import { Memuat } from "@/components/ProGate";
+import { PageContainer } from "@/components/shell/AppShell";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
@@ -77,13 +79,13 @@ export default function AdminPage() {
     }
   };
 
-  if (loading) return <main className="px-6 py-16 text-ink-faint">Memuat…</main>;
+  if (loading) return <Memuat />;
 
   if (!configured || !user || profile?.role !== "admin") {
     // Ini hanya penjaga tampilan. Penjagaan sebenarnya ada di API route
     // (verifikasi custom claim) dan di Firestore Rules.
     return (
-      <main className="mx-auto max-w-md px-6 py-20">
+      <PageContainer>
         <Card>
           <CardHeader>
             <CardTitle>Tidak punya akses</CardTitle>
@@ -92,48 +94,50 @@ export default function AdminPage() {
             <p className="text-[15px] text-ink-soft">Halaman ini hanya untuk admin.</p>
           </CardBody>
         </Card>
-      </main>
+      </PageContainer>
     );
   }
 
   return (
-    <main className="mx-auto max-w-5xl space-y-6 px-6 py-10">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="font-heading text-3xl font-bold text-ink">Kelola Pengguna</h1>
-          <p className="mt-1 text-sm text-ink-soft">Masuk sebagai {profile.email}</p>
+    <PageContainer wide>
+      <div className="space-y-6">
+        <header className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 className="font-heading text-3xl font-bold text-ink">Kelola Pengguna</h1>
+            <p className="mt-1 text-sm text-ink-soft">Masuk sebagai {profile.email}</p>
+          </div>
+          <ThemeToggle />
+        </header>
+
+        {error && <Alert tone="error">{error}</Alert>}
+
+        <div className="flex flex-wrap gap-2.5">
+          {FILTER.map((f) => (
+            <Chip
+              key={f.key}
+              selected={filter === f.key}
+              onClick={() => {
+                if (f.key === filter) return;
+                setMemuat(true);
+                setError(null);
+                setFilter(f.key);
+              }}
+            >
+              {f.label}
+            </Chip>
+          ))}
         </div>
-        <ThemeToggle />
-      </header>
 
-      {error && <Alert tone="error">{error}</Alert>}
-
-      <div className="flex flex-wrap gap-2.5">
-        {FILTER.map((f) => (
-          <Chip
-            key={f.key}
-            selected={filter === f.key}
-            onClick={() => {
-              if (f.key === filter) return;
-              setMemuat(true);
-              setError(null);
-              setFilter(f.key);
-            }}
-          >
-            {f.label}
-          </Chip>
-        ))}
+        <Card elevation={2}>
+          <CardBody className="pt-6">
+            {memuat ? (
+              <p className="py-10 text-center text-sm text-ink-faint">Memuat…</p>
+            ) : (
+              <UserTable users={users} onAction={aksi} />
+            )}
+          </CardBody>
+        </Card>
       </div>
-
-      <Card elevation={2}>
-        <CardBody className="pt-6">
-          {memuat ? (
-            <p className="py-10 text-center text-sm text-ink-faint">Memuat…</p>
-          ) : (
-            <UserTable users={users} onAction={aksi} />
-          )}
-        </CardBody>
-      </Card>
-    </main>
+    </PageContainer>
   );
 }
