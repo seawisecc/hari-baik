@@ -24,11 +24,7 @@ export default function DebugWarigaPage() {
             >
               <span className={r.pass ? "text-ink-soft" : "text-ink"}>{r.test}</span>
               <span
-                className={
-                  r.pass
-                    ? "shrink-0 text-success"
-                    : "shrink-0 font-medium text-error"
-                }
+                className={r.pass ? "shrink-0 text-success" : "shrink-0 font-medium text-error"}
               >
                 {r.pass ? "lolos" : `gagal → ${String(r.actual)}`}
               </span>

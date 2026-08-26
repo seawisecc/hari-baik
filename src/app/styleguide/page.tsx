@@ -19,10 +19,30 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 const KATEGORI = [
-  { key: "guru", nama: "Hari Mengalir", tagline: "Energi mendukung, langkah terasa ringan.", cls: "bg-guru" },
-  { key: "ratu", nama: "Hari Tenang", tagline: "Stabil dan produktif — jalankan yang sudah dimulai.", cls: "bg-ratu" },
-  { key: "lara", nama: "Hari Mawas", tagline: "Kurangi tergesa, perbanyak pertimbangan.", cls: "bg-lara" },
-  { key: "pati", nama: "Hari Istirahat", tagline: "Hari terbaik untuk memulihkan diri.", cls: "bg-pati" },
+  {
+    key: "guru",
+    nama: "Hari Mengalir",
+    tagline: "Energi mendukung, langkah terasa ringan.",
+    cls: "bg-guru",
+  },
+  {
+    key: "ratu",
+    nama: "Hari Tenang",
+    tagline: "Stabil dan produktif — jalankan yang sudah dimulai.",
+    cls: "bg-ratu",
+  },
+  {
+    key: "lara",
+    nama: "Hari Mawas",
+    tagline: "Kurangi tergesa, perbanyak pertimbangan.",
+    cls: "bg-lara",
+  },
+  {
+    key: "pati",
+    nama: "Hari Istirahat",
+    tagline: "Hari terbaik untuk memulihkan diri.",
+    cls: "bg-pati",
+  },
 ];
 
 export default function StyleguidePage() {

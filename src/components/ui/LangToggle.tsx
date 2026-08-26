@@ -20,7 +20,9 @@ export function LangToggle({ className }: { className?: string }) {
           onClick={() => setLang(l)}
           className={cn(
             "rounded-pill px-3 py-1.5 text-xs font-medium transition-[box-shadow,background-color] duration-150",
-            lang === l ? "bg-surface text-ink hb-raise-1" : "text-ink-faint hover:text-ink-soft",
+            lang === l
+              ? "bg-surface text-ink hb-raise-1"
+              : "text-ink-faint hover:text-ink-soft",
           )}
         >
           {LANG_LABELS[l]}

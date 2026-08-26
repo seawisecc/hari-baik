@@ -1,8 +1,20 @@
 import { getKategoriHari } from "./dewasa";
 import {
-  getAstawara, getCaturwara, getDasawara, getLintang, getPatra, getSadwara,
-  getSangawara, getSasih, getTriwara, getWatek, getWuku,
-  pancawaraName, saptawaraName, uripHari, uripSadwara,
+  getAstawara,
+  getCaturwara,
+  getDasawara,
+  getLintang,
+  getPatra,
+  getSadwara,
+  getSangawara,
+  getSasih,
+  getTriwara,
+  getWatek,
+  getWuku,
+  pancawaraName,
+  saptawaraName,
+  uripHari,
+  uripSadwara,
 } from "./pawukon";
 import { getLiburNasional } from "./dewasa";
 

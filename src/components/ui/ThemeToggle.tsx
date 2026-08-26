@@ -10,10 +10,7 @@ export function ThemeToggle({ className }: { className?: string }) {
     <div
       role="radiogroup"
       aria-label="Tema warna"
-      className={cn(
-        "inline-flex gap-1 rounded-pill bg-surface-sunk p-1 hb-sink",
-        className,
-      )}
+      className={cn("inline-flex gap-1 rounded-pill bg-surface-sunk p-1 hb-sink", className)}
     >
       {THEMES.map((t) => (
         <button

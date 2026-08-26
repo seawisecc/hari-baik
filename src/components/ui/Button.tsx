@@ -15,13 +15,10 @@ const button = cva(
         primary:
           "bg-accent text-accent-ink hb-raise-2 hover:bg-accent-strong active:hb-sink-sm",
         // Aksi sekunder: permukaan netral timbul.
-        surface:
-          "bg-surface text-ink hb-raise-1 hover:bg-surface-sunk active:hb-sink-sm",
+        surface: "bg-surface text-ink hb-raise-1 hover:bg-surface-sunk active:hb-sink-sm",
         // Tanpa elevasi — untuk aksi tersier di dalam kartu.
-        ghost:
-          "bg-transparent text-ink-soft hover:bg-surface-sunk hover:text-ink",
-        danger:
-          "bg-error/85 text-white hb-raise-1 hover:bg-error active:hb-sink-sm",
+        ghost: "bg-transparent text-ink-soft hover:bg-surface-sunk hover:text-ink",
+        danger: "bg-error/85 text-white hb-raise-1 hover:bg-error active:hb-sink-sm",
       },
       size: {
         sm: "h-9 px-4 text-sm rounded-pill",
@@ -36,16 +33,11 @@ const button = cva(
 );
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof button> {}
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof button> {}
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, block, ...props }, ref) => (
-    <button
-      ref={ref}
-      className={cn(button({ variant, size, block }), className)}
-      {...props}
-    />
+    <button ref={ref} className={cn(button({ variant, size, block }), className)} {...props} />
   ),
 );
 Button.displayName = "Button";

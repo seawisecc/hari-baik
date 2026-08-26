@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "tsx src/lib/__tests__/wariga.test.ts && tsx src/lib/__tests__/content.test.ts && tsx src/lib/__tests__/subscription.test.ts",
+    "set-admin": "tsx scripts/set-admin.ts"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
@@ -19,6 +21,7 @@
     "next": "16.3.3",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "server-only": "^0.0.1",
     "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
@@ -26,9 +29,12 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "16.3.3",
+    "prettier": "^3.9.6",
     "tailwindcss": "^4",
+    "tsx": "^4.23.12",
     "typescript": "^5"
   }
 }

@@ -1,41 +1,33 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo } from "react";
+import { useStoredValue } from "@/lib/useStoredValue";
 import { LANGS, type Lang, type MessageKey, translate } from "./i18n";
 
 const STORAGE_KEY = "hb_lang";
+const DEFAULT: Lang = "id";
+
+function normalize(value: string | null): Lang {
+  return (LANGS as readonly string[]).includes(value ?? "") ? (value as Lang) : DEFAULT;
+}
 
 const LangContext = createContext<{ lang: Lang; setLang: (l: Lang) => void }>({
-  lang: "id",
+  lang: DEFAULT,
   setLang: () => {},
 });
 
 export function LangProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = useState<Lang>("id");
+  const [stored, setStored] = useStoredValue(STORAGE_KEY);
+  const lang = normalize(stored);
 
-  // Dibaca setelah mount supaya HTML server dan klien cocok saat hidrasi.
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored && (LANGS as readonly string[]).includes(stored)) {
-        setLangState(stored as Lang);
-      }
-    } catch {
-      // Storage diblokir — tetap pakai bahasa default.
-    }
-  }, []);
+    document.documentElement.lang = lang;
+  }, [lang]);
 
-  const setLang = useCallback((l: Lang) => {
-    setLangState(l);
-    document.documentElement.lang = l;
-    try {
-      localStorage.setItem(STORAGE_KEY, l);
-    } catch {
-      /* abaikan */
-    }
-  }, []);
+  const setLang = useCallback((l: Lang) => setStored(l), [setStored]);
+  const value = useMemo(() => ({ lang, setLang }), [lang, setLang]);
 
-  return <LangContext.Provider value={{ lang, setLang }}>{children}</LangContext.Provider>;
+  return <LangContext.Provider value={value}>{children}</LangContext.Provider>;
 }
 
 export function useLang() {

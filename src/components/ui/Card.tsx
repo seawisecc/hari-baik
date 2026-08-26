@@ -15,12 +15,7 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   sunken?: boolean;
 }
 
-export function Card({
-  className,
-  elevation = 2,
-  sunken = false,
-  ...props
-}: CardProps) {
+export function Card({ className, elevation = 2, sunken = false, ...props }: CardProps) {
   return (
     <div
       className={cn(
@@ -39,10 +34,7 @@ export function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDiv
 
 export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
-    <h3
-      className={cn("font-heading text-lg font-semibold text-ink", className)}
-      {...props}
-    />
+    <h3 className={cn("font-heading text-lg font-semibold text-ink", className)} {...props} />
   );
 }
 

@@ -11,11 +11,11 @@ import { Input, Label } from "@/components/ui/Input";
 import { LangToggle } from "@/components/ui/LangToggle";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { useLang } from "@/lib/content/LangProvider";
-import { useBirthDate } from "@/lib/useBirthDate";
+import { useUserData } from "@/lib/useUserData";
 import { toDateString } from "@/lib/wariga";
 
 export default function KalenderPage() {
-  const { birthDate, setBirthDate, loaded } = useBirthDate();
+  const { birthDate, setBirthDate, editable, loading } = useUserData();
   const { lang } = useLang();
   const today = toDateString(new Date());
   const [cursor, setCursor] = useState(() => {
@@ -37,7 +37,7 @@ export default function KalenderPage() {
     { month: "long", year: "numeric" },
   );
 
-  if (!loaded) {
+  if (loading) {
     return <main className="mx-auto max-w-2xl px-6 py-16 text-ink-faint">Memuat…</main>;
   }
 
@@ -48,8 +48,7 @@ export default function KalenderPage() {
           <CardHeader>
             <CardTitle>Isi tanggal lahir</CardTitle>
             <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
-              Kalender siklus dihitung dari tanggal lahirmu, jadi ini harus diisi
-              lebih dulu.
+              Kalender siklus dihitung dari tanggal lahirmu, jadi ini harus diisi lebih dulu.
             </p>
           </CardHeader>
           <CardBody>
@@ -132,13 +131,18 @@ export default function KalenderPage() {
       <DayDetail date={selected} birthDate={birthDate} />
 
       <p className="pt-2 text-center text-xs text-ink-faint">
-        Tanggal lahir: {birthDate} ·{" "}
-        <button
-          onClick={() => setBirthDate(null)}
-          className="underline underline-offset-2 hover:text-ink-soft"
-        >
-          ubah
-        </button>
+        Tanggal lahir: {birthDate}
+        {editable && (
+          <>
+            {" · "}
+            <button
+              onClick={() => setBirthDate(null)}
+              className="underline underline-offset-2 hover:text-ink-soft"
+            >
+              ubah
+            </button>
+          </>
+        )}
       </p>
     </main>
   );

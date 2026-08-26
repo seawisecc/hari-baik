@@ -1,0 +1,83 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Role admin datang dari custom claim yang di-set lewat Admin SDK di server,
+    // bukan dari field dokumen — supaya tidak bisa diubah dari klien.
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.admin == true;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // Field yang hanya boleh disentuh admin.
+    function protectedFields() {
+      return [
+        'role',
+        'subscriptionStatus',
+        'subscriptionExpiresAt',
+        'trialEndsAt',
+        'email',
+        'createdAt'
+      ];
+    }
+
+    // True bila update TIDAK mengubah satu pun field terlindungi.
+    function keepsProtectedFields() {
+      return !request.resource.data.diff(resource.data)
+        .affectedKeys()
+        .hasAny(protectedFields().toSet());
+    }
+
+    match /users/{uid} {
+      allow get, list: if isOwner(uid) || isAdmin();
+
+      // Saat mendaftar, klien menulis dokumen awal untuk dirinya sendiri.
+      // Statusnya dipaksa 'trial' dan role dipaksa 'user' supaya tidak ada
+      // yang bisa mendaftar langsung sebagai admin atau berlangganan aktif.
+      allow create: if isOwner(uid)
+        && request.resource.data.role == 'user'
+        && request.resource.data.subscriptionStatus == 'trial'
+        && request.resource.data.subscriptionExpiresAt == null
+        && request.resource.data.email == request.auth.token.email;
+
+      // Pengguna boleh mengubah profilnya sendiri, kecuali field terlindungi.
+      // Tanggal lahir hanya boleh diisi sekali (saat onboarding); setelah itu
+      // perubahan harus lewat admin.
+      allow update: if isAdmin()
+        || (isOwner(uid)
+            && keepsProtectedFields()
+            && (resource.data.tanggalLahir == null
+                || request.resource.data.tanggalLahir == resource.data.tanggalLahir));
+
+      allow delete: if isAdmin();
+
+      match /riwayat/{docId} {
+        allow read, write: if isOwner(uid) || isAdmin();
+      }
+    }
+
+    // Permintaan aktivasi langganan. Pengguna hanya boleh membuat dan membaca
+    // miliknya sendiri; keputusan approve/tolak hanya milik admin.
+    match /aktivasi/{reqId} {
+      allow get, list: if isAdmin()
+        || (isSignedIn() && resource.data.uid == request.auth.uid);
+      allow create: if isSignedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'pending';
+      allow update, delete: if isAdmin();
+    }
+
+    // Tolak selain yang di atas.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

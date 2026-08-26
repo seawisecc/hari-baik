@@ -149,6 +149,8 @@ html {
 body {
   background: var(--hb-canvas);
   color: var(--hb-ink);
+  /* Ruang untuk BottomNav yang fixed, plus safe-area di iOS. */
+  padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
   font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;

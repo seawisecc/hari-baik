@@ -8,38 +8,97 @@ Masehi. Pengembangan ulang dari app sebelumnya (base44).
 Next.js 16 (App Router) · TypeScript · Tailwind v4 · Firebase (Auth + Firestore)
 · Vercel.
 
-## Jalankan
+## Menjalankan
 
 ```bash
 npm install
-npm run dev
+npm run dev     # http://localhost:3000
+npm test        # engine wariga, konten, aturan langganan
+npm run build
 ```
 
-| Rute | Isi |
-|---|---|
-| `/` | Beranda + wariga hari ini |
-| `/styleguide` | Sistem desain, pemilih tema |
-| `/debug-wariga` | Self-test engine (41 tes) |
+Aplikasi **bisa langsung dijalankan tanpa Firebase** — tanggal lahir disimpan
+di browser dan semua fitur terbuka. Ini untuk pengembangan; begitu kredensial
+Firebase dipasang, sumber data otomatis pindah ke profil pengguna dan fitur
+Pro dikunci sesuai status langganan.
+
+## Menyiapkan Firebase
+
+1. Buat project di [Firebase Console](https://console.firebase.google.com).
+2. **Authentication** → aktifkan metode **Email/Password**.
+3. **Firestore Database** → buat database (mode production).
+4. Salin `.env.example` → `.env.local`, isi semua nilainya.
+   Kunci klien ada di *Project settings → General → Your apps*;
+   kredensial admin di *Project settings → Service accounts → Generate new private key*.
+5. Terapkan security rules:
+   ```bash
+   npx firebase deploy --only firestore:rules,firestore:indexes
+   ```
+6. Daftarkan akun pertamamu lewat aplikasi, lalu jadikan admin:
+   ```bash
+   npm run set-admin -- email@kamu.com
+   ```
+   Keluar lalu masuk lagi supaya token memuat claim yang baru.
+
+## Rute
+
+| Rute | Isi | Akses |
+|---|---|---|
+| `/` | Landing page | publik |
+| `/login`, `/register`, `/verify-email` | Autentikasi | publik |
+| `/onboarding` | Nama + tanggal lahir, mulai trial 3 hari | login |
+| `/kalender` | Grid bulanan + panduan hari terpilih | login |
+| `/kepribadian` | Pangarasan & Pancasuda dari weton lahir | login |
+| `/nama-makna` | Makna nama lewat aksara Bali | Pro |
+| `/kecocokan` | Petemon Lanang Istri | Pro |
+| `/perjalanan-hidup` | Peta rejeki & kesehatan per periode usia | Pro |
+| `/profil` | Profil & status langganan | login |
+| `/expired` | Ajakan aktivasi langganan | login |
+| `/admin` | Kelola pengguna & langganan | admin |
+| `/styleguide` | Sistem desain | dev |
+| `/debug-wariga` | Self-test engine (41 tes) | dev |
 
 ## Struktur
 
 ```
 src/
-├── app/                  # rute App Router
-├── components/ui/        # primitif desain (Button, Card, Input, Chip, Alert)
+├── app/                    # rute App Router
+│   ├── (auth)/             # login, register, verify-email
+│   └── api/admin/          # route server: users, subscription, claim
+├── components/
+│   ├── ui/                 # primitif desain
+│   ├── calendar/           # grid, detail hari, legenda
+│   └── admin/              # tabel pengguna
 ├── lib/
-│   ├── wariga/           # engine kalender Bali — murni fungsi, tanpa DB
-│   │   ├── constants.ts  # nama wara, urip, epoch
-│   │   ├── pawukon.ts    # semua siklus wara + sasih + fase bulan
-│   │   ├── dewasa.ts     # hari raya + kategori siklus personal
-│   │   ├── holidays.ts   # tabel libur (perlu update tiap tahun)
-│   │   └── selftest.ts   # 41 tes terhadap tanggal acuan
-│   └── theme/            # provider tema
+│   ├── wariga/             # engine kalender Bali — murni fungsi, tanpa DB
+│   ├── content/            # data yang diport dari app lama + i18n
+│   ├── firebase/           # client, admin SDK, auth provider, penjaga admin
+│   ├── theme/              # provider tema
+│   ├── subscription.ts     # satu-satunya tempat aturan akses diputuskan
+│   └── __tests__/          # dijalankan lewat `npm test`
 └── types/
+firestore.rules             # security rules
+scripts/set-admin.ts        # bootstrap admin pertama
 docs/
-├── arsitektur.md            # dokumen arsitektur awal
-└── inventaris-app-lama.md   # hasil pembacaan app lama + sisa pekerjaan
+├── arsitektur.md              # dokumen arsitektur awal
+└── inventaris-app-lama.md     # hasil pembacaan app lama
 ```
+
+## Keamanan
+
+Tiga lapis, dan lapisan klien **bukan** yang menentukan:
+
+1. **Firestore Rules** — pengguna hanya bisa baca/tulis dokumennya sendiri,
+   dan tidak bisa menyentuh `role`, `subscriptionStatus`, atau
+   `subscriptionExpiresAt`. Tanggal lahir hanya bisa diisi sekali.
+2. **API route admin** — memverifikasi custom claim `admin: true` pada ID token
+   di server tiap permintaan, dengan `checkRevoked`. Tidak ada yang dipercaya
+   dari body request.
+3. **Penjaga tampilan** — hanya untuk pengalaman pengguna; menyembunyikan menu
+   yang tidak relevan, bukan mengamankan data.
+
+Role admin datang dari custom claim, bukan field Firestore, supaya tidak bisa
+diubah dari klien.
 
 ## Tema
 
@@ -48,20 +107,24 @@ Dua tema aksen di atas dasar netral off-white yang sama:
 - **Mint** (default) — hijau mint, sesuai styleguide referensi
 - **Senja** — jingga hangat
 
-Dipilih lewat `[data-theme]` di `<html>`, disimpan di `localStorage`, dan
-dipasang sebelum paint pertama supaya tidak berkedip. Semua warna adalah
-token CSS di `src/app/globals.css` — komponen tidak pernah memakai nilai hex
-langsung, jadi menambah tema ketiga cukup dengan satu blok `:root[data-theme=...]`.
+Warna empat kategori siklus (hijau/biru/kuning/merah) **sama di kedua tema** —
+diambil dari aplikasi lama, karena identitas kategori tidak boleh ikut berubah
+saat pengguna mengganti tema.
+
+Semua warna adalah token CSS di `src/app/globals.css`; komponen tidak pernah
+memakai hex langsung, jadi menambah tema ketiga cukup satu blok
+`:root[data-theme=...]`.
 
 ## Status
 
 - [x] Engine Wariga lengkap — 41/41 tes lolos
 - [x] Sistem desain + 2 tema
-- [ ] Konten (i18n, panduan harian, pangarasan, pancasuda, aksara nama)
-- [ ] Firebase Auth + Firestore
-- [ ] Halaman kalender & dashboard
-- [ ] Fitur Pro (nama, kecocokan, perjalanan hidup, kepribadian)
-- [ ] Admin + approval langganan
-- [ ] Deploy Vercel
-
-Rincian sisa pekerjaan ada di `docs/inventaris-app-lama.md`.
+- [x] Konten diport dari app lama (i18n, panduan, weton, watak, nama, petemon, nasib)
+- [x] Kalender + panduan harian
+- [x] Fitur Pro: nama, kecocokan, perjalanan hidup, kepribadian
+- [x] Firebase Auth + Firestore + security rules
+- [x] Admin + approval langganan
+- [ ] **Diuji terhadap project Firebase sungguhan** — kode auth/admin belum
+      pernah dijalankan dengan kredensial nyata
+- [ ] Deploy ke Vercel
+- [ ] Tabel libur nasional baru terisi 2026–2027 (`src/lib/wariga/holidays.ts`)

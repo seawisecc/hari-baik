@@ -32,11 +32,36 @@ export const PANCAWARA_EPOCH_INDEX = 4; // 1993-06-30 = Kliwon
 
 /** Wuku — 30 wuku x 7 hari = siklus 210 hari. */
 export const WUKU: string[] = [
-  "Sinta", "Landep", "Ukir", "Kulantir", "Tolu", "Gumbreg",
-  "Wariga", "Warigadean", "Julungwangi", "Sungsang", "Dunggulan", "Kuningan",
-  "Langkir", "Medangsia", "Pujut", "Pahang", "Krulut", "Merakih",
-  "Tambir", "Medangkungan", "Matal", "Uye", "Menail", "Prangbakat",
-  "Bala", "Ugu", "Wayang", "Klawu", "Dukut", "Watugunung",
+  "Sinta",
+  "Landep",
+  "Ukir",
+  "Kulantir",
+  "Tolu",
+  "Gumbreg",
+  "Wariga",
+  "Warigadean",
+  "Julungwangi",
+  "Sungsang",
+  "Dunggulan",
+  "Kuningan",
+  "Langkir",
+  "Medangsia",
+  "Pujut",
+  "Pahang",
+  "Krulut",
+  "Merakih",
+  "Tambir",
+  "Medangkungan",
+  "Matal",
+  "Uye",
+  "Menail",
+  "Prangbakat",
+  "Bala",
+  "Ugu",
+  "Wayang",
+  "Klawu",
+  "Dukut",
+  "Watugunung",
 ];
 /** Hari ke-0 dari wuku Sinta. Siklus pawukon dihitung dari sini. */
 export const PAWUKON_EPOCH = "1993-06-27";
@@ -63,31 +88,84 @@ export const SADWARA_EPOCH = "1993-06-30";
 export const SADWARA_EPOCH_INDEX = 3;
 
 /** Astawara — siklus 8 hari. */
-export const ASTAWARA = ["Sri", "Indra", "Guru", "Yama", "Ludra", "Brahma", "Kala", "Uma"] as const;
+export const ASTAWARA = [
+  "Sri",
+  "Indra",
+  "Guru",
+  "Yama",
+  "Ludra",
+  "Brahma",
+  "Kala",
+  "Uma",
+] as const;
 export const ASTAWARA_EPOCH = "2000-01-01";
 export const ASTAWARA_EPOCH_INDEX = 7;
 
 /** Sangawara — siklus 9 hari. */
 export const SANGAWARA = [
-  "Dangu", "Jangur", "Gigis", "Nohan", "Ogan",
-  "Erangan", "Urungan", "Tulus", "Dadi",
+  "Dangu",
+  "Jangur",
+  "Gigis",
+  "Nohan",
+  "Ogan",
+  "Erangan",
+  "Urungan",
+  "Tulus",
+  "Dadi",
 ] as const;
 export const SANGAWARA_EPOCH = "2000-01-01";
 
 /** Dasawara — dipilih dari jumlah urip Saptawara + Pancawara. */
 export const DASAWARA = [
-  "Pandita", "Pati", "Suka", "Duka", "Sri",
-  "Manuh", "Manusa", "Raja", "Dewa", "Raksasa",
+  "Pandita",
+  "Pati",
+  "Suka",
+  "Duka",
+  "Sri",
+  "Manuh",
+  "Manusa",
+  "Raja",
+  "Dewa",
+  "Raksasa",
 ] as const;
 
 /** Lintang — 35 lintang, siklus dari posisi pawukon. */
 export const LINTANG: string[] = [
-  "Gajah", "Kiriman", "Jongsarad", "Ula", "Kelapa", "Kukus", "Asu",
-  "Kartika", "Naga", "Angsa Angrem", "Panah", "Patrem", "Lembu", "Depat",
-  "Sangkatikel", "Salah Ukur", "Perahu Pegat", "Puwuh Atarung", "Gajah Mina",
-  "Lumbung", "Kumba", "Udang", "Begoong", "Tiwa-Tiwa", "Sugenge", "Pepet",
-  "Pegelangan", "Kala", "Yuyu", "Lawe", "Kelapa Sungsang", "Ikan", "Magelut",
-  "Tunggak Semi", "Bade",
+  "Gajah",
+  "Kiriman",
+  "Jongsarad",
+  "Ula",
+  "Kelapa",
+  "Kukus",
+  "Asu",
+  "Kartika",
+  "Naga",
+  "Angsa Angrem",
+  "Panah",
+  "Patrem",
+  "Lembu",
+  "Depat",
+  "Sangkatikel",
+  "Salah Ukur",
+  "Perahu Pegat",
+  "Puwuh Atarung",
+  "Gajah Mina",
+  "Lumbung",
+  "Kumba",
+  "Udang",
+  "Begoong",
+  "Tiwa-Tiwa",
+  "Sugenge",
+  "Pepet",
+  "Pegelangan",
+  "Kala",
+  "Yuyu",
+  "Lawe",
+  "Kelapa Sungsang",
+  "Ikan",
+  "Magelut",
+  "Tunggak Semi",
+  "Bade",
 ];
 
 /** Watek — gabungan watek Pancawara (madya) dan Saptawara (alit). */
@@ -116,8 +194,18 @@ export const NEW_MOON_EPOCH_MS = Date.UTC(2000, 0, 6, 18, 14, 0);
 export const SYNODIC_MONTH_DAYS = 29.530588853;
 
 export const SASIH: string[] = [
-  "Kasa", "Karo", "Katiga", "Kapat", "Kalima", "Kanem",
-  "Kapitu", "Kaulu", "Kasanga", "Kadasa", "Jyestha", "Sadha",
+  "Kasa",
+  "Karo",
+  "Katiga",
+  "Kapat",
+  "Kalima",
+  "Kanem",
+  "Kapitu",
+  "Kaulu",
+  "Kasanga",
+  "Kadasa",
+  "Jyestha",
+  "Sadha",
 ];
 export const SASIH_OFFSET = 3;
 

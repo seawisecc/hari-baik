@@ -1,20 +1,33 @@
 import {
-  ASTAWARA, ASTAWARA_EPOCH, ASTAWARA_EPOCH_INDEX,
-  CATURWARA, CATURWARA_EPOCH, CATURWARA_EPOCH_INDEX,
+  ASTAWARA,
+  ASTAWARA_EPOCH,
+  ASTAWARA_EPOCH_INDEX,
+  CATURWARA,
+  CATURWARA_EPOCH,
+  CATURWARA_EPOCH_INDEX,
   DASAWARA,
   LINTANG,
   MS_PER_DAY,
   NEW_MOON_EPOCH_MS,
-  PANCAWARA, PANCAWARA_EPOCH, PANCAWARA_EPOCH_INDEX,
+  PANCAWARA,
+  PANCAWARA_EPOCH,
+  PANCAWARA_EPOCH_INDEX,
   PATRA_OFFSET,
   PAWUKON_EPOCH,
-  SADWARA, SADWARA_EPOCH, SADWARA_EPOCH_INDEX, SADWARA_URIP,
-  SANGAWARA, SANGAWARA_EPOCH,
+  SADWARA,
+  SADWARA_EPOCH,
+  SADWARA_EPOCH_INDEX,
+  SADWARA_URIP,
+  SANGAWARA,
+  SANGAWARA_EPOCH,
   SAPTAWARA,
-  SASIH, SASIH_OFFSET,
-  SYNODIC_MONTH_DAYS, HALF_SYNODIC,
+  SASIH,
+  SASIH_OFFSET,
+  SYNODIC_MONTH_DAYS,
+  HALF_SYNODIC,
   TRIWARA,
-  WATEK_PANCAWARA, WATEK_SAPTAWARA,
+  WATEK_PANCAWARA,
+  WATEK_SAPTAWARA,
   WUKU,
   type Wara,
 } from "./constants";
@@ -141,7 +154,10 @@ export function uripHari(dateStr: string): number {
  */
 export function getLunar(dateStr: string): LunarInfo {
   const [y, m, d] = dateStr.split("-").map(Number);
-  const age = mod((Date.UTC(y, m - 1, d, 12, 0, 0) - NEW_MOON_EPOCH_MS) / MS_PER_DAY, SYNODIC_MONTH_DAYS);
+  const age = mod(
+    (Date.UTC(y, m - 1, d, 12, 0, 0) - NEW_MOON_EPOCH_MS) / MS_PER_DAY,
+    SYNODIC_MONTH_DAYS,
+  );
   const half = HALF_SYNODIC;
   if (age < half) {
     return { phase: "Penanggal", day: Math.min(Math.floor(age / (half / 15)) + 1, 15) };

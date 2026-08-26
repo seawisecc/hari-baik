@@ -1,10 +1,26 @@
 import { HARI_RAYA_HINDU, LIBUR_NASIONAL } from "./holidays";
 import {
-  getAstawara, getCaturwara, getDasawara, getLintang, getPatra, getPratima,
-  getSadwara, getSangawara, getSasih, getTriwara, getWatek, getWuku,
-  getPancawara, getSaptawara,
-  isPurnama, isTilem, lunarLabel,
-  pancawaraName, saptawaraName, uripHari, wukuName,
+  getAstawara,
+  getCaturwara,
+  getDasawara,
+  getLintang,
+  getPatra,
+  getPratima,
+  getSadwara,
+  getSangawara,
+  getSasih,
+  getTriwara,
+  getWatek,
+  getWuku,
+  getPancawara,
+  getSaptawara,
+  isPurnama,
+  isTilem,
+  lunarLabel,
+  pancawaraName,
+  saptawaraName,
+  uripHari,
+  wukuName,
 } from "./pawukon";
 import type { DayMarkers, KategoriHari, KategoriName, WarigaDay } from "./types";
 
@@ -12,16 +28,20 @@ import type { DayMarkers, KategoriHari, KategoriName, WarigaDay } from "./types"
 
 /** Galungan: Budha Kliwon wuku Dunggulan. */
 export function isGalungan(dateStr: string): boolean {
-  return saptawaraName(dateStr) === "Budha"
-    && pancawaraName(dateStr) === "Kliwon"
-    && wukuName(dateStr) === "Dunggulan";
+  return (
+    saptawaraName(dateStr) === "Budha" &&
+    pancawaraName(dateStr) === "Kliwon" &&
+    wukuName(dateStr) === "Dunggulan"
+  );
 }
 
 /** Kuningan: Saniscara Kliwon wuku Kuningan. */
 export function isKuningan(dateStr: string): boolean {
-  return saptawaraName(dateStr) === "Saniscara"
-    && pancawaraName(dateStr) === "Kliwon"
-    && wukuName(dateStr) === "Kuningan";
+  return (
+    saptawaraName(dateStr) === "Saniscara" &&
+    pancawaraName(dateStr) === "Kliwon" &&
+    wukuName(dateStr) === "Kuningan"
+  );
 }
 
 /** Kajeng Kliwon: pertemuan Kajeng (Triwara) dengan Kliwon (Pancawara), tiap 15 hari. */
@@ -56,8 +76,10 @@ export function getHariRayaHindu(dateStr: string): string[] | null {
   const list: string[] = [];
   const fixed = HARI_RAYA_HINDU[dateStr];
   if (fixed) list.push(fixed);
-  if (isGalungan(dateStr) && !list.includes("Hari Raya Galungan")) list.push("Hari Raya Galungan");
-  if (isKuningan(dateStr) && !list.includes("Hari Raya Kuningan")) list.push("Hari Raya Kuningan");
+  if (isGalungan(dateStr) && !list.includes("Hari Raya Galungan"))
+    list.push("Hari Raya Galungan");
+  if (isKuningan(dateStr) && !list.includes("Hari Raya Kuningan"))
+    list.push("Hari Raya Kuningan");
   if (isPurnama(dateStr)) list.push(`Purnama ${getSasih(dateStr)}`);
   if (isTilem(dateStr)) list.push(`Tilem ${getSasih(dateStr)}`);
   return list.length > 0 ? list : null;
@@ -65,7 +87,10 @@ export function getHariRayaHindu(dateStr: string): string[] | null {
 
 // ── Kategori siklus personal ──────────────────────────────────────────────
 
-const KATEGORI: Record<number, { name: KategoriName; label: string; color: KategoriHari["color"] }> = {
+const KATEGORI: Record<
+  number,
+  { name: KategoriName; label: string; color: KategoriHari["color"] }
+> = {
   1: { name: "GURU", label: "Sangat Baik", color: "guru" },
   2: { name: "RATU", label: "Baik", color: "ratu" },
   3: { name: "LARA", label: "Kurang Baik", color: "lara" },
@@ -90,9 +115,11 @@ export function getKategoriHari(birthDate: string, dateStr: string): KategoriHar
  */
 export function isDewasaAyu(birthDate: string, dateStr: string): boolean {
   const sapta = saptawaraName(dateStr);
-  return getKategoriHari(birthDate, dateStr).name === "GURU"
-    && (sapta === "Wraspati" || sapta === "Sukra")
-    && pancawaraName(dateStr) !== "Kliwon";
+  return (
+    getKategoriHari(birthDate, dateStr).name === "GURU" &&
+    (sapta === "Wraspati" || sapta === "Sukra") &&
+    pancawaraName(dateStr) !== "Kliwon"
+  );
 }
 
 // ── Agregat ───────────────────────────────────────────────────────────────

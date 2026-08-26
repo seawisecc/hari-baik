@@ -22,19 +22,15 @@ const KEY: Record<KategoriName, string> = {
 };
 
 function formatTanggal(dateStr: string, lang: string) {
-  return new Date(dateStr + "T12:00:00").toLocaleDateString(
-    lang === "en" ? "en-GB" : "id-ID",
-    { weekday: "long", day: "numeric", month: "long", year: "numeric" },
-  );
+  return new Date(dateStr + "T12:00:00").toLocaleDateString(lang === "en" ? "en-GB" : "id-ID", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 }
 
-export function DayDetail({
-  date,
-  birthDate,
-}: {
-  date: string;
-  birthDate: string | null;
-}) {
+export function DayDetail({ date, birthDate }: { date: string; birthDate: string | null }) {
   const t = useT();
   const { lang } = useLang();
   const hari = getWarigaDay(date, birthDate);
@@ -49,14 +45,19 @@ export function DayDetail({
           <p className="text-sm text-ink-faint">{formatTanggal(date, lang)}</p>
           {kategori ? (
             <div className="mt-2 flex items-center gap-3">
-              <span aria-hidden className={cn("h-8 w-8 rounded-pill hb-raise-1", TONE[kategori])} />
+              <span
+                aria-hidden
+                className={cn("h-8 w-8 rounded-pill hb-raise-1", TONE[kategori])}
+              />
               <div>
                 <CardTitle>{t(`day.${KEY[kategori]}`)}</CardTitle>
                 <p className="text-sm text-ink-soft">{t(`day.${KEY[kategori]}.tagline`)}</p>
               </div>
             </div>
           ) : (
-            <CardTitle className="mt-2">{hari.saptaWara} {hari.pancaWara}</CardTitle>
+            <CardTitle className="mt-2">
+              {hari.saptaWara} {hari.pancaWara}
+            </CardTitle>
           )}
         </CardHeader>
 
@@ -100,7 +101,10 @@ export function DayDetail({
               <ul className="space-y-1.5">
                 {panduan.supported.map((s) => (
                   <li key={s} className="flex gap-2.5 text-sm text-ink-soft">
-                    <span aria-hidden className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-guru" />
+                    <span
+                      aria-hidden
+                      className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-guru"
+                    />
                     {s}
                   </li>
                 ))}
@@ -113,7 +117,10 @@ export function DayDetail({
               <ul className="space-y-1.5">
                 {panduan.postpone.map((s) => (
                   <li key={s} className="flex gap-2.5 text-sm text-ink-soft">
-                    <span aria-hidden className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-pati" />
+                    <span
+                      aria-hidden
+                      className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-pati"
+                    />
                     {s}
                   </li>
                 ))}

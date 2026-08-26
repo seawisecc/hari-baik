@@ -51,10 +51,10 @@ Kajeng Kliwon · Tumpek · Anggara Kasih · Buda Kliwon · libur nasional.
 | Sangawara | 2000-01-01 | 0 |
 | Bulan baru | 2000-01-06 18:14 UTC | — |
 
-## Konten & data yang MASIH PERLU DIPORT
+## Konten & data — SUDAH DIPORT ✅
 
-Semua di bawah ini adalah data teks besar yang ada di app lama. Belum
-dipindahkan — ini pekerjaan berikutnya.
+Semua di bawah ini sudah dipindahkan ke `src/lib/content/` dan diverifikasi
+lewat `npm test`.
 
 1. **i18n ID/EN** — ±70 key. Label kategori: GURU→"Hari Mengalir",
    RATU→"Hari Tenang", LARA→"Hari Mawas", PATI→"Hari Istirahat", masing-masing
@@ -82,6 +82,12 @@ dipindahkan — ini pekerjaan berikutnya.
 - Field user: `nama`, `tanggal_lahir`, `phone_number` (opsional),
   `sapta_wara_lahir`, `panca_wara_lahir`, `sad_wara_lahir`, `wuku_lahir`,
   `urip_lahir`, `urip_petemon_lahir`, `trial_ends_at`, `onboarding_complete`.
+
+## Yang belum
+
+- Kode Firebase (auth, admin API, rules) belum pernah dijalankan terhadap
+  project Firebase sungguhan — belum ada kredensial.
+- Deploy ke Vercel.
 
 ## Catatan
 

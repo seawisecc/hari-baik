@@ -20,7 +20,10 @@ export function Legend() {
         </span>
       ))}
       <span className="flex items-center gap-2 text-xs text-ink-soft">
-        <span aria-hidden className="h-2.5 w-2.5 rounded-full border border-ink-faint bg-surface" />
+        <span
+          aria-hidden
+          className="h-2.5 w-2.5 rounded-full border border-ink-faint bg-surface"
+        />
         Purnama
       </span>
       <span className="flex items-center gap-2 text-xs text-ink-soft">

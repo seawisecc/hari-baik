@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo } from "react";
+import { useStoredValue } from "@/lib/useStoredValue";
 
 export const THEMES = ["mint", "senja"] as const;
 export type Theme = (typeof THEMES)[number];
@@ -11,44 +12,31 @@ export const THEME_LABELS: Record<Theme, string> = {
 };
 
 const STORAGE_KEY = "hb_theme";
+const DEFAULT: Theme = "mint";
 
-interface ThemeContextValue {
-  theme: Theme;
-  setTheme: (t: Theme) => void;
+function normalize(value: string | null): Theme {
+  return (THEMES as readonly string[]).includes(value ?? "") ? (value as Theme) : DEFAULT;
 }
 
-const ThemeContext = createContext<ThemeContextValue>({
-  theme: "mint",
+const ThemeContext = createContext<{ theme: Theme; setTheme: (t: Theme) => void }>({
+  theme: DEFAULT,
   setTheme: () => {},
 });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // Nilai awal harus cocok dengan yang dipasang script anti-flash di <head>,
-  // jadi kita mulai dari default lalu sinkron setelah mount.
-  const [theme, setThemeState] = useState<Theme>("mint");
+  const [stored, setStored] = useStoredValue(STORAGE_KEY);
+  const theme = normalize(stored);
 
+  // Atribut sudah dipasang sebelum paint oleh themeInitScript; ini menjaganya
+  // tetap sinkron kalau nilainya berubah (mis. dari tab lain).
   useEffect(() => {
-    const stored = document.documentElement.getAttribute("data-theme");
-    if (stored && (THEMES as readonly string[]).includes(stored)) {
-      setThemeState(stored as Theme);
-    }
-  }, []);
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
 
-  const setTheme = useCallback((t: Theme) => {
-    setThemeState(t);
-    document.documentElement.setAttribute("data-theme", t);
-    try {
-      localStorage.setItem(STORAGE_KEY, t);
-    } catch {
-      // Private mode / storage diblokir — tema tetap jalan untuk sesi ini.
-    }
-  }, []);
+  const setTheme = useCallback((t: Theme) => setStored(t), [setStored]);
+  const value = useMemo(() => ({ theme, setTheme }), [theme, setTheme]);
 
-  return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
 export function useTheme() {

@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Manrope } from "next/font/google";
+import { BottomNav } from "@/components/BottomNav";
 import { LangProvider } from "@/lib/content/LangProvider";
+import { AuthProvider } from "@/lib/firebase/AuthProvider";
 import { ThemeProvider, themeInitScript } from "@/lib/theme/ThemeProvider";
 import "./globals.css";
 
@@ -29,9 +31,7 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="id" data-theme="mint" suppressHydrationWarning>
       <head>
@@ -39,7 +39,12 @@ export default function RootLayout({
       </head>
       <body className={`${display.variable} ${body.variable}`}>
         <ThemeProvider>
-          <LangProvider>{children}</LangProvider>
+          <LangProvider>
+            <AuthProvider>
+              {children}
+              <BottomNav />
+            </AuthProvider>
+          </LangProvider>
         </ThemeProvider>
       </body>
     </html>

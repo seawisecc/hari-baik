@@ -10,369 +10,81 @@ export type NasibTone = "accent" | "guru" | "ratu" | "lara" | "pati";
 
 /** Rentang [usiaMin, usiaMax] tiap periode. */
 const PERIODE_USIA: [number, number][] = [
-  [
-    0,
-    6
-  ],
-  [
-    7,
-    12
-  ],
-  [
-    13,
-    18
-  ],
-  [
-    19,
-    24
-  ],
-  [
-    25,
-    30
-  ],
-  [
-    31,
-    36
-  ],
-  [
-    37,
-    42
-  ],
-  [
-    43,
-    48
-  ],
-  [
-    49,
-    54
-  ],
-  [
-    55,
-    60
-  ],
-  [
-    61,
-    66
-  ],
-  [
-    67,
-    72
-  ],
-  [
-    73,
-    78
-  ],
-  [
-    79,
-    84
-  ],
-  [
-    85,
-    90
-  ],
-  [
-    91,
-    96
-  ],
-  [
-    97,
-    102
-  ],
-  [
-    103,
-    108
-  ]
+  [0, 6],
+  [7, 12],
+  [13, 18],
+  [19, 24],
+  [25, 30],
+  [31, 36],
+  [37, 42],
+  [43, 48],
+  [49, 54],
+  [55, 60],
+  [61, 66],
+  [67, 72],
+  [73, 78],
+  [79, 84],
+  [85, 90],
+  [91, 96],
+  [97, 102],
+  [103, 108],
 ];
 
 /** 18 periode × 12 kolom urip. */
 const PERIODE_NILAI: (number | null)[][] = [
-  [
-    4,
-    4,
-    2,
-    1,
-    2,
-    0,
-    0,
-    1,
-    2,
-    0,
-    1,
-    2
-  ],
-  [
-    1,
-    1,
-    2,
-    0,
-    4,
-    5,
-    1,
-    0,
-    0,
-    3,
-    1,
-    5
-  ],
-  [
-    4,
-    0,
-    1,
-    4,
-    1,
-    1,
-    0,
-    1,
-    1,
-    1,
-    0,
-    1
-  ],
-  [
-    1,
-    1,
-    0,
-    1,
-    1,
-    0,
-    5,
-    4,
-    1,
-    2,
-    5,
-    0
-  ],
-  [
-    0,
-    0,
-    4,
-    1,
-    8,
-    4,
-    0,
-    4,
-    5,
-    0,
-    0,
-    5
-  ],
-  [
-    2,
-    3,
-    1,
-    3,
-    1,
-    0,
-    1,
-    0,
-    2,
-    1,
-    1,
-    1
-  ],
-  [
-    0,
-    0,
-    4,
-    0,
-    0,
-    1,
-    1,
-    1,
-    0,
-    3,
-    1,
-    4
-  ],
-  [
-    null,
-    7,
-    0,
-    0,
-    1,
-    0,
-    5,
-    4,
-    1,
-    1,
-    5,
-    0
-  ],
-  [
-    null,
-    null,
-    7,
-    4,
-    2,
-    1,
-    2,
-    1,
-    2,
-    2,
-    2,
-    1
-  ],
-  [
-    null,
-    null,
-    null,
-    4,
-    0,
-    4,
-    0,
-    4,
-    5,
-    1,
-    0,
-    4
-  ],
-  [
-    null,
-    null,
-    null,
-    null,
-    2,
-    4,
-    1,
-    4,
-    5,
-    2,
-    1,
-    4
-  ],
-  [
-    null,
-    null,
-    null,
-    null,
-    null,
-    0,
-    2,
-    1,
-    1,
-    0,
-    2,
-    0
-  ],
-  [
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    5,
-    1,
-    0,
-    1,
-    5,
-    0
-  ],
-  [
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    0,
-    4,
-    1,
-    5,
-    2
-  ],
-  [
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    4,
-    0,
-    1,
-    1
-  ],
-  [
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    2,
-    0,
-    4
-  ],
-  [
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    4,
-    0
-  ],
-  [
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    0
-  ]
+  [4, 4, 2, 1, 2, 0, 0, 1, 2, 0, 1, 2],
+  [1, 1, 2, 0, 4, 5, 1, 0, 0, 3, 1, 5],
+  [4, 0, 1, 4, 1, 1, 0, 1, 1, 1, 0, 1],
+  [1, 1, 0, 1, 1, 0, 5, 4, 1, 2, 5, 0],
+  [0, 0, 4, 1, 8, 4, 0, 4, 5, 0, 0, 5],
+  [2, 3, 1, 3, 1, 0, 1, 0, 2, 1, 1, 1],
+  [0, 0, 4, 0, 0, 1, 1, 1, 0, 3, 1, 4],
+  [null, 7, 0, 0, 1, 0, 5, 4, 1, 1, 5, 0],
+  [null, null, 7, 4, 2, 1, 2, 1, 2, 2, 2, 1],
+  [null, null, null, 4, 0, 4, 0, 4, 5, 1, 0, 4],
+  [null, null, null, null, 2, 4, 1, 4, 5, 2, 1, 4],
+  [null, null, null, null, null, 0, 2, 1, 1, 0, 2, 0],
+  [null, null, null, null, null, null, 5, 1, 0, 1, 5, 0],
+  [null, null, null, null, null, null, null, 0, 4, 1, 5, 2],
+  [null, null, null, null, null, null, null, null, 4, 0, 1, 1],
+  [null, null, null, null, null, null, null, null, null, 2, 0, 4],
+  [null, null, null, null, null, null, null, null, null, null, 4, 0],
+  [null, null, null, null, null, null, null, null, null, null, null, 0],
 ];
 
 export const NASIB_LABEL: Record<number, { label: string; tone: NasibTone }> = {
   "0": {
-    "label": "Masa Ujian",
-    "tone": "pati"
+    label: "Masa Ujian",
+    tone: "pati",
   },
   "1": {
-    "label": "Tumbuh Perlahan",
-    "tone": "lara"
+    label: "Tumbuh Perlahan",
+    tone: "lara",
   },
   "2": {
-    "label": "Stabil Berkembang",
-    "tone": "lara"
+    label: "Stabil Berkembang",
+    tone: "lara",
   },
   "3": {
-    "label": "Masa Baik",
-    "tone": "guru"
+    label: "Masa Baik",
+    tone: "guru",
   },
   "4": {
-    "label": "Masa Cerah",
-    "tone": "guru"
+    label: "Masa Cerah",
+    tone: "guru",
   },
   "5": {
-    "label": "Masa Suka Cita",
-    "tone": "ratu"
+    label: "Masa Suka Cita",
+    tone: "ratu",
   },
   "7": {
-    "label": "Masa Berlimpah",
-    "tone": "accent"
+    label: "Masa Berlimpah",
+    tone: "accent",
   },
   "8": {
-    "label": "Masa Puncak",
-    "tone": "accent"
-  }
+    label: "Masa Puncak",
+    tone: "accent",
+  },
 };
 
 export const NASIB_REJEKI: Record<number, string> = {
@@ -383,7 +95,7 @@ export const NASIB_REJEKI: Record<number, string> = {
   "4": "Periode penuh dukungan — rezeki, kesehatan, dan kondisi umum cenderung menguntungkan. Bergeraklah dengan percaya diri.",
   "5": "Ketenangan dan kebahagiaan hadir dalam periode ini. Nikmati, bagikan, dan jadikan ini bahan bakar untuk memberi lebih banyak ke orang sekitarmu.",
   "7": "Kelimpahan dalam berbagai bentuk hadir di periode ini. Gunakan dengan bijak — rezeki yang disyukuri dan dibagi cenderung terus bertumbuh.",
-  "8": "Ini adalah periode terbaik dalam siklus hidupmu. Ambil langkah-langkah besar yang sudah lama kamu persiapkan. Puncak dicapai bukan hanya dengan kerja keras, tapi juga dengan syukur."
+  "8": "Ini adalah periode terbaik dalam siklus hidupmu. Ambil langkah-langkah besar yang sudah lama kamu persiapkan. Puncak dicapai bukan hanya dengan kerja keras, tapi juga dengan syukur.",
 };
 
 export const NASIB_SARAN: Record<number, string> = {
@@ -394,7 +106,7 @@ export const NASIB_SARAN: Record<number, string> = {
   "4": "Berani ambil langkah lebih besar. Energi mendukung usaha dan pertumbuhan.",
   "5": "Bagikan kebahagiaan ini. Investasi dalam hubungan dan kenangan indah.",
   "7": "Kelola kelimpahan dengan bijak. Sisihkan untuk masa depan dan berbagi.",
-  "8": "Ini saatnya. Wujudkan mimpi terbesar yang sudah kamu persiapkan."
+  "8": "Ini saatnya. Wujudkan mimpi terbesar yang sudah kamu persiapkan.",
 };
 
 export interface PeriodeHidup {
@@ -420,8 +132,8 @@ export function petaPerjalananHidup(uripLahir: number): PeriodeHidup[] {
       value,
       label: meta?.label ?? null,
       tone: meta?.tone ?? null,
-      rejeki: value !== null ? NASIB_REJEKI[value] ?? null : null,
-      saran: value !== null ? NASIB_SARAN[value] ?? null : null,
+      rejeki: value !== null ? (NASIB_REJEKI[value] ?? null) : null,
+      saran: value !== null ? (NASIB_SARAN[value] ?? null) : null,
     };
   });
 }

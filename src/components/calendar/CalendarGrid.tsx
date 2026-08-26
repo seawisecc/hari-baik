@@ -2,12 +2,7 @@
 
 import { useMemo } from "react";
 import { cn } from "@/lib/cn";
-import {
-  getDayMarkers,
-  getKategoriHari,
-  toDateString,
-  type KategoriName,
-} from "@/lib/wariga";
+import { getDayMarkers, getKategoriHari, toDateString, type KategoriName } from "@/lib/wariga";
 
 const HARI = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
 
