@@ -16,6 +16,18 @@ export function evaluateAccess(
   user: Pick<UserProfile, "subscriptionStatus" | "subscriptionExpiresAt" | "trialEndsAt">,
   now: Date = new Date(),
 ): AccessState {
+  // Seumur hidup diperiksa paling dulu: tidak punya tanggal habis, jadi tidak
+  // boleh ikut logika kedaluwarsa apa pun.
+  if (user.subscriptionStatus === "lifetime") {
+    return {
+      canView: true,
+      isPro: true,
+      type: "lifetime",
+      daysLeft: null,
+      expiresAt: null,
+    };
+  }
+
   if (user.subscriptionStatus === "active" && user.subscriptionExpiresAt) {
     const left = daysUntil(user.subscriptionExpiresAt, now);
     if (left > 0) {
@@ -56,5 +68,22 @@ export function extendOneYear(currentExpiry: string | null, now: Date = new Date
     currentExpiry && new Date(currentExpiry) > now ? new Date(currentExpiry) : new Date(now);
   const next = new Date(base);
   next.setFullYear(next.getFullYear() + 1);
+  return next.toISOString();
+}
+
+/**
+ * Tanggal habis setelah ditambah `tahun` tahun.
+ * Ditumpuk dari tanggal habis yang ada bila langganan masih berjalan, supaya
+ * sisa masa berlaku tidak hangus saat diperpanjang.
+ */
+export function extendYears(
+  currentExpiry: string | null,
+  tahun: number,
+  now: Date = new Date(),
+): string {
+  const base =
+    currentExpiry && new Date(currentExpiry) > now ? new Date(currentExpiry) : new Date(now);
+  const next = new Date(base);
+  next.setFullYear(next.getFullYear() + tahun);
   return next.toISOString();
 }

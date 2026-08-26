@@ -8,6 +8,19 @@ export const RUTE_PUBLIK = new Set(["/", "/login", "/register", "/lupa-sandi"]);
  */
 export const RUTE_TUJUAN = new Set(["/verify-email", "/onboarding", "/expired"]);
 
+/**
+ * Rute yang butuh langganan aktif, beserta teks layar kuncinya.
+ *
+ * Ini satu-satunya daftar fitur Pro. Navigasi mengambil penanda "PRO" dari
+ * sini, dan gerbang memakainya untuk mengunci; jadi menambah fitur Pro cukup
+ * di satu tempat dan tidak mungkin lupa memasang penjaganya.
+ */
+export const RUTE_PRO: Record<string, { titleKey: string; descKey: string }> = {
+  "/nama-makna": { titleKey: "pro.nama.title", descKey: "pro.lock.desc.nama" },
+  "/kecocokan": { titleKey: "pro.petemon.title", descKey: "pro.lock.desc.petemon" },
+  "/perjalanan-hidup": { titleKey: "pro.nasib.title", descKey: "pro.lock.desc.nasib" },
+};
+
 export interface KondisiAkses {
   pathname: string;
   configured: boolean;

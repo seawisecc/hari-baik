@@ -57,6 +57,10 @@ dari syarat paling dasar: masuk, verifikasi email, lengkapi profil, lalu
 status langganan. Keputusannya ada di `src/lib/gate.ts` sebagai fungsi murni
 yang diuji terpisah, jadi halaman baru otomatis ikut terjaga.
 
+Fitur Pro juga didaftarkan di sana (`RUTE_PRO`). Navigasi mengambil penanda
+"PRO" dari daftar yang sama, sehingga tidak mungkin sebuah halaman ditandai
+Pro tapi lupa dipasangi penjaganya.
+
 | Rute | Isi | Akses |
 |---|---|---|
 | `/` | Landing page | publik |
@@ -165,7 +169,7 @@ memakai hex langsung, jadi menambah tema ketiga cukup satu blok
 - [x] Kalender + panduan harian
 - [x] Fitur Pro: nama, kecocokan, perjalanan hidup, kepribadian
 - [x] Firebase Auth + Firestore + security rules
-- [x] Admin + approval langganan
+- [x] Admin: perpanjang N tahun, tetapkan tanggal habis, atau seumur hidup
 - [x] Layout desktop & mobile terpisah, beranda = insight hari ini
 - [x] Diuji terhadap project Firebase sungguhan (`hari-baik-7e56c`)
 - [ ] Deploy ke Vercel

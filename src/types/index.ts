@@ -2,12 +2,13 @@ export type Role = "user" | "admin";
 
 /**
  * Status langganan.
- * - `trial`   : 3 hari pertama sejak onboarding, otomatis
- * - `pending`: sudah minta aktivasi, menunggu approval admin
- * - `active`: berbayar, aktif sampai `subscriptionExpiresAt`
- * - `expired`: trial atau langganan sudah lewat
+ * - `trial`    : 3 hari pertama sejak pembuatan akun, otomatis
+ * - `pending`  : sudah minta aktivasi, menunggu approval admin
+ * - `active`   : berbayar, aktif sampai `subscriptionExpiresAt`
+ * - `lifetime` : berbayar tanpa batas waktu; `subscriptionExpiresAt` diabaikan
+ * - `expired`  : trial atau langganan sudah lewat
  */
-export type SubscriptionStatus = "trial" | "pending" | "active" | "expired";
+export type SubscriptionStatus = "trial" | "pending" | "active" | "lifetime" | "expired";
 
 export interface UserProfile {
   uid: string;
@@ -40,9 +41,9 @@ export interface AccessState {
   canView: boolean;
   /** Boleh membuka fitur Pro. */
   isPro: boolean;
-  /** "trial" | "subscription" | "none" */
-  type: "trial" | "subscription" | "none";
-  /** Sisa hari, null bila tidak relevan. */
+  /** Dari mana akses berasal. */
+  type: "trial" | "subscription" | "lifetime" | "none";
+  /** Sisa hari; null untuk seumur hidup atau saat tidak relevan. */
   daysLeft: number | null;
   expiresAt: string | null;
 }

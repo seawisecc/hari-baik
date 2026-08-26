@@ -5,14 +5,16 @@ import { usePathname } from "next/navigation";
 import { LangToggle } from "@/components/ui/LangToggle";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { cn } from "@/lib/cn";
-import { NAV_ADMIN, NAV_AKUN, NAV_PRO, NAV_UTAMA, type NavItem } from "@/lib/nav";
+import { NAV_ADMIN, NAV_AKUN, NAV_PRO, NAV_UTAMA, butuhPro, type NavItem } from "@/lib/nav";
 import { useAuth } from "@/lib/firebase/AuthProvider";
 import { useUserData } from "@/lib/useUserData";
 
-function Item({ item, locked }: { item: NavItem; locked: boolean }) {
+function Item({ item, terkunci }: { item: NavItem; terkunci: boolean }) {
   const pathname = usePathname();
   const active = pathname === item.href;
   const Icon = item.icon;
+  // Penanda hanya muncul untuk rute Pro yang memang sedang terkunci.
+  const tampilkanPro = terkunci && butuhPro(item.href);
 
   return (
     <li>
@@ -29,7 +31,7 @@ function Item({ item, locked }: { item: NavItem; locked: boolean }) {
       >
         <Icon className="h-[18px] w-[18px] shrink-0" aria-hidden />
         <span className="flex-1 truncate">{item.label}</span>
-        {locked && (
+        {tampilkanPro && (
           <span
             className="rounded-pill bg-surface-sunk px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-ink-faint"
             title="Butuh langganan aktif"
@@ -77,21 +79,21 @@ export function Sidebar() {
       <nav aria-label="Navigasi utama" className="flex-1 space-y-6 overflow-y-auto">
         <Grup label="Harian">
           {NAV_UTAMA.map((i) => (
-            <Item key={i.href} item={i} locked={false} />
+            <Item key={i.href} item={i} terkunci={false} />
           ))}
         </Grup>
 
         <Grup label="Analisis">
           {NAV_PRO.map((i) => (
-            <Item key={i.href} item={i} locked={terkunci} />
+            <Item key={i.href} item={i} terkunci={terkunci} />
           ))}
         </Grup>
 
         <Grup label="Akun">
           {NAV_AKUN.map((i) => (
-            <Item key={i.href} item={i} locked={false} />
+            <Item key={i.href} item={i} terkunci={false} />
           ))}
-          {profile?.role === "admin" && <Item item={NAV_ADMIN} locked={false} />}
+          {profile?.role === "admin" && <Item item={NAV_ADMIN} terkunci={false} />}
         </Grup>
       </nav>
 

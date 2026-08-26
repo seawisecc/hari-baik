@@ -1,25 +1,38 @@
 import type { NextRequest } from "next/server";
 import { adminDb } from "@/lib/firebase/admin";
-import { handleAdminError, requireAdmin, AdminError } from "@/lib/firebase/requireAdmin";
-import { extendOneYear } from "@/lib/subscription";
+import { AdminError, handleAdminError, requireAdmin } from "@/lib/firebase/requireAdmin";
+import { extendYears } from "@/lib/subscription";
 import type { SubscriptionStatus } from "@/types";
 
-type Action = "approve" | "extend" | "deactivate";
-const ACTIONS: Action[] = ["approve", "extend", "deactivate"];
+type Action = "extend" | "set" | "lifetime" | "deactivate";
+const ACTIONS: Action[] = ["extend", "set", "lifetime", "deactivate"];
+
+/** Batas wajar agar salah ketik tidak membuat langganan 900 tahun. */
+const MAX_TAHUN = 20;
+
+interface Body {
+  uid?: string;
+  action?: Action;
+  /** Untuk "extend": jumlah tahun yang ditambahkan. */
+  tahun?: number;
+  /** Untuk "set": tanggal habis, "YYYY-MM-DD". */
+  expiresAt?: string;
+}
+
+const POLA_TANGGAL = /^\d{4}-\d{2}-\d{2}$/;
 
 /**
  * Ubah status langganan seorang pengguna.
  *
- * approve/extend sama-sama menambah setahun; bedanya approve dipakai untuk
- * permintaan yang masih `pending`. Keduanya menumpuk dari tanggal habis kalau
- * langganan masih aktif, supaya sisa masa berlaku tidak hangus.
+ * - `extend`     tambah N tahun, ditumpuk dari tanggal habis yang ada
+ * - `set`        tetapkan tanggal habis tertentu
+ * - `lifetime`   tanpa batas waktu
+ * - `deactivate` matikan sekarang juga
  */
 export async function POST(req: NextRequest) {
   try {
     const admin = await requireAdmin(req);
-
-    const body = (await req.json()) as { uid?: string; action?: Action };
-    const { uid, action } = body;
+    const { uid, action, tahun, expiresAt } = (await req.json()) as Body;
 
     if (!uid) throw new AdminError(400, "uid wajib diisi.");
     if (!action || !ACTIONS.includes(action)) {
@@ -40,10 +53,42 @@ export async function POST(req: NextRequest) {
 
     if (action === "deactivate") {
       update = { subscriptionStatus: "expired", subscriptionExpiresAt: null };
-    } else {
+    } else if (action === "lifetime") {
+      update = { subscriptionStatus: "lifetime", subscriptionExpiresAt: null };
+    } else if (action === "extend") {
+      const n = Number(tahun ?? 1);
+      if (!Number.isInteger(n) || n < 1 || n > MAX_TAHUN) {
+        throw new AdminError(400, `tahun harus bilangan bulat 1 sampai ${MAX_TAHUN}.`);
+      }
       update = {
         subscriptionStatus: "active",
-        subscriptionExpiresAt: extendOneYear(current.subscriptionExpiresAt ?? null, now),
+        subscriptionExpiresAt: extendYears(current.subscriptionExpiresAt ?? null, n, now),
+      };
+    } else {
+      // action === "set"
+      if (!expiresAt || !POLA_TANGGAL.test(expiresAt)) {
+        throw new AdminError(400, "expiresAt harus berformat YYYY-MM-DD.");
+      }
+      // Akhir hari waktu Indonesia Tengah (UTC+8), supaya tanggal yang dipilih
+      // admin masih terhitung aktif sepanjang hari itu.
+      const akhir = new Date(`${expiresAt}T23:59:59+08:00`);
+      if (Number.isNaN(akhir.getTime())) {
+        throw new AdminError(400, "Tanggal tidak valid.");
+      }
+      if (akhir <= now) {
+        throw new AdminError(400, "Tanggal habis harus di masa depan.");
+      }
+      const batas = new Date(now);
+      batas.setFullYear(batas.getFullYear() + MAX_TAHUN);
+      if (akhir > batas) {
+        throw new AdminError(
+          400,
+          `Tanggal terlalu jauh. Untuk tanpa batas waktu, pakai "selamanya".`,
+        );
+      }
+      update = {
+        subscriptionStatus: "active",
+        subscriptionExpiresAt: akhir.toISOString(),
       };
     }
 

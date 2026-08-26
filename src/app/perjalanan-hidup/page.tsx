@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ButuhTanggalLahir, Memuat, ProLocked } from "@/components/ProGate";
+import { ButuhTanggalLahir, Memuat } from "@/components/ProGate";
 import { Card, CardBody } from "@/components/ui/Card";
 import { PageContainer } from "@/components/shell/AppShell";
 import { PageHeader, Wisdom } from "@/components/ui/PageHeader";
@@ -26,13 +26,10 @@ const TONE_BG: Record<NasibTone, string> = {
 
 export default function PerjalananHidupPage() {
   const t = useT();
-  const { birthDate, access, loading } = useUserData();
+  const { birthDate, loading } = useUserData();
   const [terbuka, setTerbuka] = useState<number | null>(null);
 
   if (loading) return <Memuat />;
-  if (!access.isPro) {
-    return <ProLocked titleKey="pro.nasib.title" descKey="pro.lock.desc.nasib" />;
-  }
 
   if (!birthDate) return <ButuhTanggalLahir title={t("pro.nasib.title")} />;
 

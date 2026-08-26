@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { AksiLangganan } from "@/components/admin/AturLangganan";
 import { UserTable } from "@/components/admin/UserTable";
 import { Alert } from "@/components/ui/Alert";
 import { Memuat } from "@/components/ProGate";
@@ -15,6 +16,7 @@ const FILTER: { key: SubscriptionStatus | "all"; label: string }[] = [
   { key: "all", label: "Semua" },
   { key: "pending", label: "Menunggu" },
   { key: "active", label: "Aktif" },
+  { key: "lifetime", label: "Selamanya" },
   { key: "trial", label: "Trial" },
   { key: "expired", label: "Habis" },
 ];
@@ -60,7 +62,7 @@ export default function AdminPage() {
     };
   }, [user, filter, refresh]);
 
-  const aksi = async (uid: string, action: "approve" | "extend" | "deactivate") => {
+  const aksi = async (uid: string, perintah: AksiLangganan) => {
     if (!user) return;
     setError(null);
     try {
@@ -68,7 +70,7 @@ export default function AdminPage() {
       const res = await fetch("/api/admin/subscription", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ uid, action }),
+        body: JSON.stringify({ uid, ...perintah }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Gagal.");

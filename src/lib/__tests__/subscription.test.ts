@@ -2,7 +2,7 @@
  * Tes aturan akses. Dijalankan dengan: npm run test
  * Sengaja tanpa framework: logikanya kecil dan hanya butuh perbandingan nilai.
  */
-import { evaluateAccess, extendOneYear, trialEnd } from "../subscription";
+import { evaluateAccess, extendOneYear, extendYears, trialEnd } from "../subscription";
 
 const now = new Date("2026-08-26T10:00:00Z");
 const iso = (d: string) => new Date(d).toISOString();
@@ -84,6 +84,42 @@ eq(
 );
 
 eq("trial 3 hari", iso("2026-08-29T10:00:00Z"), trialEnd(now));
+
+// Seumur hidup tidak punya tanggal habis, jadi tidak boleh ikut logika
+// kedaluwarsa apa pun, termasuk saat trial-nya sudah lewat.
+s = evaluateAccess(
+  {
+    subscriptionStatus: "lifetime",
+    subscriptionExpiresAt: null,
+    trialEndsAt: iso("2020-01-01"),
+  },
+  now,
+);
+eq("lifetime: pro", true, s.isPro);
+eq("lifetime: bisa lihat", true, s.canView);
+eq("lifetime: type", "lifetime", s.type);
+eq("lifetime: tanpa sisa hari", null, s.daysLeft);
+eq("lifetime: tanpa tanggal habis", null, s.expiresAt);
+
+// Tanggal habis lama yang masih tertinggal tidak boleh mengunci lifetime.
+s = evaluateAccess(
+  {
+    subscriptionStatus: "lifetime",
+    subscriptionExpiresAt: iso("2020-01-01"),
+    trialEndsAt: null,
+  },
+  now,
+);
+eq("lifetime abaikan tanggal lama", true, s.isPro);
+
+// Perpanjangan beberapa tahun sekaligus.
+eq("tambah 2 tahun dari nol", iso("2028-08-26T10:00:00Z"), extendYears(null, 2, now));
+eq("tambah 5 tahun ditumpuk", iso("2032-01-01"), extendYears(iso("2027-01-01"), 5, now));
+eq(
+  "tambah dari yang sudah lewat",
+  iso("2029-08-26T10:00:00Z"),
+  extendYears(iso("2020-01-01"), 3, now),
+);
 
 console.log(fail === 0 ? "✓ langganan: semua lolos" : `✗ langganan: ${fail} gagal`);
 if (fail) process.exit(1);

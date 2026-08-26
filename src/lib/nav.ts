@@ -10,14 +10,14 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import { RUTE_PRO } from "./gate";
+
 export interface NavItem {
   href: string;
   label: string;
   /** Label pendek untuk bottom nav di layar sempit. */
   short: string;
   icon: LucideIcon;
-  /** Fitur Pro: diberi penanda di navigasi. */
-  pro?: boolean;
 }
 
 /** Urutan mengikuti alur pemakaian harian: hari ini dulu, kalender kedua. */
@@ -28,16 +28,18 @@ export const NAV_UTAMA: NavItem[] = [
 ];
 
 export const NAV_PRO: NavItem[] = [
-  { href: "/nama-makna", label: "Makna Nama", short: "Nama", icon: Sparkles, pro: true },
-  { href: "/kecocokan", label: "Kecocokan", short: "Cocok", icon: Heart, pro: true },
+  { href: "/nama-makna", label: "Makna Nama", short: "Nama", icon: Sparkles },
+  { href: "/kecocokan", label: "Kecocokan", short: "Cocok", icon: Heart },
   {
     href: "/perjalanan-hidup",
     label: "Perjalanan Hidup",
     short: "Hidup",
     icon: Route,
-    pro: true,
   },
 ];
+
+/** True bila rute ini butuh langganan aktif. */
+export const butuhPro = (href: string) => href in RUTE_PRO;
 
 export const NAV_AKUN: NavItem[] = [
   { href: "/profil", label: "Profil", short: "Profil", icon: UserCircle },

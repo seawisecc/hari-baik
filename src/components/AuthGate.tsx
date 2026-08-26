@@ -3,7 +3,8 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAuth } from "@/lib/firebase/AuthProvider";
-import { RUTE_TUJUAN, tentukanAlihan } from "@/lib/gate";
+import { ProLocked } from "@/components/ProGate";
+import { RUTE_PRO, RUTE_TUJUAN, tentukanAlihan } from "@/lib/gate";
 
 /**
  * Satu tempat yang memutuskan siapa boleh melihat apa.
@@ -37,6 +38,13 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   // Jangan tampilkan isi halaman yang sebentar lagi ditinggalkan; itu membuat
   // konten terkunci sempat terlihat sekejap.
   if (alihkan && !RUTE_TUJUAN.has(pathname)) return <LayarTunggu />;
+
+  // Fitur Pro: bukan dialihkan, tapi diganti layar kunci di tempat, supaya
+  // pengguna tahu fitur apa yang sedang dikunci dan kenapa.
+  const pro = RUTE_PRO[pathname];
+  if (pro && configured && !access.isPro) {
+    return <ProLocked titleKey={pro.titleKey} descKey={pro.descKey} />;
+  }
 
   return <>{children}</>;
 }

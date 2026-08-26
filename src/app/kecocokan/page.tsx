@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ButuhTanggalLahir, Memuat, ProLocked } from "@/components/ProGate";
+import { ButuhTanggalLahir, Memuat } from "@/components/ProGate";
 import { Button } from "@/components/ui/Button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input, Label } from "@/components/ui/Input";
@@ -29,15 +29,12 @@ function RincianUrip({ label, u }: { label: string; u: UripPetemon }) {
 
 export default function KecocokanPage() {
   const t = useT();
-  const { birthDate, access, loading } = useUserData();
+  const { birthDate, loading } = useUserData();
   const today = toDateString(new Date());
   const [pasangan, setPasangan] = useState("");
   const [hasil, setHasil] = useState<HasilPetemon | null>(null);
 
   if (loading) return <Memuat />;
-  if (!access.isPro) {
-    return <ProLocked titleKey="pro.petemon.title" descKey="pro.lock.desc.petemon" />;
-  }
   if (!birthDate) return <ButuhTanggalLahir title="Kecocokan" />;
 
   return (
