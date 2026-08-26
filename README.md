@@ -219,23 +219,30 @@ kadang gagal pada endpoint dinamis.
 
 ## Kedalaman
 
-Elemen dibentuk seperti bantal yang menggembung, bukan lempeng rata yang
-diberi bayangan. Empat lapis membentuknya:
+Dibangun dari tiga hal yang halus, bukan satu efek yang mencolok:
 
-1. gradasi putih ke hitam transparan, memberi kesan permukaan melengkung dan
-   disinari dari atas
-2. rim putih tipis mengelilingi tepi, sisi yang paling terang
-3. bayangan di dalam tepi bawah, tempat permukaannya melengkung pergi
-4. dua bayangan jatuh: satu dekat dan tegas sebagai titik sentuh, satu jauh
-   dan lembut sebagai bayangan ruangan
+1. garis rambut satu piksel yang mendefinisikan tepi. Ini yang paling
+   menentukan: bentuk yang tepinya jelas terbaca rapi di ukuran apa pun,
+   sementara bentuk yang hanya dibatasi bayangan selalu terlihat lembek.
+2. dua bayangan bertumpuk, satu rapat untuk titik sentuh dan satu lebar untuk
+   bayangan ruangan.
+3. sorotan satu piksel di tepi atas, hanya pada elemen yang tinggi.
 
-Semuanya putih dan hitam transparan, tanpa warna tetap, jadi satu utilitas
-yang sama bekerja di atas warna apa pun. Tingkat elevasi dibedakan oleh
-seberapa dalam lengkung bawahnya dan seberapa jauh bayangannya jatuh.
+Sengaja tidak memakai gradasi permukaan maupun rim tebal. Keduanya terlihat
+meyakinkan pada satu tombol besar berwarna terang, tapi begitu dipakai di
+banyak warna dan ukuran hasilnya jadi berat dan mengurangi keterbacaan teks
+di atasnya.
 
-Elemen yang terukir memakai kebalikannya: gelap di tepi atas karena cahaya
-dari atas tertahan dindingnya, terang di tepi bawah, ditambah garis putih
-tipis di luar tepi bawah sebagai bibir lubangnya.
+### Kontras
+
+Setiap pasangan teks dan latar diperiksa mencapai minimal 4,5:1. Dua hal yang
+ditemukan lewat pemeriksaan itu:
+
+- Teks putih di atas warna kategori hanya mencapai 2,7 sampai 3,4:1. Kartu
+  utama halaman Hari Ini memakai varian `*-pekat` yang mencapai 4,5:1,
+  sementara warna penanda kalender tetap seperti semula.
+- `ink-faint` yang lama hanya 2,8:1, padahal dipakai untuk hampir semua label
+  kecil di aplikasi.
 
 ## Tipografi
 

@@ -57,8 +57,8 @@ export const KATEGORI_HURUF: Record<KategoriName, string> = {
  * perlu varian terang/gelap terpisah.
  */
 export const KATEGORI_SOLID: Record<KategoriName, string> = {
-  GURU: "bg-guru text-white",
-  RATU: "bg-ratu text-white",
-  LARA: "bg-lara text-white",
-  PATI: "bg-pati text-white",
+  GURU: "bg-guru-pekat text-white",
+  RATU: "bg-ratu-pekat text-white",
+  LARA: "bg-lara-pekat text-white",
+  PATI: "bg-pati-pekat text-white",
 };
