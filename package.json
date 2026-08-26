@@ -14,7 +14,8 @@
     "deploy-rules": "tsx scripts/deploy-rules.ts",
     "deploy-indexes": "tsx scripts/deploy-indexes.ts",
     "authorize-domains": "tsx scripts/authorize-domains.ts",
-    "revoke-domain": "tsx scripts/revoke-domain.ts"
+    "revoke-domain": "tsx scripts/revoke-domain.ts",
+    "protection": "tsx scripts/deployment-protection.ts"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

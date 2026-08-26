@@ -108,7 +108,7 @@ docs/
 ## Deploy
 
 ```bash
-./scripts/push-env.sh                       # kirim 9 variabel Firebase ke Vercel
+./scripts/push-env.sh                          # kirim 9 variabel Firebase ke Vercel
 npx vercel deploy --prod
 npm run authorize-domains -- domain-baru.com   # daftarkan ke Firebase Auth
 ```
@@ -116,6 +116,31 @@ npm run authorize-domains -- domain-baru.com   # daftarkan ke Firebase Auth
 Tanpa langkah terakhir, Firebase menolak login dari domain baru dengan
 `auth/unauthorized-domain`, dan gejalanya baru terlihat setelah live.
 `npm run revoke-domain` mencabut kembali bila salah daftar.
+
+Deployment baru di Vercel menyala dengan proteksi SSO, artinya hanya anggota
+tim yang bisa membukanya. Untuk membuka ke publik:
+
+```bash
+npm run protection            # lihat status
+npm run protection -- off     # buka untuk umum
+npm run protection -- on      # tutup lagi
+```
+
+### Domain
+
+| Domain | Keterangan |
+|---|---|
+| `hari-baik-seawise.vercel.app` | aktif |
+| `haribaik.seawise.id` | menunggu DNS |
+
+DNS `seawise.id` dikelola di cloudhost.id, jadi record-nya dibuat di sana:
+
+```
+CNAME   haribaik   1bf39122ca7a8100.vercel-dns-017.com.
+```
+
+Perhatikan: `hari-baik.vercel.app` (tanpa akhiran tim) adalah milik aplikasi
+orang lain, bukan project ini.
 
 ## Keamanan
 
