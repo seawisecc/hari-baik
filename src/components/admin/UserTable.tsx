@@ -2,10 +2,12 @@
 
 import { Settings2 } from "lucide-react";
 import { Fragment, useState } from "react";
+import { AturAddOn } from "./AturAddOn";
 import { AturLangganan, type AksiLangganan } from "./AturLangganan";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
-import { useT } from "@/lib/content/LangProvider";
+import { useLang, useT } from "@/lib/content/LangProvider";
+import { teks, type AddOn } from "@/lib/harga";
 import type { SubscriptionStatus, UserProfile } from "@/types";
 
 const STATUS_STYLE: Record<SubscriptionStatus, string> = {
@@ -40,9 +42,12 @@ function nomorWa(phone: string) {
 
 export function UserTable({
   users,
+  katalogAddOn,
   onAction,
 }: {
   users: UserProfile[];
+  /** Daftar add-on yang ada, untuk pengatur per pengguna. */
+  katalogAddOn: AddOn[];
   onAction: (uid: string, aksi: AksiLangganan) => Promise<void>;
 }) {
   const t = useT();
@@ -66,13 +71,14 @@ export function UserTable({
   return (
     // Tabel lebar harus bisa digulir sendiri, bukan mendorong lebar halaman.
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[680px] text-sm">
+      <table className="w-full min-w-[820px] text-sm">
         <thead>
           <tr className="text-left text-[11px] uppercase tracking-wider text-ink-faint">
             <th className="px-3 py-2 font-semibold">{t("admin.col.user")}</th>
             <th className="px-3 py-2 font-semibold">{t("admin.col.status")}</th>
             <th className="px-3 py-2 font-semibold">{t("admin.col.validUntil")}</th>
             <th className="px-3 py-2 font-semibold">{t("admin.col.birth")}</th>
+            <th className="px-3 py-2 font-semibold">{t("admin.col.addon")}</th>
             <th className="px-3 py-2 text-right font-semibold">{t("admin.col.action")}</th>
           </tr>
         </thead>
@@ -129,6 +135,10 @@ export function UserTable({
                   </td>
 
                   <td className="px-3 py-3">
+                    <SelAddOn dimiliki={u.addOn ?? []} katalog={katalogAddOn} />
+                  </td>
+
+                  <td className="px-3 py-3">
                     <div className="flex justify-end">
                       <Button
                         size="sm"
@@ -145,13 +155,21 @@ export function UserTable({
 
                 {dibuka && (
                   <tr>
-                    <td colSpan={5} className="px-3 pb-4">
-                      <AturLangganan
-                        aktif={aktif}
-                        busy={busy === u.uid}
-                        onTutup={() => setTerbuka(null)}
-                        onPilih={(aksi) => jalankan(u.uid, aksi)}
-                      />
+                    <td colSpan={6} className="px-3 pb-4">
+                      <div className="grid gap-5 lg:grid-cols-2 lg:items-start">
+                        <AturLangganan
+                          aktif={aktif}
+                          busy={busy === u.uid}
+                          onTutup={() => setTerbuka(null)}
+                          onPilih={(aksi) => jalankan(u.uid, aksi)}
+                        />
+                        <AturAddOn
+                          katalog={katalogAddOn}
+                          dimiliki={u.addOn ?? []}
+                          busy={busy === u.uid}
+                          onSimpan={(addOn) => jalankan(u.uid, { action: "addon", addOn })}
+                        />
+                      </div>
                     </td>
                   </tr>
                 )}
@@ -160,6 +178,33 @@ export function UserTable({
           })}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+/** Ringkasan add-on di baris tabel: cukup untuk memindai, tidak untuk membaca. */
+function SelAddOn({ dimiliki, katalog }: { dimiliki: string[]; katalog: AddOn[] }) {
+  const t = useT();
+  const { lang } = useLang();
+
+  if (dimiliki.length === 0) {
+    return <span className="text-xs text-ink-faint">{t("admin.addon.none")}</span>;
+  }
+
+  return (
+    <div className="flex flex-wrap gap-1">
+      {dimiliki.map((id) => {
+        const a = katalog.find((x) => x.id === id);
+        return (
+          <span
+            key={id}
+            title={a ? teks(a.nama, lang) : id}
+            className="rounded-pill bg-accent-wash px-2 py-0.5 text-[10px] font-medium text-accent-deep"
+          >
+            {a ? teks(a.nama, lang) : id}
+          </span>
+        );
+      })}
     </div>
   );
 }

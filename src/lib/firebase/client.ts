@@ -52,6 +52,36 @@ export interface Firebase {
   };
 }
 
+/**
+ * Firestore dengan cache lokal yang bertahan antar kunjungan.
+ *
+ * Tanpa ini, setiap kali aplikasi dibuka profil pengguna harus ditarik ulang
+ * dari Jakarta sebelum apa pun bisa ditampilkan, dan selama itu layar hanya
+ * menunggu. Dengan cache, kunjungan berikutnya terisi dari perangkat lebih
+ * dulu lalu diperbarui begitu jawaban server tiba.
+ *
+ * Data yang sebentar tertinggal tidak membuka akses apa pun: penjaga yang
+ * sesungguhnya ada di Security Rules dan di route API, yang selalu memeriksa
+ * ulang di server. Yang dipercepat hanya apa yang tampil di layar.
+ *
+ * Kalau cache tidak bisa dipasang, misalnya di jendela penyamaran atau saat
+ * ada tab lain yang sudah memegangnya, Firestore biasa tetap dipakai.
+ */
+function buatDb(
+  firestore: typeof import("firebase/firestore"),
+  instance: FirebaseApp,
+): Firestore {
+  try {
+    return firestore.initializeFirestore(instance, {
+      localCache: firestore.persistentLocalCache({
+        tabManager: firestore.persistentMultipleTabManager(),
+      }),
+    });
+  } catch {
+    return firestore.getFirestore(instance);
+  }
+}
+
 let dimuat: Promise<Firebase> | null = null;
 
 /**
@@ -79,7 +109,7 @@ export function firebase(): Promise<Firebase> {
       : app.initializeApp(config);
     return {
       auth: auth.getAuth(instance),
-      db: firestore.getFirestore(instance),
+      db: buatDb(firestore, instance),
       fn: {
         onAuthStateChanged: auth.onAuthStateChanged,
         createUserWithEmailAndPassword: auth.createUserWithEmailAndPassword,

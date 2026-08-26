@@ -172,8 +172,12 @@ function KartuAnggota({
       <Card elevation={1} className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
           <div className="min-w-0 flex-1">
-            <p className="font-heading text-lg font-semibold text-ink">{anggota.nama}</p>
-            {anggota.hubungan && <p className="text-sm text-ink-soft">{anggota.hubungan}</p>}
+            <p className="break-words font-heading text-lg font-semibold text-ink">
+              {anggota.nama}
+            </p>
+            {anggota.hubungan && (
+              <p className="break-words text-sm text-ink-soft">{anggota.hubungan}</p>
+            )}
             <p className="mt-1 text-xs text-ink-faint">
               {tanggalMedium(anggota.tanggalLahir, lang)} · {t("keluarga.weton")} {w.saptaWara}{" "}
               {w.pancaWara}

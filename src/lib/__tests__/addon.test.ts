@@ -84,5 +84,20 @@ for (const id of Object.keys(ADDON_SIAP)) {
   );
 }
 
+// 7. Route admin harus menolak id add-on yang tidak dikenal. Tanpa itu, salah
+//    ketik tersimpan diam-diam ke profil pengguna dan tidak pernah membuka
+//    apa pun, sementara admin mengira pelanggannya sudah aktif.
+{
+  const rute = readFileSync("src/app/api/admin/subscription/route.ts", "utf8");
+  eq("aksi addon ada di daftar aksi", true, rute.includes('"addon"'));
+  eq(
+    "id add-on divalidasi terhadap katalog",
+    true,
+    rute.includes("HARGA_BAWAAN.addOn.map((a) => a.id)"),
+  );
+  eq("id asing ditolak", true, /Add-on tidak dikenal/.test(rute));
+  eq("daftar dibersihkan dari duplikat", true, rute.includes("[...new Set(addOn)]"));
+}
+
 console.log(fail === 0 ? "✓ add-on: semua lolos" : `✗ add-on: ${fail} gagal`);
 if (fail) process.exit(1);

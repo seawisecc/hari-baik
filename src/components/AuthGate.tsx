@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAuth } from "@/lib/firebase/AuthProvider";
 import { ProLocked } from "@/components/ProGate";
+import { RangkaHalaman } from "@/components/ui/Rangka";
 import {
   RUTE_ADDON,
   RUTE_PRO,
@@ -67,9 +68,5 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
 }
 
 function LayarTunggu() {
-  return (
-    <div className="grid min-h-[60vh] place-items-center px-6">
-      <p className="text-sm text-ink-faint">Memuat…</p>
-    </div>
-  );
+  return <RangkaHalaman />;
 }

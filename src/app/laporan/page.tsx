@@ -77,7 +77,7 @@ export default function LaporanPage() {
               <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-faint">
                 {t("laporan.for")}
               </p>
-              <p className="font-heading text-2xl font-bold text-ink">
+              <p className="break-words font-heading text-2xl font-bold text-ink">
                 {nama || profile?.email || "-"}
               </p>
               <p className="mt-1 text-sm text-ink-soft">

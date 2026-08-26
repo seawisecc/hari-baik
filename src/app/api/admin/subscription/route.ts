@@ -1,11 +1,12 @@
 import type { NextRequest } from "next/server";
 import { adminDb } from "@/lib/firebase/admin";
 import { AdminError, handleAdminError, requireAdmin } from "@/lib/firebase/requireAdmin";
+import { HARGA_BAWAAN } from "@/lib/harga";
 import { extendYears } from "@/lib/subscription";
 import type { SubscriptionStatus } from "@/types";
 
-type Action = "extend" | "set" | "lifetime" | "deactivate";
-const ACTIONS: Action[] = ["extend", "set", "lifetime", "deactivate"];
+type Action = "extend" | "set" | "lifetime" | "deactivate" | "addon";
+const ACTIONS: Action[] = ["extend", "set", "lifetime", "deactivate", "addon"];
 
 /** Batas wajar agar salah ketik tidak membuat langganan 900 tahun. */
 const MAX_TAHUN = 20;
@@ -17,6 +18,8 @@ interface Body {
   tahun?: number;
   /** Untuk "set": tanggal habis, "YYYY-MM-DD". */
   expiresAt?: string;
+  /** Untuk "addon": daftar id add-on yang dimiliki pengguna ini. */
+  addOn?: string[];
 }
 
 const POLA_TANGGAL = /^\d{4}-\d{2}-\d{2}$/;
@@ -28,11 +31,17 @@ const POLA_TANGGAL = /^\d{4}-\d{2}-\d{2}$/;
  * - `set`        tetapkan tanggal habis tertentu
  * - `lifetime`   tanpa batas waktu
  * - `deactivate` matikan sekarang juga
+ * - `addon`      tetapkan add-on mana yang dimiliki pengguna ini
+ *
+ * `addon` sengaja menetapkan daftar penuh, bukan menambah atau mengurangi
+ * satu per satu. Admin melihat daftar lengkapnya di layar lalu menyimpan apa
+ * yang terlihat, jadi tidak ada keadaan yang bisa berbeda antara yang tampil
+ * dan yang tersimpan.
  */
 export async function POST(req: NextRequest) {
   try {
     const admin = await requireAdmin(req);
-    const { uid, action, tahun, expiresAt } = (await req.json()) as Body;
+    const { uid, action, tahun, expiresAt, addOn } = (await req.json()) as Body;
 
     if (!uid) throw new AdminError(400, "uid wajib diisi.");
     if (!action || !ACTIONS.includes(action)) {
@@ -42,6 +51,26 @@ export async function POST(req: NextRequest) {
     const ref = adminDb().collection("users").doc(uid);
     const snap = await ref.get();
     if (!snap.exists) throw new AdminError(404, "Pengguna tidak ditemukan.");
+
+    // Add-on ditangani terpisah: ini tidak menyentuh status langganan sama
+    // sekali, karena keduanya memang dibeli terpisah.
+    if (action === "addon") {
+      if (!Array.isArray(addOn)) throw new AdminError(400, "addOn harus berupa daftar id.");
+      // Hanya id yang benar-benar ada di katalog yang diterima. Tanpa ini,
+      // salah ketik akan tersimpan diam-diam dan tidak pernah membuka apa pun.
+      const dikenal = new Set(HARGA_BAWAAN.addOn.map((a) => a.id));
+      const asing = addOn.filter((id) => typeof id !== "string" || !dikenal.has(id));
+      if (asing.length) {
+        throw new AdminError(400, `Add-on tidak dikenal: ${asing.join(", ")}.`);
+      }
+      const bersih = [...new Set(addOn)];
+      await ref.update({
+        addOn: bersih,
+        lastChangedBy: admin.email ?? admin.uid,
+        lastChangedAt: new Date().toISOString(),
+      });
+      return Response.json({ ok: true, addOn: bersih });
+    }
 
     const current = snap.data() as { subscriptionExpiresAt?: string | null };
     const now = new Date();

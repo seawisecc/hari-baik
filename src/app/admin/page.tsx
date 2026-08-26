@@ -15,6 +15,7 @@ import { useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
 import type { SubscriptionStatus, UserProfile } from "@/types";
 import { ambilToken } from "@/lib/firebase/client";
+import { HARGA_BAWAAN, type AddOn, type PengaturanHarga } from "@/lib/harga";
 
 const FILTER: { key: SubscriptionStatus | "all"; labelKey: string }[] = [
   { key: "all", labelKey: "admin.filter.all" },
@@ -35,6 +36,24 @@ export default function AdminPage() {
   /** Dinaikkan untuk memaksa muat ulang setelah sebuah aksi berhasil. */
   const [refresh, setRefresh] = useState(0);
   const [tab, setTab] = useState<"pengguna" | "permintaan" | "harga">("pengguna");
+  /** Katalog add-on, dipakai kolom dan pengatur add-on di tabel pengguna. */
+  const [katalogAddOn, setKatalogAddOn] = useState<AddOn[]>(HARGA_BAWAAN.addOn);
+
+  useEffect(() => {
+    let batal = false;
+    void (async () => {
+      try {
+        const res = await fetch("/api/admin/harga");
+        const d = (await res.json()) as PengaturanHarga;
+        if (!batal) setKatalogAddOn(d.addOn);
+      } catch {
+        // Katalog bawaan sudah cukup untuk menampilkan namanya.
+      }
+    })();
+    return () => {
+      batal = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -189,7 +208,7 @@ export default function AdminPage() {
                     {t("common.loading")}
                   </p>
                 ) : (
-                  <UserTable users={users} onAction={aksi} />
+                  <UserTable users={users} katalogAddOn={katalogAddOn} onAction={aksi} />
                 )}
               </CardBody>
             </Card>

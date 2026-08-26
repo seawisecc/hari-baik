@@ -8,6 +8,7 @@ import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { useT } from "@/lib/content/LangProvider";
 import { useUserData } from "@/lib/useUserData";
+import { RangkaHalaman } from "@/components/ui/Rangka";
 
 /** Layar kunci fitur Pro. `descKey` menjelaskan fitur apa yang terkunci. */
 export function ProLocked({ titleKey, descKey }: { titleKey: string; descKey: string }) {
@@ -71,10 +72,5 @@ export function ButuhTanggalLahir({ title }: { title: string }) {
 
 /** Placeholder saat data masih dimuat. */
 export function Memuat() {
-  const t = useT();
-  return (
-    <PageContainer>
-      <div className="py-20 text-center text-sm text-ink-faint">{t("common.loading")}</div>
-    </PageContainer>
-  );
+  return <RangkaHalaman />;
 }

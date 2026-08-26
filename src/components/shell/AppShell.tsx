@@ -28,7 +28,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <TopBar />
       {/* Padding bawah menyediakan ruang untuk bottom nav di mobile. */}
       <div className="pb-24 lg:pb-10">
-        <AuthGate>{children}</AuthGate>
+        {/* `key` pada pathname membuat React memasang ulang isi tiap pindah
+            halaman, sehingga animasi masuknya berjalan lagi. Tanpa itu, hanya
+            halaman pertama yang beranimasi. */}
+        <div key={pathname} className="hb-masuk">
+          <AuthGate>{children}</AuthGate>
+        </div>
       </div>
       <MobileNav />
     </div>

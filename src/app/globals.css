@@ -163,6 +163,82 @@
    dipakai di banyak warna dan ukuran hasilnya jadi berat dan mengurangi
    keterbacaan teks di atasnya. */
 
+/*
+ * Gerak.
+ *
+ * Semua nilai di sini sengaja pendek. Animasi yang terasa "halus" saat
+ * ditonton sendiri akan terasa lambat setelah dipakai puluhan kali sehari,
+ * dan aplikasi ini dibuka tiap pagi. Yang dicari bukan pertunjukan, tapi
+ * supaya perpindahan tidak terasa patah.
+ *
+ * Kurva keluarnya sedikit melambat di ujung, bukan linear, supaya berhenti
+ * dengan tenang alih-alih mendadak.
+ */
+@theme inline {
+  --ease-hb: cubic-bezier(0.22, 0.8, 0.32, 1);
+}
+
+@keyframes hb-muncul {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes hb-pudar {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Denyut rangka: lembut, tanpa kilau yang bergerak menyilang. Kilau menarik
+   mata ke tempat yang belum ada isinya, dan itu justru mengganggu. */
+@keyframes hb-denyut {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/** Isi halaman yang baru masuk: naik sedikit sambil memudar masuk. */
+@utility hb-masuk {
+  animation: hb-muncul 320ms var(--ease-hb) both;
+}
+
+/** Pemudaran polos, untuk yang tidak perlu ikut bergerak. */
+@utility hb-pudar {
+  animation: hb-pudar 260ms var(--ease-hb) both;
+}
+
+/** Kotak rangka saat menunggu data. */
+@utility hb-rangka {
+  background: var(--hb-surface-sunk);
+  border-radius: var(--hb-r-sm);
+  animation: hb-denyut 1.6s ease-in-out infinite;
+}
+
+/* Baris rangka berurutan dijeda sedikit, supaya terbaca sebagai satu daftar
+   yang sedang terisi, bukan beberapa kotak yang kebetulan berdenyut bersama. */
+@utility hb-jeda-1 {
+  animation-delay: 120ms;
+}
+@utility hb-jeda-2 {
+  animation-delay: 240ms;
+}
+@utility hb-jeda-3 {
+  animation-delay: 360ms;
+}
+
 @utility hb-raise-1 {
   border: 1px solid var(--hb-edge);
   box-shadow:
