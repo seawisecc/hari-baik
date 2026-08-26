@@ -1,10 +1,6 @@
 import {
   ASTAWARA,
-  ASTAWARA_EPOCH,
-  ASTAWARA_EPOCH_INDEX,
   CATURWARA,
-  CATURWARA_EPOCH,
-  CATURWARA_EPOCH_INDEX,
   DASAWARA,
   LINTANG,
   MS_PER_DAY,
@@ -19,7 +15,6 @@ import {
   SADWARA_EPOCH_INDEX,
   SADWARA_URIP,
   SANGAWARA,
-  SANGAWARA_EPOCH,
   SAPTAWARA,
   SASIH,
   SASIH_OFFSET,
@@ -93,8 +88,36 @@ export function getTriwara(dateStr: string): string {
   return TRIWARA[pawukonIndex(dateStr) % 3];
 }
 
+/*
+ * Caturwara, Astawara, dan Sangawara tidak membagi habis 210:
+ * 210/4 = 52,5   210/8 = 26,25   210/9 = 23,33
+ *
+ * Karena itu ketiganya tidak bisa dihitung sebagai modulo biasa dari sebuah
+ * tanggal acuan, dan dulu di sini justru begitu. Akibatnya ketiganya salah
+ * untuk sebagian besar hari: caturwara meleset di 139 dari 210 hari, astawara
+ * di 210, sangawara di 209.
+ *
+ * Tradisinya menyelesaikan sisa itu dengan menahan hitungan:
+ *
+ * - Caturwara dan Astawara ditahan tiga hari di awal wuku Dungulan, yaitu
+ *   hari ke-71 sampai 73 dalam siklus. Nilainya sama selama tiga hari itu,
+ *   lalu lanjut seperti biasa.
+ * - Sangawara ditahan empat hari di awal siklus: hari ke-1 sampai 4 semuanya
+ *   Dangu, baru kemudian berjalan.
+ *
+ * Ketiga aturan ini diambil dari tabel 210 hari milik pemilik aplikasi dan
+ * cocok 210 dari 210 baris. Uji di wariga.test.ts memeriksanya seluruhnya.
+ */
+
+/** Indeks efektif untuk Caturwara dan Astawara, dengan tahanan di Dungulan. */
+function indeksTertahan(i: number): number {
+  if (i < 70) return i;
+  if (i <= 72) return 70;
+  return i - 2;
+}
+
 export function getCaturwara(dateStr: string): string {
-  return CATURWARA[mod(daysBetween(dateStr, CATURWARA_EPOCH) + CATURWARA_EPOCH_INDEX, 4)];
+  return CATURWARA[indeksTertahan(pawukonIndex(dateStr)) % 4];
 }
 
 export function getSadwara(dateStr: string): string {
@@ -102,11 +125,12 @@ export function getSadwara(dateStr: string): string {
 }
 
 export function getAstawara(dateStr: string): string {
-  return ASTAWARA[mod(daysBetween(dateStr, ASTAWARA_EPOCH) + ASTAWARA_EPOCH_INDEX, 8)];
+  return ASTAWARA[indeksTertahan(pawukonIndex(dateStr)) % 8];
 }
 
 export function getSangawara(dateStr: string): string {
-  return SANGAWARA[mod(daysBetween(dateStr, SANGAWARA_EPOCH), 9)];
+  const i = pawukonIndex(dateStr);
+  return SANGAWARA[i < 4 ? 0 : (i - 3) % 9];
 }
 
 /** Dasawara dipilih dari total urip Saptawara + Pancawara. */

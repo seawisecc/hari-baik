@@ -71,8 +71,6 @@ export const TRIWARA = ["Pasah", "Beteng", "Kajeng"] as const;
 
 /** Caturwara: siklus 4 hari. */
 export const CATURWARA = ["Sri", "Laba", "Jaya", "Menala"] as const;
-export const CATURWARA_EPOCH = "2000-01-01";
-export const CATURWARA_EPOCH_INDEX = 3;
 
 /** Sadwara: siklus 6 hari, punya urip sendiri (dipakai di perhitungan petemon). */
 export const SADWARA = ["Tungleh", "Aryang", "Urukung", "Paniron", "Was", "Maulu"] as const;
@@ -98,8 +96,6 @@ export const ASTAWARA = [
   "Kala",
   "Uma",
 ] as const;
-export const ASTAWARA_EPOCH = "2000-01-01";
-export const ASTAWARA_EPOCH_INDEX = 7;
 
 /** Sangawara: siklus 9 hari. */
 export const SANGAWARA = [
@@ -113,7 +109,6 @@ export const SANGAWARA = [
   "Tulus",
   "Dadi",
 ] as const;
-export const SANGAWARA_EPOCH = "2000-01-01";
 
 /** Dasawara: dipilih dari jumlah urip Saptawara + Pancawara. */
 export const DASAWARA = [
