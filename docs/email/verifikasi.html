@@ -1,8 +1,19 @@
 <!--
   Template email verifikasi Hari Baik.
 
-  Tempelkan isi <body> di bawah ke Firebase Console:
-  Authentication > Templates > Email address verification > ikon pensil > Message.
+  PENTING: berkas ini TIDAK bisa dipasang lewat Firebase Console.
+
+  Sudah diperiksa langsung di console project hari-baik-7e56c: kolom Message
+  pada template "Email address verification" dikunci Firebase, bahkan setelah
+  masuk mode edit. Alasannya disebut Firebase sendiri di tooltip kolom itu:
+  "To help prevent spam, the message can't be edited on this email template".
+
+  Jadi berkas ini hanya berguna kalau nanti kita mengirim email verifikasi
+  sendiri, memakai generateEmailVerificationLink() dari Admin SDK plus layanan
+  pengirim email. Selama masih memakai sendEmailVerification() bawaan Firebase,
+  isi emailnya tetap teks bawaan mereka dan berkas ini menganggur.
+
+  Yang BISA dipasang sekarang cuma reset-sandi.html. Baca README.md.
 
   Aturan main email berbeda dari web, dan itu yang menentukan bentuk berkas ini:
 

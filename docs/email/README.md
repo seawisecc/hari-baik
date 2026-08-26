@@ -1,55 +1,81 @@
 # Template email Firebase
 
-Dua email yang dikirim Firebase atas nama aplikasi, dibuat mengikuti tema Hari Baik.
+## Yang bisa dan tidak bisa diubah
 
-| Berkas | Dipasang di |
-|---|---|
-| `verifikasi.html` | Authentication > Templates > **Email address verification** |
-| `reset-sandi.html` | Authentication > Templates > **Password reset** |
+Diperiksa langsung di console project `hari-baik-7e56c` pada 26 Agustus 2026, bukan dari dokumentasi. Kolom **Message** diperiksa sesudah masuk mode edit, dan hasilnya berbeda per template:
 
-## Cara pasang
+| Template | Subject | Message |
+|---|---|---|
+| Email address verification | bisa | **dikunci** |
+| Password reset | bisa | **bisa** |
+| Email address change | bisa | **dikunci** |
+
+Alasannya disebut Firebase sendiri di tooltip kolom Message:
+
+> To help prevent spam, the message can't be edited on this email template.
+
+Ini bukan soal paket Spark, bukan soal hak akses, dan tidak hilang dengan upgrade. Firebase mengunci isi kedua email itu karena keduanya berisi tautan yang bisa dipakai mengambil alih akun, jadi teksnya dijaga supaya tidak bisa dijadikan alat phishing.
+
+Artinya: **email verifikasi tidak bisa dibuat bertema lewat Console.** Yang bisa sekarang hanya reset kata sandi.
+
+## Yang bisa dipasang sekarang
+
+### Reset kata sandi
 
 1. Buka [Firebase Console](https://console.firebase.google.com/) lalu pilih project `hari-baik-7e56c`.
-2. Masuk ke **Authentication > Templates**.
-3. Pilih template yang mau diubah, tekan ikon pensil di kanan.
-4. **Sender name**: isi `Hari Baik`.
-5. **Subject**: pakai salah satu di bawah.
-6. **Message**: hapus isinya, lalu tempel seluruh isi berkas HTML-nya. Bagian komentar di atas boleh ikut ditempel atau dibuang, keduanya tidak terkirim ke penerima.
-7. Tekan **Save**, lalu kirim satu email uji ke dirimu sendiri sebelum dipakai pelanggan.
+2. Masuk ke **Authentication > Templates > Password reset**.
+3. Tekan ikon pensil di kanan panel.
+4. **Sender name**: `Hari Baik`
+5. **Subject**: `Atur ulang kata sandi Hari Baik`
+6. **Message**: hapus isinya, tempel seluruh isi `reset-sandi.html`. Komentar di bagian atas boleh ikut atau dibuang, keduanya tidak terkirim ke penerima.
+7. **Save**, lalu kirim satu email uji ke dirimu sendiri.
 
-### Subject yang disarankan
+### Untuk email verifikasi
 
-| Template | Subject |
-|---|---|
-| Verifikasi | `Konfirmasi email kamu di Hari Baik` |
-| Reset sandi | `Atur ulang kata sandi Hari Baik` |
+Yang masih bisa dilakukan tanpa membangun apa pun:
 
-Hindari kata seperti "gratis", "promo", atau tanda seru di subject. Ketiganya menaikkan peluang email masuk folder spam, dan email verifikasi yang tidak terbaca sama saja dengan pendaftaran yang gagal.
+- **Sender name** jadi `Hari Baik`, supaya di kotak masuk tidak muncul sebagai `noreply`.
+- **Subject** jadi `Konfirmasi email kamu di Hari Baik`.
 
-## Kenapa bentuknya seperti ini
+Keduanya sudah cukup mengubah kesan pertama di daftar inbox, walaupun isi emailnya tetap teks bawaan Firebase.
 
-Email bukan halaman web. Empat hal di bawah menentukan cara template ini ditulis, dan ketiganya bukan pilihan gaya.
+Catatan: waktu diperiksa, Sender name masih `not provided` dan Subject masih bawaan. Perubahan yang belum ditekan **Save** tidak tersimpan.
 
-- **Semua gaya ditulis inline.** Gmail membuang blok `<style>` di banyak konteks, jadi kelas CSS tidak bisa diandalkan.
-- **Tata letaknya pakai `<table>`.** Outlook di Windows merender lewat mesin Word, yang tidak mengenal flexbox maupun grid.
-- **Fontnya bukan font aplikasi.** Source Serif dan Inter tidak ikut terkirim. Penggantinya Georgia dan Arial, yang ada di hampir semua perangkat dan bentuknya paling mendekati.
-- **Tidak ada gambar sama sekali.** Kebanyakan klien email memblokir gambar sampai penerima menekan "tampilkan gambar". Logo cincinnya digambar dengan `border-radius`, jadi selalu muncul. Di Outlook lama bentuknya jadi kotak, dan itu masih lebih baik daripada kotak kosong bertuliskan gambar gagal dimuat.
+## Kalau email verifikasi harus bertema
 
-## Yang tidak bisa diubah dari sini
+Satu-satunya jalan adalah berhenti memakai `sendEmailVerification()` bawaan dan mengirim emailnya sendiri:
 
-Tiga batas ini datang dari Firebase, bukan dari templatenya. Aku sebutkan supaya kamu tidak menghabiskan waktu mencarinya di Console.
+1. Di server, panggil `generateEmailVerificationLink(email)` dari Firebase Admin SDK. Ini mengembalikan tautan konfirmasi yang sah, tanpa mengirim email apa pun.
+2. Kirim email sendiri lewat layanan pengirim, memakai `verifikasi.html` sebagai isinya.
 
-**Alamat pengirim tetap `noreply@hari-baik-7e56c.firebaseapp.com`.** Nama pengirim bisa diubah jadi "Hari Baik", tapi alamatnya tidak. Untuk mengirim dari `noreply@seawise.id` perlu SMTP sendiri, yang hanya tersedia setelah project dinaikkan ke Google Cloud Identity Platform. Ini berbayar dan sebaiknya dipertimbangkan nanti, bukan sekarang.
+Yang didapat: kendali penuh atas tampilan, alamat pengirim bisa jadi `noreply@seawise.id`, dan isinya bisa mengikuti bahasa pilihan pengguna.
 
-**Domain tautan konfirmasi masih `hari-baik-7e56c.firebaseapp.com`.** Bisa diganti jadi domain sendiri lewat Authentication > Settings > Authorized domains ditambah pengaturan custom action URL. Ini gratis dan layak dikerjakan, karena tautan yang domainnya asing menurunkan kepercayaan orang untuk menekannya.
+Yang dibayar: satu layanan pengirim email tambahan untuk dipasang dan dijaga, plus domain yang perlu diverifikasi lewat DNS supaya emailnya tidak masuk spam.
 
-**Isi email tidak bisa mengikuti bahasa pengguna.** Firebase menyimpan satu template per bahasa dan memilihnya dari pengaturan `languageCode`, bukan dari pilihan bahasa di dalam aplikasi. Untuk sekarang templatenya berbahasa Indonesia saja. Kalau nanti pelanggan berbahasa Inggris sudah cukup banyak, Console punya pilihan menambah template per bahasa dan aplikasinya perlu diatur mengirim `languageCode` yang sesuai.
+Belum dikerjakan, karena ini menambah satu komponen baru ke sistem dan sebaiknya diputuskan lebih dulu, bukan diselipkan.
+
+## Kenapa bentuk HTML-nya seperti itu
+
+Email bukan halaman web. Empat hal di bawah menentukan cara template ditulis, dan semuanya bukan pilihan gaya.
+
+- **Semua gaya inline.** Gmail membuang blok `<style>` di banyak konteks.
+- **Tata letak pakai `<table>`.** Outlook di Windows merender lewat mesin Word, yang tidak mengenal flexbox maupun grid.
+- **Font bukan font aplikasi.** Source Serif dan Inter tidak ikut terkirim. Penggantinya Georgia dan Arial.
+- **Tidak ada gambar.** Kebanyakan klien email memblokir gambar sampai penerima menekan tombol tampilkan. Logo cincinnya digambar dengan `border-radius`, jadi selalu muncul.
+
+## Dua batas lain yang tetap berlaku
+
+**Alamat pengirim tetap `noreply@hari-baik-7e56c.firebaseapp.com`.** Nama pengirim bisa diubah, alamatnya tidak, kecuali memakai SMTP sendiri lewat Google Cloud Identity Platform.
+
+**Domain tautan konfirmasi masih `hari-baik-7e56c.firebaseapp.com`.** Bisa diganti lewat **Customize action URL** di panel yang sama. Ini gratis dan layak dikerjakan, karena tautan berdomain asing menurunkan kepercayaan orang untuk menekannya.
+
+**Isi email tidak mengikuti bahasa di dalam aplikasi.** Firebase memilih template dari `languageCode`, bukan dari toggle ID/EN. Pengaturannya ada di **Template language** di kiri bawah panel, sekarang masih English.
 
 ## Setelah dipasang
 
-Uji dengan alamat sungguhan, bukan hanya melihat pratinjau di Console. Yang perlu dicek:
+Uji dengan alamat sungguhan, bukan hanya pratinjau di Console:
 
 - Gmail di ponsel dan di peramban
-- Mode gelap, kalau kamu memakainya. Beberapa klien membalik warna latar sendiri, dan teks gelap di atas latar terang bisa berubah jadi sulit dibaca
-- Tombolnya benar-benar bisa ditekan, dan tautan cadangan di bawahnya bisa disalin
-- Emailnya masuk kotak masuk, bukan spam
+- Mode gelap, kalau kamu memakainya
+- Tombolnya bisa ditekan, tautan cadangan di bawahnya bisa disalin
+- Masuk kotak masuk, bukan spam
