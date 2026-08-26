@@ -1,1 +1,136 @@
 @AGENTS.md
+
+# Hari Baik
+
+Kalender siklus personal Bali, dijual sebagai langganan. Pemiliknya Agus
+Yulyastrawan, Seawise Studio. Live di https://haribaik.seawise.id
+
+Next.js App Router, Tailwind v4, Firebase (Auth + Firestore), deploy lewat
+Vercel dari GitHub `seawisecc/hari-baik`, cabang `main`.
+
+## Cara kerja di sini
+
+**Bahasa Indonesia.** Balasan, komentar kode, nama variabel domain, commit
+message, dan teks antarmuka semuanya bahasa Indonesia. Istilah teknis yang
+tidak punya padanan wajar (commit, deploy, token, cache) boleh tetap Inggris.
+
+**Tidak ada em dash.** Jangan pakai em dash (U+2014) atau en dash (U+2013)
+di mana pun: kode, teks antarmuka, dokumen, commit message, balasan. Ganti
+dengan koma, titik dua, titik, atau tanda kurung. Di judul tab dan judul
+halaman pakai `|`. Ini permintaan tegas pemilik: em dash membuat produknya
+terlihat tidak profesional. Sebelum menerbitkan dokumen panjang, periksa
+dengan grep.
+
+**`npm run verify` sebelum push.** Merangkai lint, delapan suite tes, build,
+dan uji asap route API di build produksi asli. Perintah ini lahir dari
+kejadian nyata, lihat "Yang pernah menggigit" di bawah.
+
+**Tes harus terbukti bisa gagal.** Setelah menulis tes baru, rusak sengaja
+nilai yang diujinya dan pastikan tesnya merah, lalu kembalikan. Tes yang lolos
+kosong lebih berbahaya daripada tidak ada tes.
+
+**Ukur dulu, jangan menebak.** Untuk klaim performa, ambil angkanya dari
+produksi yang sudah ter-deploy. Untuk perilaku antarmuka pihak ketiga, buka
+halamannya dan periksa DOM-nya.
+
+## Perintah
+
+| Perintah               | Guna                                               |
+| ---------------------- | -------------------------------------------------- |
+| `npm run verify`       | Gerbang sebelum push: lint, tes, build, uji asap   |
+| `npm test`             | Delapan suite tes                                  |
+| `npm run smoke`        | Tembak kelima route API di build produksi asli     |
+| `npm run deploy-rules` | Terapkan `firestore.rules`                         |
+| `npm run set-admin`    | Beri custom claim admin                            |
+| `npm run protection`   | Nyalakan atau matikan Vercel Deployment Protection |
+
+## Keputusan yang jangan dibongkar tanpa alasan
+
+**Mesin wariga tidak boleh berubah tanpa acuan.** `src/lib/wariga/` diuji
+terhadap 41 tanggal acuan DAN seluruh 210 hari siklus pawukon dari berkas
+Excel pemilik (`src/lib/__tests__/fixtures/hari210.json`). Tanggal contoh saja
+pernah membuat tiga siklus salah bertahun-tahun tanpa ketahuan.
+
+**Caturwara, astawara, sangawara ditahan, bukan modulo.** Ketiganya tidak
+membagi habis 210. Caturwara dan astawara ditahan tiga hari di awal wuku
+Dungulan; sangawara ditahan empat hari di awal siklus.
+
+**Sasih memakai nampih sasih.** Tahun Saka dibagi 19: sisa 6, 11, 0 berarti
+Nampih Jyestha; sisa 3, 8, 14, 16 berarti Nampih Sadha. Tujuh sisipan per
+sembilan belas tahun, sesuai siklus Metonik. Tanpa ini nama sasih bergeser
+satu bulan tiap tiga tahun dan Nyepi bisa hilang dari sebuah tahun.
+
+**Warna kategori tidak boleh bergeser.** Biru, hijau, kuning, merah dari
+aplikasi lama, dikunci di suite kontras. Untuk teks pakai varian `-teks`, untuk
+bidang berlatar penuh pakai `-pekat`.
+
+**Add-on butuh dua saklar.** Terdaftar di `src/lib/addon-registry.ts` (fiturnya
+ada) DAN ditandai aktif di pengaturan harga (mau dijual). Daftar kesiapan ada
+di kode, bukan di pengaturan, karena pengaturan bisa diubah admin: pernah ada
+empat add-on dijual padahal tidak satu pun fiturnya ada.
+
+**Firebase diimpor dinamis.** `src/lib/firebase/client.ts` memiliki SDK-nya;
+komponen lain hanya boleh mengimpor tipe. Impor statis mengembalikan 640 KB
+Firebase ke setiap halaman, termasuk halaman depan yang tidak memakainya.
+
+**Token diambil lewat `ambilToken()`**, yang membaca `currentUser` milik
+Firebase, bukan objek User di state React.
+
+**Harga dibaca di server.** `bacaHarga()` di `src/lib/harga-server.ts` adalah
+satu pintu yang menyaring add-on yang belum siap. Jangan mengambil harga lewat
+fetch dari klien lagi.
+
+## Yang pernah menggigit
+
+**`next dev` bukan produksi.** Route API lolos semua di dev lalu balas 500 di
+produksi karena `firebase-admin` menarik `jose` v6 yang ESM-only. Dipatok ke
+`jose@5.10.0` lewat override tingkat atas; override bersarang tidak
+berpengaruh. Dari sini lahir `npm run smoke`.
+
+**Spread membuang method.** `setUser({ ...current } as User)` membuang seluruh
+method objek User Firebase karena methodnya ada di prototype. Cast `as`
+membuat TypeScript diam. Akibatnya setiap pengguna baru gagal membayar setelah
+verifikasi email.
+
+**Server lokal basi menyesatkan.** `pkill -f "next start"` sering tidak kena;
+server lama tetap memegang port dan `curl` mengenai build lama. Pakai
+`lsof -ti:PORT | xargs -r kill -9`, dan periksa `EADDRINUSE` di lognya.
+
+**Cache ISR bertahan antar deploy.** Halaman dengan `revalidate` yang kodenya
+tidak berubah akan memakai ulang hasil render lama, termasuk datanya. Route
+PUT harga memanggil `revalidatePath`; kalau butuh segar segera di luar itu,
+sentuh kode halamannya.
+
+**Grep pada HTML ikut mengenai payload RSC.** Untuk memeriksa apa yang
+benar-benar terlihat, buang `<script>` dan tag dulu. Dua kali aku salah lapor
+karena ini.
+
+**Prettier merapikan ulang.** Pencocokan string persis sering meleset setelah
+Prettier menggabung impor multi-baris. Sisipkan setelah baris impor satu baris
+yang pasti, bukan setelah "impor terakhir".
+
+## Yang masih terbuka
+
+- **Bulan sinodis rata-rata.** Kalau bulan baru jatuh dekat batas hari,
+  hasilnya bisa meleset sehari. Nyepi 2024 terhitung 10 Maret, sebenarnya 11
+  Maret. 2025 sampai 2027 sudah cocok. Perlu waktu bulan baru sebenarnya.
+- **Urutan bulan Mala.** Bulan sisipan ditaruh sesudah sasih aslinya. Urutan
+  terbalik menghasilkan tanggal identik dan hanya menukar label, jadi tidak
+  bisa dipastikan dari tanggal. Perlu konfirmasi orang yang paham.
+- **Libur nasional 2028 ke atas** masih manual, menunggu SKB pemerintah.
+- **Email verifikasi tidak bisa bertema.** Firebase mengunci isinya untuk
+  mencegah spam. Hanya reset kata sandi yang bisa. Lihat `docs/email/README.md`.
+- **Pengingat WhatsApp dibuang** dari katalog, butuh layanan pengirim pesan
+  dan penjadwal di luar aplikasi ini.
+
+## Struktur singkat
+
+```
+src/lib/wariga/        mesin perhitungan, murni fungsi, paling dijaga
+src/lib/content/       teks dan tabel yang diport dari aplikasi lama
+src/lib/gate.ts        semua keputusan akses, fungsi murni, ada tesnya
+src/lib/addon-registry add-on mana yang fiturnya sudah ada
+src/lib/harga-server   satu pintu baca harga di server
+src/app/api/           route admin selalu requireAdmin, harga dihitung server
+docs/email/            template email Firebase dan batasnya
+```
