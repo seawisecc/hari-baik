@@ -1,3 +1,4 @@
+import { hariRayaTerhitung, isGalungan, isKuningan } from "./hariraya";
 import { HARI_RAYA_HINDU, LIBUR_NASIONAL } from "./holidays";
 import {
   getAstawara,
@@ -26,23 +27,7 @@ import type { DayMarkers, KategoriHari, KategoriName, WarigaDay } from "./types"
 
 // ── Hari raya ─────────────────────────────────────────────────────────────
 
-/** Galungan: Budha Kliwon wuku Dunggulan. */
-export function isGalungan(dateStr: string): boolean {
-  return (
-    saptawaraName(dateStr) === "Budha" &&
-    pancawaraName(dateStr) === "Kliwon" &&
-    wukuName(dateStr) === "Dunggulan"
-  );
-}
-
-/** Kuningan: Saniscara Kliwon wuku Kuningan. */
-export function isKuningan(dateStr: string): boolean {
-  return (
-    saptawaraName(dateStr) === "Saniscara" &&
-    pancawaraName(dateStr) === "Kliwon" &&
-    wukuName(dateStr) === "Kuningan"
-  );
-}
+export { isGalungan, isKuningan } from "./hariraya";
 
 /** Kajeng Kliwon: pertemuan Kajeng (Triwara) dengan Kliwon (Pancawara), tiap 15 hari. */
 export function isKajengKliwon(dateStr: string): boolean {
@@ -73,13 +58,17 @@ export function getLiburNasional(dateStr: string): string | null {
  * hari yang bisa dihitung sendiri (Galungan, Kuningan, Purnama, Tilem).
  */
 export function getHariRayaHindu(dateStr: string): string[] | null {
-  const list: string[] = [];
-  const fixed = HARI_RAYA_HINDU[dateStr];
-  if (fixed) list.push(fixed);
-  if (isGalungan(dateStr) && !list.includes("Hari Raya Galungan"))
-    list.push("Hari Raya Galungan");
-  if (isKuningan(dateStr) && !list.includes("Hari Raya Kuningan"))
-    list.push("Hari Raya Kuningan");
+  // Semuanya dihitung; tabel hanya dipakai bila ada hari raya tambahan
+  // yang belum punya rumus. Sebelumnya tabel dan perhitungan digabung
+  // begitu saja, dan satu hari raya bisa muncul dua kali dengan selisih
+  // satu hari ketika isinya bertentangan.
+  const list = [...hariRayaTerhitung(dateStr)];
+
+  const tambahan = HARI_RAYA_HINDU[dateStr];
+  if (tambahan && !list.some((x) => x.includes(tambahan) || tambahan.includes(x))) {
+    list.push(tambahan);
+  }
+
   if (isPurnama(dateStr)) list.push(`Purnama ${getSasih(dateStr)}`);
   if (isTilem(dateStr)) list.push(`Tilem ${getSasih(dateStr)}`);
   return list.length > 0 ? list : null;

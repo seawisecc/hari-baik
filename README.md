@@ -145,6 +145,16 @@ CNAME   haribaik   1bf39122ca7a8100.vercel-dns-017.com.
 Perhatikan: `hari-baik.vercel.app` (tanpa akhiran tim) adalah milik aplikasi
 orang lain, bukan project ini.
 
+## Hari raya
+
+Galungan, Kuningan, Saraswati, Pagerwesi, Nyepi, Siwaratri, Purnama, dan Tilem
+semuanya dihitung dari pawukon dan sasih di `src/lib/wariga/hariraya.ts`,
+beserta turunannya: Penampahan, Manis, Tawur Agung, dan Ngembak Geni. Tidak
+ada yang perlu ditambah tiap tahun.
+
+Yang tetap manual hanya libur nasional, karena tanggalnya ditetapkan lewat SKB
+pemerintah dan tidak mengikuti aturan yang bisa dihitung.
+
 ## Langganan
 
 Harga diatur dari panel admin, bukan ditulis di kode, jadi mengubahnya tidak
@@ -251,4 +261,6 @@ memakai hex langsung, jadi menambah tema ketiga cukup satu blok
 - [x] Lupa kata sandi
 - [x] Poles halaman auth, onboarding, profil, admin
 - [x] Antrean aktivasi: pengguna ajukan, admin setujui
-- [ ] Tabel libur nasional baru terisi 2026–2027 (`src/lib/wariga/holidays.ts`)
+- [x] Hari raya Hindu dihitung, bukan ditulis manual
+- [ ] Libur nasional baru terisi 2026-2027 (`src/lib/wariga/holidays.ts`); ini
+      memang harus ditambah tiap tahun karena mengikuti SKB pemerintah

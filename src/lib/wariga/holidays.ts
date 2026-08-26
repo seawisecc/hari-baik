@@ -1,37 +1,21 @@
 /**
- * Hari libur nasional & hari raya Hindu Bali yang tanggalnya tidak bisa
- * diturunkan murni dari perhitungan (mengikuti SKB / penetapan tahunan).
- *
- * Galungan, Kuningan, Purnama, dan Tilem TIDAK perlu didaftarkan di sini;
- * semuanya dihitung otomatis di `dewasa.ts`. Tabel ini hanya untuk tanggal
- * yang ditetapkan, dan perlu ditambah tiap tahun.
+ * Tanggal yang ditetapkan pemerintah lewat SKB, bukan diturunkan dari
+ * kalender manapun. Ini satu-satunya bagian yang memang harus ditambah
+ * tiap tahun.
  */
 
-export const HARI_RAYA_HINDU: Record<string, string> = {
-  "2026-01-17": "Hari Suci Siwa Ratri",
-  "2026-03-18": "Tawur Agung Kesanga",
-  "2026-03-19": "Hari Suci Nyepi (Tahun Baru Saka 1948)",
-  "2026-03-20": "Ngembak Geni",
-  "2026-04-04": "Hari Raya Saraswati",
-  "2026-04-08": "Hari Raya Pagerwesi",
-  "2026-06-17": "Hari Raya Galungan",
-  "2026-06-18": "Manis Galungan",
-  "2026-06-27": "Hari Raya Kuningan",
-  "2026-10-31": "Hari Raya Saraswati",
-  "2026-11-04": "Hari Raya Pagerwesi",
-  "2027-01-06": "Hari Suci Siwa Ratri",
-  "2027-01-14": "Hari Raya Galungan",
-  "2027-01-15": "Manis Galungan",
-  "2027-01-24": "Hari Raya Kuningan",
-  "2027-03-07": "Tawur Agung Kesanga",
-  "2027-03-08": "Hari Suci Nyepi (Tahun Baru Saka 1949)",
-  "2027-03-09": "Ngembak Geni",
-  "2027-05-29": "Hari Raya Saraswati",
-  "2027-06-02": "Hari Raya Pagerwesi",
-  "2027-08-12": "Hari Raya Galungan",
-  "2027-08-13": "Manis Galungan",
-  "2027-08-22": "Hari Raya Kuningan",
-};
+/**
+ * Hari raya Hindu yang belum punya rumus.
+ *
+ * Kosong untuk sekarang: Galungan, Kuningan, Saraswati, Pagerwesi, Nyepi,
+ * Siwaratri, Purnama, dan Tilem semuanya dihitung di `hariraya.ts`, beserta
+ * hari-hari turunannya seperti Penampahan, Manis, Tawur Agung, dan Ngembak
+ * Geni.
+ *
+ * Isi di sini hanya bila ada hari raya yang benar-benar tidak bisa
+ * diturunkan dari pawukon maupun sasih.
+ */
+export const HARI_RAYA_HINDU: Record<string, string> = {};
 
 export const LIBUR_NASIONAL: Record<string, string> = {
   "2026-01-01": "Tahun Baru 2026 Masehi",
