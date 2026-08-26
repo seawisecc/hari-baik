@@ -105,6 +105,18 @@ docs/
 └── inventaris-app-lama.md     # hasil pembacaan app lama
 ```
 
+## Deploy
+
+```bash
+./scripts/push-env.sh                       # kirim 9 variabel Firebase ke Vercel
+npx vercel deploy --prod
+npm run authorize-domains -- domain-baru.com   # daftarkan ke Firebase Auth
+```
+
+Tanpa langkah terakhir, Firebase menolak login dari domain baru dengan
+`auth/unauthorized-domain`, dan gejalanya baru terlihat setelah live.
+`npm run revoke-domain` mencabut kembali bila salah daftar.
+
 ## Keamanan
 
 Tiga lapis, dan lapisan klien **bukan** yang menentukan:
@@ -172,7 +184,7 @@ memakai hex langsung, jadi menambah tema ketiga cukup satu blok
 - [x] Admin: perpanjang N tahun, tetapkan tanggal habis, atau seumur hidup
 - [x] Layout desktop & mobile terpisah, beranda = insight hari ini
 - [x] Diuji terhadap project Firebase sungguhan (`hari-baik-7e56c`)
-- [ ] Deploy ke Vercel
+- [x] Deploy ke Vercel: https://hari-baik-seawise.vercel.app
 - [x] Gerbang akses terpusat: trial habis mengunci total ke `/expired`
 - [x] Verifikasi email diwajibkan
 - [x] Lupa kata sandi
