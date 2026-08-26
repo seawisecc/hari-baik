@@ -14,7 +14,7 @@ import {
   isSaraswati,
   isSiwaratri,
 } from "../wariga/hariraya";
-import { getLunar, getSasih, toDateString } from "../wariga";
+import { getLunar, getSasih, getSasihInfo, nampihSasih, toDateString } from "../wariga";
 
 let fail = 0;
 const eq = (label: string, expected: unknown, actual: unknown) => {
@@ -59,9 +59,13 @@ eq(
   semua(isPagerwesi, A, B),
 );
 eq("Nyepi", ["2026-03-19", "2027-03-08"], semua(isNyepi, A, B));
-// Tiga kali dalam dua tahun Masehi: tahun lunar hanya sekitar 354 hari,
-// jadi sasih yang sama bisa muncul dua kali dalam satu tahun Masehi.
-eq("Siwaratri", ["2026-01-17", "2027-01-06", "2027-12-26"], semua(isSiwaratri, A, B));
+// Sekali per tahun Saka. Tanggal ketiga, 26 Desember 2027, dulu ikut muncul
+// di sini dan itu artefak model sasih tanpa bulan sisipan: tanpa nampih sasih
+// hitungannya bergeser maju sekitar sebelas hari tiap tahun sampai satu sasih
+// muncul dua kali dalam setahun Masehi. Dengan nampih sasih, Siwaratri
+// berikutnya jatuh 25 Januari 2028.
+eq("Siwaratri", ["2026-01-17", "2027-01-06"], semua(isSiwaratri, A, B));
+eq("Siwaratri berikutnya", ["2028-01-25"], semua(isSiwaratri, "2028-01-01", "2028-12-31"));
 
 const sw = semua(isSiwaratri, A, B);
 for (let i = 1; i < sw.length; i++) {
@@ -115,13 +119,60 @@ eq("hari biasa kosong", [], hariRayaTerhitung("2026-06-20"));
 
 // Rumusnya harus tetap jalan jauh ke depan tanpa tabel apa pun.
 eq("Galungan 2030 ada", true, semua(isGalungan, "2030-01-01", "2030-12-31").length >= 1);
-// Nyepi dan Siwaratri SENGAJA tidak dihitung di luar rentang sasih yang
-// terverifikasi. Model sasih di mesin ini belum punya nampih sasih, jadi
-// namanya bergeser satu bulan tiap sekitar tiga tahun. Menampilkan hari raya
-// yang salah lebih merugikan daripada tidak menampilkannya.
-eq("Nyepi 2035 tidak diklaim", 0, semua(isNyepi, "2035-01-01", "2035-12-31").length);
-eq("Nyepi 2027 masih dihitung", 1, semua(isNyepi, "2027-01-01", "2027-12-31").length);
-eq("Siwaratri 2035 tidak diklaim", 0, semua(isSiwaratri, "2035-01-01", "2035-12-31").length);
+/*
+ * Nyepi dan Siwaratri kini dihitung untuk tahun mana pun, karena sasih sudah
+ * memakai aturan nampih sasih. Sebelumnya keduanya dibatasi 2025 sampai 2027:
+ * tanpa bulan sisipan nama sasih bergeser satu bulan tiap tiga tahun, sehingga
+ * Nyepi 2031 hilang sama sekali dan 2033 muncul dua kali.
+ *
+ * Sifat yang dijaga sisipan itulah yang diuji di bawah: Nyepi selalu jatuh di
+ * bulan Maret, tepat sekali setahun.
+ */
+{
+  let salah = 0;
+  for (let y = 2025; y <= 2050; y++) {
+    const n = semua(isNyepi, `${y}-01-01`, `${y}-12-31`);
+    const sw = semua(isSiwaratri, `${y}-01-01`, `${y}-12-31`);
+    if (n.length !== 1 || Number(n[0].slice(5, 7)) !== 3) salah++;
+    if (sw.length !== 1) salah++;
+  }
+  eq("2025 sampai 2050: satu Nyepi di Maret dan satu Siwaratri tiap tahun", 0, salah);
+}
+
+// Siwaratri selalu purwaning tilem sasih Kapitu, bukan bulan sisipan.
+{
+  let salah = 0;
+  for (const t of semua(isSiwaratri, "2025-01-01", "2050-12-31")) {
+    const l = getLunar(t);
+    const info = getSasihInfo(t);
+    if (l.phase !== "Panglong" || l.day !== 14 || info.dasar !== "Kapitu" || info.mala) salah++;
+  }
+  eq("setiap Siwaratri: Panglong 14 Kapitu, bukan mala", 0, salah);
+}
+
+// Aturan nampih sasih itu sendiri. Tiga di Jyestha ditambah empat di Sadha
+// berjumlah tujuh sisipan per 19 tahun, tepat seperti siklus Metonik.
+{
+  const sisipan = Array.from({ length: 19 }, (_, i) => nampihSasih(1900 + i)).filter(Boolean);
+  eq("tujuh sisipan tiap 19 tahun Saka", 7, sisipan.length);
+  eq("tiga di Jyestha", 3, sisipan.filter((x) => x === "Jyestha").length);
+  eq("empat di Sadha", 4, sisipan.filter((x) => x === "Sadha").length);
+  eq("Saka 1949 nampih Jyestha", "Jyestha", nampihSasih(1949));
+  eq("Saka 1952 nampih Sadha", "Sadha", nampihSasih(1952));
+  eq("Saka 1948 tanpa nampih", null, nampihSasih(1948));
+  // Tahun negatif atau sangat lampau tidak boleh membuat modulo jadi negatif.
+  eq("modulo aman untuk tahun kecil", "Jyestha", nampihSasih(19));
+}
+
+// Tanggal Nyepi yang sudah pasti. 2024 sengaja TIDAK diuji: mesin ini memakai
+// bulan sinodis rata-rata, dan pada tahun itu bulan barunya jatuh dekat batas
+// hari sehingga hasilnya 10 Maret padahal Nyepi 2024 adalah 11 Maret. Batas
+// semacam itu perlu waktu bulan baru yang sebenarnya, bukan rata-rata.
+eq(
+  "Nyepi 2025 sampai 2027",
+  ["2025-03-29", "2026-03-19", "2027-03-08"].join(","),
+  semua(isNyepi, "2025-01-01", "2027-12-31").join(","),
+);
 
 /*
  * Sasih: nama bulan Bali.

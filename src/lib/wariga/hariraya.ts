@@ -1,4 +1,4 @@
-import { getLunar, getSasih, pancawaraName, saptawaraName, wukuName } from "./pawukon";
+import { getLunar, getSasihInfo, pancawaraName, saptawaraName, wukuName } from "./pawukon";
 
 /**
  * Hari raya Hindu Bali yang bisa dihitung.
@@ -31,58 +31,28 @@ export const isSaraswati = (t: string) =>
 export const isPagerwesi = (t: string) =>
   saptawaraName(t) === "Budha" && pancawaraName(t) === "Kliwon" && wukuName(t) === "Sinta";
 
-/*
- * BATAS PENTING untuk dua hari raya yang bergantung pada sasih.
+/**
+ * Nyepi: Penanggal 1 sasih Kadasa, tahun baru Saka.
  *
- * Galungan, Kuningan, Saraswati, dan Pagerwesi ditentukan siklus pawukon 210
- * hari, yang murni hitungan dan tepat selamanya. Nyepi dan Siwaratri berbeda:
- * keduanya ditentukan sasih, dan sasih di mesin ini belum lengkap.
- *
- * Kalender Saka itu luni-solar. Ada bulan sisipan, nampih sasih, kira-kira
- * tiap tiga tahun, supaya nama bulan tetap sejajar musim. Mesin ini menghitung
- * sasih sebagai 12 bulan lunar berputar tanpa sisipan, jadi namanya meleset
- * sekitar 11 hari setiap tahun dan bergeser satu bulan penuh tiap tiga tahun.
- *
- * Terlihat jelas pada Penanggal 1 di bulan Maret, yang seharusnya selalu
- * Kadasa karena Nyepi selalu jatuh di bulan Maret:
- *
- *   2025 Kadasa    2026 Kadasa    2027 Kadasa
- *   2028 Jyestha   2031 Sadha     2033 Kasa
- *
- * Karena itu keduanya dibatasi pada rentang yang sudah diverifikasi. Di luar
- * rentang ini aplikasi tidak menampilkan apa pun, bukan menampilkan tanggal
- * yang salah: pengguna memakai aplikasi ini untuk memilih hari, jadi hari raya
- * yang keliru lebih merugikan daripada hari raya yang tidak muncul.
- *
- * Untuk mencabut batas ini dibutuhkan aturan nampih sasih, atau satu tanggal
- * acuan Nyepi per tahun Saka. Keduanya harus datang dari sumber yang paham
- * kalender Bali, bukan ditebak dari pola.
+ * Sasih dicocokkan lewat nama dasarnya, bukan nama tampil, supaya bulan
+ * sisipan tidak pernah keliru terbaca sebagai bulan aslinya. Kadasa memang
+ * tidak pernah dilipat, tapi mencocokkan dasar membuat aturan ini tetap benar
+ * kalau nanti ada hari raya lain yang jatuh di Jyestha atau Sadha.
  */
-const SASIH_TERVERIFIKASI = { dari: "2025-01-01", sampai: "2027-12-31" } as const;
-
-const sasihTepercaya = (t: string) =>
-  t >= SASIH_TERVERIFIKASI.dari && t <= SASIH_TERVERIFIKASI.sampai;
-
-/** Nyepi: Penanggal 1 sasih Kadasa, tahun baru Saka. */
 export const isNyepi = (t: string) => {
-  if (!sasihTepercaya(t)) return false;
   const l = getLunar(t);
-  return l.phase === "Penanggal" && l.day === 1 && getSasih(t) === "Kadasa";
+  const s = getSasihInfo(t);
+  return l.phase === "Penanggal" && l.day === 1 && s.dasar === "Kadasa" && !s.mala;
 };
 
 /**
  * Siwaratri: purwaning tilem, yaitu Panglong 14 sasih Kapitu, malam sebelum
  * bulan mati. Malam perenungan, jatuh sekali dalam setahun Saka.
- *
- * Aturannya sekarang ditulis persis seperti sumber tradisional. Sebelumnya
- * ditulis "Kaulu" untuk mengakali `getSasih` yang keliru membulatkan; setelah
- * getSasih diperbaiki, tanggal yang dihasilkan tetap sama dan namanya menjadi
- * benar.
  */
 export const isSiwaratri = (t: string) => {
-  if (!sasihTepercaya(t)) return false;
   const l = getLunar(t);
-  return l.phase === "Panglong" && l.day === 14 && getSasih(t) === "Kapitu";
+  const s = getSasihInfo(t);
+  return l.phase === "Panglong" && l.day === 14 && s.dasar === "Kapitu" && !s.mala;
 };
 
 function geser(t: string, hari: number): string {

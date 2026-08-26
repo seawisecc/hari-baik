@@ -17,7 +17,10 @@ import {
   SANGAWARA,
   SAPTAWARA,
   SASIH,
-  SASIH_OFFSET,
+  SAKA_ACUAN,
+  NAMPIH_JYESTHA,
+  NAMPIH_SADHA,
+  AWALAN_MALA,
   SYNODIC_MONTH_DAYS,
   HALF_SYNODIC,
   TRIWARA,
@@ -195,29 +198,107 @@ export function lunarLabel(dateStr: string): string {
   return `${l.phase} ${l.day}`;
 }
 
-/**
- * Sasih: bulan dalam kalender Bali.
- *
- * Dihitung dengan `floor`, bukan `round`. Sasih ditentukan oleh bulan lunar
- * yang sedang berjalan, yaitu berapa kali bulan baru sudah terlewati, jadi
- * yang dibutuhkan adalah bagian bulatnya, bukan yang terdekat.
- *
- * Dulu di sini memakai `round`, dan itu keliru untuk separuh kalender. Pada
- * hari-hari Panglong umur bulannya sudah lewat setengah siklus, sehingga
- * pembulatan melompat ke bulan berikutnya dan namanya berganti di tengah
- * bulan. Akibatnya Siwaratri, yang jatuh pada Panglong 14, terbaca sasih
- * Kaulu padahal seharusnya Kapitu.
- *
- * Kesalahannya bisa dilihat tanpa acuan luar sama sekali: dengan `round`,
- * nama sasih berganti dua kali dalam satu bulan lunar, dan jarak dari
- * Panglong 14 ke Penanggal 1 Kadasa yang 61 hari itu mustahil kalau bulannya
- * benar-benar Kaulu. Uji di hariraya.test.ts menjaga keduanya.
- */
-export function getSasih(dateStr: string): string {
+/** Nomor bulan lunar sejak epoch bulan baru. Bagian bulat, bukan terdekat. */
+function nomorLunasi(dateStr: string): number {
   const [y, m, d] = dateStr.split("-").map(Number);
   const noon = Date.UTC(y, m - 1, d, 12, 0, 0);
-  const lunations = Math.floor((noon - NEW_MOON_EPOCH_MS) / MS_PER_DAY / SYNODIC_MONTH_DAYS);
-  return SASIH[mod(lunations - SASIH_OFFSET, 12)];
+  return Math.floor((noon - NEW_MOON_EPOCH_MS) / MS_PER_DAY / SYNODIC_MONTH_DAYS);
+}
+
+/**
+ * Sasih mana yang dilipat pada tahun Saka ini, atau null bila tidak ada.
+ *
+ * Aturan nampih sasih menurut Lontar Purwaning Wariga dan keputusan PHDI:
+ * tahun Saka dibagi 19, sisanya menentukan apakah ada bulan sisipan dan di
+ * sasih mana. Lihat catatan pada NAMPIH_JYESTHA di constants.ts.
+ */
+export function nampihSasih(tahunSaka: number): "Jyestha" | "Sadha" | null {
+  const sisa = mod(tahunSaka, 19);
+  if (NAMPIH_JYESTHA.has(sisa)) return "Jyestha";
+  if (NAMPIH_SADHA.has(sisa)) return "Sadha";
+  return null;
+}
+
+export interface SasihInfo {
+  /** Nama tampil, sudah termasuk awalan "Mala" bila ini bulan sisipan. */
+  nama: string;
+  /** Nama dasarnya tanpa awalan, dipakai untuk mencocokkan hari raya. */
+  dasar: string;
+  /** True bila ini bulan sisipan. */
+  mala: boolean;
+  tahunSaka: number;
+}
+
+/**
+ * Urutan sasih dalam satu tahun Saka.
+ *
+ * Tahun Saka dimulai pada Penanggal 1 Kadasa, hari Nyepi, jadi urutannya
+ * berawal di Kadasa dan berakhir di Kasanga. Jyestha dan Sadha karena itu
+ * berada di awal daftar ini tetapi merupakan sasih terakhir tahun Saka
+ * sebelumnya menurut penomoran satu sampai dua belas, dan di situlah bulan
+ * sisipan diletakkan.
+ *
+ * CATATAN: bulan sisipan ditaruh SESUDAH sasih aslinya. Urutan terbalik
+ * menghasilkan tanggal yang persis sama dan hanya menukar bulan mana yang
+ * diberi label Mala, jadi tidak bisa dipastikan dari tanggal saja. Perlu
+ * dikonfirmasi oleh yang paham kalender Bali. Nyepi dan Siwaratri tidak
+ * terpengaruh: keduanya jatuh di Kadasa dan Kapitu, bukan di Jyestha
+ * maupun Sadha.
+ */
+function urutanSasih(tahunSaka: number): { nama: string; mala: boolean }[] {
+  const sisipan = nampihSasih(tahunSaka);
+  const urut: { nama: string; mala: boolean }[] = [
+    { nama: "Kadasa", mala: false },
+    { nama: "Jyestha", mala: false },
+  ];
+  if (sisipan === "Jyestha") urut.push({ nama: "Jyestha", mala: true });
+  urut.push({ nama: "Sadha", mala: false });
+  if (sisipan === "Sadha") urut.push({ nama: "Sadha", mala: true });
+  // Kasa sampai Kasanga menutup tahun Saka.
+  for (const nama of SASIH.slice(0, 9)) urut.push({ nama, mala: false });
+  return urut;
+}
+
+/**
+ * Sasih lengkap untuk sebuah tanggal, termasuk tahun Saka dan status mala.
+ *
+ * Dihitung dengan berjalan dari acuan Nyepi 2026 sepanjang tahun-tahun Saka,
+ * bukan dengan modulo dua belas. Modulo dua belas mengabaikan bulan sisipan,
+ * sehingga nama sasih bergeser satu bulan tiap sekitar tiga tahun; dengan cara
+ * itu Nyepi 2031 hilang sama sekali dan 2033 muncul dua kali.
+ */
+export function getSasihInfo(dateStr: string): SasihInfo {
+  let tahunSaka = SAKA_ACUAN.tahun;
+  let sisa = nomorLunasi(dateStr) - nomorLunasi(SAKA_ACUAN.tanggal);
+
+  while (sisa < 0) {
+    tahunSaka -= 1;
+    sisa += urutanSasih(tahunSaka).length;
+  }
+  for (;;) {
+    const panjang = urutanSasih(tahunSaka).length;
+    if (sisa < panjang) break;
+    sisa -= panjang;
+    tahunSaka += 1;
+  }
+
+  const bulan = urutanSasih(tahunSaka)[sisa];
+  return {
+    nama: bulan.mala ? `${AWALAN_MALA} ${bulan.nama}` : bulan.nama,
+    dasar: bulan.nama,
+    mala: bulan.mala,
+    tahunSaka,
+  };
+}
+
+/** Nama sasih yang ditampilkan, termasuk awalan Mala bila bulan sisipan. */
+export function getSasih(dateStr: string): string {
+  return getSasihInfo(dateStr).nama;
+}
+
+/** Tahun Saka untuk sebuah tanggal Masehi. */
+export function getTahunSaka(dateStr: string): number {
+  return getSasihInfo(dateStr).tahunSaka;
 }
 
 export function isPurnama(dateStr: string): boolean {

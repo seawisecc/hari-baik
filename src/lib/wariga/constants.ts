@@ -202,7 +202,30 @@ export const SASIH: string[] = [
   "Jyestha",
   "Sadha",
 ];
-export const SASIH_OFFSET = 3;
+/**
+ * Acuan tahun Saka: Nyepi 2026, yaitu Penanggal 1 sasih Kadasa, awal Saka 1948.
+ * Semua penamaan sasih dihitung maju atau mundur dari titik ini.
+ */
+export const SAKA_ACUAN = { tanggal: "2026-03-19", tahun: 1948 } as const;
+
+/**
+ * Sisa bagi tahun Saka terhadap 19 yang menandai adanya bulan sisipan.
+ *
+ * Kalender Saka luni-solar: tahun candra lebih pendek sekitar 11 hari dari
+ * tahun surya, jadi tiap sekitar tiga tahun satu sasih dilipat agar namanya
+ * tetap sejajar musim. Ini siklus Metonik: 19 tahun surya sama dengan 235
+ * bulan lunar, yaitu 19 x 12 ditambah 7 sisipan. Tiga di Jyestha ditambah
+ * empat di Sadha tepat berjumlah tujuh, jadi aturannya konsisten dengan
+ * astronominya, bukan sekadar daftar angka.
+ *
+ * Sisipan hanya diletakkan di dua sasih terakhir tahun Saka, karena keduanya
+ * secara tradisional tidak dipakai untuk pedewasaan upacara besar.
+ */
+export const NAMPIH_JYESTHA = new Set([6, 11, 0]);
+export const NAMPIH_SADHA = new Set([3, 8, 14, 16]);
+
+/** Awalan untuk bulan sisipan, mis. "Mala Sadha". */
+export const AWALAN_MALA = "Mala";
 
 export const MS_PER_DAY = 86_400_000;
 
