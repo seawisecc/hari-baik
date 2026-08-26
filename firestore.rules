@@ -26,6 +26,7 @@ service cloud.firestore {
         'subscriptionStatus',
         'subscriptionExpiresAt',
         'trialEndsAt',
+        'addOn',
         'email',
         'createdAt'
       ];

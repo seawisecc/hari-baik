@@ -31,28 +31,58 @@ export const isSaraswati = (t: string) =>
 export const isPagerwesi = (t: string) =>
   saptawaraName(t) === "Budha" && pancawaraName(t) === "Kliwon" && wukuName(t) === "Sinta";
 
+/*
+ * BATAS PENTING untuk dua hari raya yang bergantung pada sasih.
+ *
+ * Galungan, Kuningan, Saraswati, dan Pagerwesi ditentukan siklus pawukon 210
+ * hari, yang murni hitungan dan tepat selamanya. Nyepi dan Siwaratri berbeda:
+ * keduanya ditentukan sasih, dan sasih di mesin ini belum lengkap.
+ *
+ * Kalender Saka itu luni-solar. Ada bulan sisipan, nampih sasih, kira-kira
+ * tiap tiga tahun, supaya nama bulan tetap sejajar musim. Mesin ini menghitung
+ * sasih sebagai 12 bulan lunar berputar tanpa sisipan, jadi namanya meleset
+ * sekitar 11 hari setiap tahun dan bergeser satu bulan penuh tiap tiga tahun.
+ *
+ * Terlihat jelas pada Penanggal 1 di bulan Maret, yang seharusnya selalu
+ * Kadasa karena Nyepi selalu jatuh di bulan Maret:
+ *
+ *   2025 Kadasa    2026 Kadasa    2027 Kadasa
+ *   2028 Jyestha   2031 Sadha     2033 Kasa
+ *
+ * Karena itu keduanya dibatasi pada rentang yang sudah diverifikasi. Di luar
+ * rentang ini aplikasi tidak menampilkan apa pun, bukan menampilkan tanggal
+ * yang salah: pengguna memakai aplikasi ini untuk memilih hari, jadi hari raya
+ * yang keliru lebih merugikan daripada hari raya yang tidak muncul.
+ *
+ * Untuk mencabut batas ini dibutuhkan aturan nampih sasih, atau satu tanggal
+ * acuan Nyepi per tahun Saka. Keduanya harus datang dari sumber yang paham
+ * kalender Bali, bukan ditebak dari pola.
+ */
+const SASIH_TERVERIFIKASI = { dari: "2025-01-01", sampai: "2027-12-31" } as const;
+
+const sasihTepercaya = (t: string) =>
+  t >= SASIH_TERVERIFIKASI.dari && t <= SASIH_TERVERIFIKASI.sampai;
+
 /** Nyepi: Penanggal 1 sasih Kadasa, tahun baru Saka. */
 export const isNyepi = (t: string) => {
+  if (!sasihTepercaya(t)) return false;
   const l = getLunar(t);
   return l.phase === "Penanggal" && l.day === 1 && getSasih(t) === "Kadasa";
 };
 
 /**
- * Siwaratri: Panglong 14, malam perenungan.
+ * Siwaratri: purwaning tilem, yaitu Panglong 14 sasih Kapitu, malam sebelum
+ * bulan mati. Malam perenungan, jatuh sekali dalam setahun Saka.
  *
- * CATATAN: sumber tradisional menyebut sasih Kapitu, tapi mesin sasih di
- * aplikasi ini menamai bulan tersebut Kaulu. Dua tanggal acuan yang diketahui,
- * 17 Januari 2026 dan 6 Januari 2027, keduanya jatuh pada Panglong 14 Kaulu
- * menurut mesin ini, jadi aturan di bawah menghasilkan tanggal yang benar.
- *
- * Yang belum pasti adalah penamaannya: kemungkinan penomoran sasih di mesin
- * ini bergeser satu bulan dari konvensi. Tanggalnya benar; namanya perlu
- * diperiksa oleh yang paham kalender Bali sebelum ditampilkan sebagai nama
- * sasih di layar.
+ * Aturannya sekarang ditulis persis seperti sumber tradisional. Sebelumnya
+ * ditulis "Kaulu" untuk mengakali `getSasih` yang keliru membulatkan; setelah
+ * getSasih diperbaiki, tanggal yang dihasilkan tetap sama dan namanya menjadi
+ * benar.
  */
 export const isSiwaratri = (t: string) => {
+  if (!sasihTepercaya(t)) return false;
   const l = getLunar(t);
-  return l.phase === "Panglong" && l.day === 14 && getSasih(t) === "Kaulu";
+  return l.phase === "Panglong" && l.day === 14 && getSasih(t) === "Kapitu";
 };
 
 function geser(t: string, hari: number): string {

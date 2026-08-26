@@ -171,10 +171,28 @@ export function lunarLabel(dateStr: string): string {
   return `${l.phase} ${l.day}`;
 }
 
+/**
+ * Sasih: bulan dalam kalender Bali.
+ *
+ * Dihitung dengan `floor`, bukan `round`. Sasih ditentukan oleh bulan lunar
+ * yang sedang berjalan, yaitu berapa kali bulan baru sudah terlewati, jadi
+ * yang dibutuhkan adalah bagian bulatnya, bukan yang terdekat.
+ *
+ * Dulu di sini memakai `round`, dan itu keliru untuk separuh kalender. Pada
+ * hari-hari Panglong umur bulannya sudah lewat setengah siklus, sehingga
+ * pembulatan melompat ke bulan berikutnya dan namanya berganti di tengah
+ * bulan. Akibatnya Siwaratri, yang jatuh pada Panglong 14, terbaca sasih
+ * Kaulu padahal seharusnya Kapitu.
+ *
+ * Kesalahannya bisa dilihat tanpa acuan luar sama sekali: dengan `round`,
+ * nama sasih berganti dua kali dalam satu bulan lunar, dan jarak dari
+ * Panglong 14 ke Penanggal 1 Kadasa yang 61 hari itu mustahil kalau bulannya
+ * benar-benar Kaulu. Uji di hariraya.test.ts menjaga keduanya.
+ */
 export function getSasih(dateStr: string): string {
   const [y, m, d] = dateStr.split("-").map(Number);
   const noon = Date.UTC(y, m - 1, d, 12, 0, 0);
-  const lunations = Math.round((noon - NEW_MOON_EPOCH_MS) / MS_PER_DAY / SYNODIC_MONTH_DAYS);
+  const lunations = Math.floor((noon - NEW_MOON_EPOCH_MS) / MS_PER_DAY / SYNODIC_MONTH_DAYS);
   return SASIH[mod(lunations - SASIH_OFFSET, 12)];
 }
 

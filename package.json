@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsx src/lib/__tests__/wariga.test.ts && tsx src/lib/__tests__/content.test.ts && tsx src/lib/__tests__/subscription.test.ts && tsx src/lib/__tests__/gate.test.ts && tsx src/lib/__tests__/hariraya.test.ts && tsx src/lib/__tests__/kontras.test.ts && tsx src/lib/__tests__/auth.test.ts",
+    "test": "tsx src/lib/__tests__/wariga.test.ts && tsx src/lib/__tests__/content.test.ts && tsx src/lib/__tests__/subscription.test.ts && tsx src/lib/__tests__/gate.test.ts && tsx src/lib/__tests__/hariraya.test.ts && tsx src/lib/__tests__/kontras.test.ts && tsx src/lib/__tests__/auth.test.ts && tsx src/lib/__tests__/addon.test.ts",
     "set-admin": "tsx scripts/set-admin.ts",
     "check-firebase": "tsx scripts/check-firebase.ts",
     "import-sa": "tsx scripts/import-service-account.ts",

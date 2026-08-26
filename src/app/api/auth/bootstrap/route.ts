@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
       // Jam trial mulai dari pembuatan akun, bukan dari selesainya onboarding,
       // supaya tidak bisa ditunda dengan menunda pengisian profil.
       trialEndsAt: trialEnd(),
+      addOn: [],
       onboardingComplete: false,
       createdAt: new Date().toISOString(),
       saptaWaraLahir: null,

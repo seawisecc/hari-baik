@@ -23,6 +23,16 @@ export interface UserProfile {
   subscriptionExpiresAt: string | null;
   /** ISO string. Akhir trial 3 hari. */
   trialEndsAt: string | null;
+  /**
+   * Id add-on yang sudah dibayar pengguna ini.
+   *
+   * Ditulis server saat admin menyetujui permintaan aktivasi. Sebelumnya
+   * daftar add-on hanya tersimpan di dokumen permintaan dan hilang begitu
+   * permintaannya disetujui, jadi tidak ada satu tempat pun yang tahu siapa
+   * membayar apa. Field terlindungi: hanya server dan admin yang boleh
+   * menulis, sama seperti field langganan lainnya.
+   */
+  addOn: string[];
   onboardingComplete: boolean;
   createdAt: string;
 

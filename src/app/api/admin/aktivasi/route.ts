@@ -82,7 +82,10 @@ export async function POST(req: NextRequest) {
 
     const userSnap = await userRef.get();
     if (!userSnap.exists) throw new AdminError(404, "Pengguna tidak ditemukan.");
-    const current = userSnap.data() as { subscriptionExpiresAt?: string | null };
+    const current = userSnap.data() as {
+      subscriptionExpiresAt?: string | null;
+      addOn?: string[];
+    };
 
     const expiresAt = extendYears(
       current.subscriptionExpiresAt ?? null,
@@ -90,9 +93,16 @@ export async function POST(req: NextRequest) {
       now,
     );
 
+    // Add-on ditumpuk, bukan ditimpa: pengguna yang membeli tambahan di
+    // perpanjangan berikutnya tidak boleh kehilangan yang sudah dibayarnya.
+    const addOnDimiliki = [
+      ...new Set([...(current.addOn ?? []), ...permintaan.addOn.map((a) => a.id)]),
+    ];
+
     await userRef.update({
       subscriptionStatus: "active",
       subscriptionExpiresAt: expiresAt,
+      addOn: addOnDimiliki,
       lastChangedBy: admin.email ?? admin.uid,
       lastChangedAt: now.toISOString(),
     });

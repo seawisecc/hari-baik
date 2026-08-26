@@ -84,7 +84,7 @@ export const HARGA_BAWAAN: PengaturanHarga = {
         en: "Add up to 4 family members, each with their own cycle calendar and personality reading.",
       },
       sekali: false,
-      aktif: true,
+      aktif: false,
     },
     {
       id: "cari-hari-acara",
@@ -95,7 +95,7 @@ export const HARGA_BAWAAN: PengaturanHarga = {
         en: "Pick a date range and see the most supportive days for a wedding, a business opening, or travel.",
       },
       sekali: false,
-      aktif: true,
+      aktif: false,
     },
     {
       id: "pengingat-whatsapp",
@@ -106,7 +106,7 @@ export const HARGA_BAWAAN: PengaturanHarga = {
         en: "A summary of today's energy sent to WhatsApp every morning.",
       },
       sekali: false,
-      aktif: true,
+      aktif: false,
     },
     {
       id: "laporan-pdf",
@@ -117,7 +117,7 @@ export const HARGA_BAWAAN: PengaturanHarga = {
         en: "Personality, life journey, and name meaning gathered into one printable file.",
       },
       sekali: true,
-      aktif: true,
+      aktif: false,
     },
   ],
   diperbaruiPada: null,
