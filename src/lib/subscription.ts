@@ -1,4 +1,4 @@
-import type { AccessState, UserProfile } from "@/types";
+import type { AccessState, SubscriptionStatus, UserProfile } from "@/types";
 
 const MS_PER_DAY = 86_400_000;
 
@@ -96,4 +96,38 @@ export function extendYears(
   const next = new Date(base);
   next.setFullYear(next.getFullYear() + tahun);
   return next.toISOString();
+}
+
+/** Bentuk minimal yang dibutuhkan untuk menilai keadaan langganan seseorang. */
+type Langganan = Pick<UserProfile, "subscriptionStatus" | "subscriptionExpiresAt">;
+
+/**
+ * Apakah orang ini sedang memegang akses yang sudah dibayar?
+ *
+ * Dipakai route pengajuan aktivasi untuk memutuskan apakah statusnya boleh
+ * diubah jadi "pending". Pelanggan yang memperpanjang lebih awal atau menambah
+ * add-on tetap pelanggan aktif: menandainya menunggu akan mencabut akses yang
+ * sudah dibayarnya sampai admin sempat menyetujui, dan bagi pemegang langganan
+ * seumur hidup, mencabutnya untuk selamanya.
+ */
+export function punyaAksesBerbayar(u: Langganan, now: Date = new Date()): boolean {
+  if (u.subscriptionStatus === "lifetime") return true;
+  return (
+    u.subscriptionStatus === "active" &&
+    !!u.subscriptionExpiresAt &&
+    new Date(u.subscriptionExpiresAt) > now
+  );
+}
+
+/**
+ * Status yang benar setelah sebuah permintaan aktivasi ditolak.
+ *
+ * Dulu selalu "expired". Itu benar untuk orang yang memang sudah habis masa
+ * berlakunya, tapi salah untuk pelanggan aktif yang permintaan perpanjangannya
+ * ditolak: satu penolakan mencabut sisa langganan yang masih dia miliki.
+ */
+export function statusSetelahDitolak(u: Langganan, now: Date = new Date()): SubscriptionStatus {
+  if (u.subscriptionStatus === "lifetime") return "lifetime";
+  const habis = u.subscriptionExpiresAt;
+  return habis && new Date(habis) > now ? "active" : "expired";
 }

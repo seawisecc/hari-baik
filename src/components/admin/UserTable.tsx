@@ -2,8 +2,10 @@
 
 import { Settings2 } from "lucide-react";
 import { Fragment, useState } from "react";
+import type { AksiPengguna } from "./aksi";
 import { AturAddOn } from "./AturAddOn";
-import { AturLangganan, type AksiLangganan } from "./AturLangganan";
+import { AturLangganan } from "./AturLangganan";
+import { AturTanggalLahir } from "./AturTanggalLahir";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 import { useLang, useT } from "@/lib/content/LangProvider";
@@ -48,13 +50,13 @@ export function UserTable({
   users: UserProfile[];
   /** Daftar add-on yang ada, untuk pengatur per pengguna. */
   katalogAddOn: AddOn[];
-  onAction: (uid: string, aksi: AksiLangganan) => Promise<void>;
+  onAction: (uid: string, aksi: AksiPengguna) => Promise<void>;
 }) {
   const t = useT();
   const [busy, setBusy] = useState<string | null>(null);
   const [terbuka, setTerbuka] = useState<string | null>(null);
 
-  const jalankan = async (uid: string, aksi: AksiLangganan) => {
+  const jalankan = async (uid: string, aksi: AksiPengguna) => {
     setBusy(uid);
     try {
       await onAction(uid, aksi);
@@ -168,6 +170,16 @@ export function UserTable({
                           dimiliki={u.addOn ?? []}
                           busy={busy === u.uid}
                           onSimpan={(addOn) => jalankan(u.uid, { action: "addon", addOn })}
+                        />
+                        {/* Pengguna tidak bisa lagi mengubah tanggal lahirnya
+                            sendiri setelah onboarding, jadi perbaikannya ada
+                            di sini. */}
+                        <AturTanggalLahir
+                          sekarang={u.tanggalLahir}
+                          busy={busy === u.uid}
+                          onSimpan={(tanggalLahir) =>
+                            jalankan(u.uid, { action: "lahir", tanggalLahir })
+                          }
                         />
                       </div>
                     </td>

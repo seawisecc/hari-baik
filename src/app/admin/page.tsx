@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { AksiLangganan } from "@/components/admin/AturLangganan";
+import type { AksiPengguna } from "@/components/admin/aksi";
 import { AturHarga } from "@/components/admin/AturHarga";
 import { DaftarPermintaan } from "@/components/admin/DaftarPermintaan";
 import { UserTable } from "@/components/admin/UserTable";
@@ -87,12 +87,16 @@ export default function AdminPage() {
     };
   }, [user, filter, refresh, t]);
 
-  const aksi = async (uid: string, perintah: AksiLangganan) => {
+  const aksi = async (uid: string, perintah: AksiPengguna) => {
     if (!user) return;
     setError(null);
     try {
       const token = await ambilToken();
-      const res = await fetch("/api/admin/subscription", {
+      // Tanggal lahir bukan urusan langganan: ia diperiksa dan dihitung ulang
+      // di route profil, yang juga mencatatnya ke jejak audit.
+      const jalur =
+        perintah.action === "lahir" ? "/api/admin/profil" : "/api/admin/subscription";
+      const res = await fetch(jalur, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ uid, ...perintah }),

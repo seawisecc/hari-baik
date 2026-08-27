@@ -88,7 +88,7 @@ for (const f of komponen) {
 // menarik SDK-nya kembali ke bundel halaman yang bersangkutan.
 for (const f of [
   "src/app/onboarding/page.tsx",
-  "src/components/EditTanggalLahir.tsx",
+  "src/app/keluarga/page.tsx",
   "src/lib/firebase/AuthProvider.tsx",
 ]) {
   const barisImpor = readFileSync(f, "utf8")

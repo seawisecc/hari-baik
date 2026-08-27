@@ -15,6 +15,12 @@ function saringAddOn(h: PengaturanHarga): PengaturanHarga {
   return {
     ...h,
     addOn: h.addOn.map((a) => (addOnSiapJual(a.id) ? a : { ...a, aktif: false })),
+    // Siapa yang terakhir menyimpan harga adalah urusan internal, dan
+    // nilainya adalah alamat email admin. Daftar harga ini dibaca siapa pun:
+    // lewat GET /api/admin/harga yang memang publik, dan ikut terkirim di
+    // HTML halaman depan sebagai prop. Jejaknya tidak hilang, hanya pindah
+    // ke koleksi jejak audit yang cuma bisa dibaca admin.
+    diperbaruiOleh: null,
   };
 }
 

@@ -1,8 +1,9 @@
 import type { NextRequest } from "next/server";
+import { catatJejak } from "@/lib/audit";
 import { adminDb } from "@/lib/firebase/admin";
 import { AdminError, handleAdminError, requireAdmin } from "@/lib/firebase/requireAdmin";
-import { extendYears } from "@/lib/subscription";
-import type { Aktivasi } from "@/types";
+import { extendYears, statusSetelahDitolak } from "@/lib/subscription";
+import type { Aktivasi, UserProfile } from "@/types";
 
 const ALASAN_MAKS = 300;
 
@@ -68,30 +69,42 @@ export async function POST(req: NextRequest) {
 
     const userRef = db.collection("users").doc(permintaan.uid);
 
+    const userSnap = await userRef.get();
+    if (!userSnap.exists) throw new AdminError(404, "Pengguna tidak ditemukan.");
+    const current = userSnap.data() as Pick<
+      UserProfile,
+      "subscriptionStatus" | "subscriptionExpiresAt"
+    > & { addOn?: string[] };
+
     if (aksi === "tolak") {
-      await ref.update({
-        ...jejak,
-        status: "ditolak",
-        alasanTolak: (alasan ?? "").trim().slice(0, ALASAN_MAKS) || null,
-      });
-      // Dikembalikan ke expired, bukan dibiarkan pending: pending menandakan
-      // ada yang sedang ditunggu, dan tidak ada lagi yang ditunggu.
-      await userRef.update({ subscriptionStatus: "expired" });
+      const alasanBersih = (alasan ?? "").trim().slice(0, ALASAN_MAKS) || null;
+      await ref.update({ ...jejak, status: "ditolak", alasanTolak: alasanBersih });
+      // Dikembalikan ke keadaan sebenarnya, bukan selalu expired. Permintaan
+      // yang ditolak boleh datang dari pelanggan yang langganannya masih
+      // berjalan (mis. sedang memperpanjang atau menambah add-on); menandainya
+      // expired akan mencabut akses yang sudah dibayarnya.
+      const dipulihkan = statusSetelahDitolak(current);
+      await userRef.update({ subscriptionStatus: dipulihkan });
+      await catatJejak(
+        {
+          aksi: "aktivasi",
+          aktor: admin.email ?? admin.uid,
+          aktorUid: admin.uid,
+          sasaran: permintaan.uid,
+          ringkasan: `Permintaan aktivasi ${permintaan.paketNama} dari ${permintaan.email} ditolak.`,
+          detail: { permintaan: id, alasan: alasanBersih, status: dipulihkan },
+        },
+        req,
+      );
       return Response.json({ ok: true, status: "ditolak" });
     }
 
-    const userSnap = await userRef.get();
-    if (!userSnap.exists) throw new AdminError(404, "Pengguna tidak ditemukan.");
-    const current = userSnap.data() as {
-      subscriptionExpiresAt?: string | null;
-      addOn?: string[];
-    };
-
-    const expiresAt = extendYears(
-      current.subscriptionExpiresAt ?? null,
-      permintaan.paketTahun,
-      now,
-    );
+    // Langganan seumur hidup tidak punya tanggal habis dan tidak boleh
+    // diturunkan jadi berbayar tahunan hanya karena pemiliknya membeli add-on.
+    const seumurHidup = current.subscriptionStatus === "lifetime";
+    const expiresAt = seumurHidup
+      ? null
+      : extendYears(current.subscriptionExpiresAt ?? null, permintaan.paketTahun, now);
 
     // Add-on ditumpuk, bukan ditimpa: pengguna yang membeli tambahan di
     // perpanjangan berikutnya tidak boleh kehilangan yang sudah dibayarnya.
@@ -100,13 +113,38 @@ export async function POST(req: NextRequest) {
     ];
 
     await userRef.update({
-      subscriptionStatus: "active",
-      subscriptionExpiresAt: expiresAt,
+      subscriptionStatus: seumurHidup ? "lifetime" : "active",
+      ...(seumurHidup ? {} : { subscriptionExpiresAt: expiresAt }),
       addOn: addOnDimiliki,
       lastChangedBy: admin.email ?? admin.uid,
       lastChangedAt: now.toISOString(),
     });
     await ref.update({ ...jejak, status: "disetujui", alasanTolak: null });
+
+    await catatJejak(
+      {
+        aksi: "aktivasi",
+        aktor: admin.email ?? admin.uid,
+        aktorUid: admin.uid,
+        sasaran: permintaan.uid,
+        ringkasan: `Permintaan aktivasi ${permintaan.paketNama} dari ${permintaan.email} disetujui, aktif sampai ${expiresAt ?? "tanpa batas"}.`,
+        detail: {
+          permintaan: id,
+          total: permintaan.total,
+          sebelum: {
+            status: current.subscriptionStatus,
+            expiresAt: current.subscriptionExpiresAt ?? null,
+            addOn: current.addOn ?? [],
+          },
+          sesudah: {
+            status: seumurHidup ? "lifetime" : "active",
+            expiresAt,
+            addOn: addOnDimiliki,
+          },
+        },
+      },
+      req,
+    );
 
     return Response.json({ ok: true, status: "disetujui", expiresAt });
   } catch (err) {

@@ -2,7 +2,14 @@
  * Tes aturan akses. Dijalankan dengan: npm run test
  * Sengaja tanpa framework: logikanya kecil dan hanya butuh perbandingan nilai.
  */
-import { evaluateAccess, extendOneYear, extendYears, trialEnd } from "../subscription";
+import {
+  evaluateAccess,
+  extendOneYear,
+  extendYears,
+  punyaAksesBerbayar,
+  statusSetelahDitolak,
+  trialEnd,
+} from "../subscription";
 
 const now = new Date("2026-08-26T10:00:00Z");
 const iso = (d: string) => new Date(d).toISOString();
@@ -119,6 +126,69 @@ eq(
   "tambah dari yang sudah lewat",
   iso("2029-08-26T10:00:00Z"),
   extendYears(iso("2020-01-01"), 3, now),
+);
+
+/*
+ * Permintaan aktivasi dari orang yang masih berbayar.
+ *
+ * Ini pernah menjadi lubang nyata: route pengajuan selalu menandai pemohon
+ * "pending", dan penolakan selalu menandainya "expired". Artinya pelanggan
+ * yang memperpanjang lebih awal langsung kehilangan akses yang sudah dia
+ * bayar, dan pemegang langganan seumur hidup kehilangan status itu untuk
+ * selamanya hanya karena membeli satu add-on.
+ */
+eq(
+  "aktif dan belum habis: masih berbayar",
+  true,
+  punyaAksesBerbayar(
+    { subscriptionStatus: "active", subscriptionExpiresAt: iso("2027-01-01") },
+    now,
+  ),
+);
+eq(
+  "aktif tapi sudah lewat: tidak berbayar",
+  false,
+  punyaAksesBerbayar(
+    { subscriptionStatus: "active", subscriptionExpiresAt: iso("2020-01-01") },
+    now,
+  ),
+);
+eq(
+  "seumur hidup: selalu berbayar",
+  true,
+  punyaAksesBerbayar({ subscriptionStatus: "lifetime", subscriptionExpiresAt: null }, now),
+);
+eq(
+  "masa coba: belum berbayar",
+  false,
+  punyaAksesBerbayar({ subscriptionStatus: "trial", subscriptionExpiresAt: null }, now),
+);
+
+eq(
+  "ditolak saat langganan masih jalan: tetap aktif",
+  "active",
+  statusSetelahDitolak(
+    { subscriptionStatus: "pending", subscriptionExpiresAt: iso("2027-01-01") },
+    now,
+  ),
+);
+eq(
+  "ditolak saat seumur hidup: tetap seumur hidup",
+  "lifetime",
+  statusSetelahDitolak({ subscriptionStatus: "lifetime", subscriptionExpiresAt: null }, now),
+);
+eq(
+  "ditolak tanpa langganan: expired",
+  "expired",
+  statusSetelahDitolak({ subscriptionStatus: "pending", subscriptionExpiresAt: null }, now),
+);
+eq(
+  "ditolak saat langganan sudah habis: expired",
+  "expired",
+  statusSetelahDitolak(
+    { subscriptionStatus: "pending", subscriptionExpiresAt: iso("2020-01-01") },
+    now,
+  ),
 );
 
 console.log(fail === 0 ? "✓ langganan: semua lolos" : `✗ langganan: ${fail} gagal`);

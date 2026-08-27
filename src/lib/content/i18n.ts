@@ -64,7 +64,13 @@ const dict = {
     "admin.delete.confirm":
       "Apakah kamu yakin ingin menghapus akun ini? Tindakan ini tidak dapat dibatalkan.",
     "admin.delete.success": "Akun berhasil dihapus.",
-    "profile.dob.hint": "Mengubah tanggal lahir akan menghitung ulang seluruh siklusmu.",
+    "admin.birth.title": "Tanggal lahir",
+    "admin.birth.current": "Sekarang: {tanggal}",
+    "admin.birth.preview": "Weton tanggal baru",
+    "admin.birth.note":
+      "Pengguna tidak bisa mengubah ini sendiri. Cocokkan dulu dengan yang dia sebutkan, karena seluruh perhitungannya ikut berubah.",
+    "admin.birth.save": "Simpan tanggal lahir",
+    "profile.dob.hint": "Seluruh siklusmu dihitung dari tanggal lahir ini.",
     "expired.title": "Waktunya Isi Ulang Energi",
     "expired.desc":
       "Akses kalender siklus personalmu telah berakhir. Aktifkan kembali untuk melanjutkan perjalananmu.",
@@ -171,14 +177,25 @@ const dict = {
     "onboarding.whatsapp": "Nomor WhatsApp",
     "onboarding.whatsappHint": "Memudahkan admin menghubungimu soal langganan.",
     "onboarding.start": "Mulai perjalanan",
+    "onboarding.continue": "Lanjutkan",
+    "onboarding.birthHint": "Tanggal ini hanya diisi sekali, jadi periksa lagi sebelum lanjut.",
+    "onboarding.confirmTitle": "Sudah benar tanggalnya?",
+    "onboarding.confirmDesc":
+      "Baca sekali lagi. Seluruh isi aplikasi dihitung dari tanggal lahir ini.",
+    "onboarding.lockWarning":
+      "Setelah disimpan, tanggal lahir tidak bisa kamu ubah sendiri. Kalau ada yang keliru, perbaikannya lewat admin.",
+    "onboarding.confirmYes": "Ya, simpan dan mulai",
+    "onboarding.fix": "Perbaiki dulu",
     "birth.needed": "Tanggal lahir belum diisi",
     "birth.neededDesc":
       "Kalender siklusmu dihitung dari tanggal lahir, jadi itu harus diisi lebih dulu.",
     "birth.fill": "Isi tanggal lahir",
-    "birth.change": "Ubah tanggal lahir",
-    "birth.newWeton": "Weton baru",
-    "birth.recalcNote":
-      "Seluruh kalender siklus, kepribadian, dan perjalanan hidupmu akan dihitung ulang dari tanggal ini.",
+    "birth.locked": "Tanggal lahir terkunci",
+    "birth.lockedDesc":
+      "Tanggal lahir dikonfirmasi sekali saat pendaftaran dan tidak bisa diubah sendiri, supaya seluruh perhitungan siklusmu tetap konsisten. Kalau ada yang keliru, admin bisa memperbaikinya.",
+    "birth.lockedAsk": "Minta admin perbaiki",
+    "birth.lockedWa":
+      "Halo admin Hari Baik, tanggal lahir di akun saya ({email}) keliru. Mohon dibantu perbaiki.",
     "today.greeting": "Halo",
     "today.forecast": "7 Hari ke Depan",
     "today.viewCalendar": "Lihat kalender",
@@ -550,7 +567,13 @@ const dict = {
     "admin.delete.confirm":
       "Are you sure you want to delete this account? This action cannot be undone.",
     "admin.delete.success": "Account successfully deleted.",
-    "profile.dob.hint": "Changing your birth date recalculates your entire cycle.",
+    "admin.birth.title": "Birth date",
+    "admin.birth.current": "Currently: {tanggal}",
+    "admin.birth.preview": "Weton of the new date",
+    "admin.birth.note":
+      "Users cannot change this themselves. Check it against what they told you first, because every calculation follows from it.",
+    "admin.birth.save": "Save birth date",
+    "profile.dob.hint": "Your entire cycle is calculated from this birth date.",
     "expired.title": "Time to Recharge",
     "expired.desc":
       "Your access to the personal cycle calendar has ended. Reactivate to continue your journey.",
@@ -657,14 +680,25 @@ const dict = {
     "onboarding.whatsappHint":
       "Makes it easier for the admin to reach you about your subscription.",
     "onboarding.start": "Start the journey",
+    "onboarding.continue": "Continue",
+    "onboarding.birthHint": "This date is set only once, so check it again before continuing.",
+    "onboarding.confirmTitle": "Is the date correct?",
+    "onboarding.confirmDesc":
+      "Read it once more. Everything in the app is calculated from this birth date.",
+    "onboarding.lockWarning":
+      "Once saved, you cannot change your birth date yourself. If something is wrong, the admin fixes it for you.",
+    "onboarding.confirmYes": "Yes, save and start",
+    "onboarding.fix": "Let me fix it",
     "birth.needed": "Birth date not set",
     "birth.neededDesc":
       "Your cycle calendar is calculated from your birth date, so it must be set first.",
     "birth.fill": "Set birth date",
-    "birth.change": "Change birth date",
-    "birth.newWeton": "New weton",
-    "birth.recalcNote":
-      "Your entire cycle calendar, personality, and life journey will be recalculated from this date.",
+    "birth.locked": "Birth date is locked",
+    "birth.lockedDesc":
+      "Your birth date is confirmed once at sign-up and cannot be changed by you, so every cycle calculation stays consistent. If something is wrong, the admin can fix it.",
+    "birth.lockedAsk": "Ask the admin to fix it",
+    "birth.lockedWa":
+      "Hello Hari Baik admin, the birth date on my account ({email}) is wrong. Could you please fix it?",
     "today.greeting": "Hello",
     "today.forecast": "Next 7 Days",
     "today.viewCalendar": "View calendar",

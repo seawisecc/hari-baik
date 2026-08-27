@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { catatJejak } from "@/lib/audit";
 import { adminAuth, adminDb } from "@/lib/firebase/admin";
 import { AdminError, handleAdminError, requireAdmin } from "@/lib/firebase/requireAdmin";
 
@@ -28,6 +29,18 @@ export async function POST(req: NextRequest) {
       .collection("users")
       .doc(uid)
       .update({ role: admin ? "admin" : "user" });
+
+    await catatJejak(
+      {
+        aksi: "klaim",
+        aktor: caller.email ?? caller.uid,
+        aktorUid: caller.uid,
+        sasaran: uid,
+        ringkasan: admin ? `Hak admin diberikan ke ${uid}.` : `Hak admin dicabut dari ${uid}.`,
+        detail: { admin },
+      },
+      req,
+    );
 
     return Response.json({ ok: true, uid, admin });
   } catch (err) {

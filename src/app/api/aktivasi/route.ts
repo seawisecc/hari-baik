@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { adminAuth, adminDb } from "@/lib/firebase/admin";
 import { bacaHarga } from "@/lib/harga-server";
+import { punyaAksesBerbayar } from "@/lib/subscription";
 import type { Aktivasi, UserProfile } from "@/types";
 
 const CATATAN_MAKS = 400;
@@ -92,7 +93,16 @@ export async function POST(req: NextRequest) {
 
     // Status pengguna ikut berubah supaya muncul di filter Menunggu admin,
     // tanpa memberi akses apa pun sebelum disetujui.
-    await userRef.update({ subscriptionStatus: "pending" });
+    //
+    // Hanya kalau dia memang belum punya akses berbayar. Permintaan juga
+    // datang dari pelanggan yang masih aktif (memperpanjang lebih awal, atau
+    // menambah add-on); menandai mereka "pending" akan langsung mencabut
+    // akses yang sudah dibayar, dan untuk yang seumur hidup, menghapusnya
+    // untuk selamanya. Permintaannya sendiri tetap masuk antrean admin
+    // lewat koleksi aktivasi, jadi tidak ada yang hilang.
+    if (!punyaAksesBerbayar(user)) {
+      await userRef.update({ subscriptionStatus: "pending" });
+    }
 
     return Response.json({ ok: true, id: ref.id, total });
   } catch (err) {

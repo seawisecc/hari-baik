@@ -5,14 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
 import { useT } from "@/lib/content/LangProvider";
-
-export type AksiLangganan =
-  | { action: "extend"; tahun: number }
-  | { action: "set"; expiresAt: string }
-  | { action: "lifetime" }
-  | { action: "deactivate" }
-  /** Tetapkan daftar penuh add-on yang dimiliki pengguna. */
-  | { action: "addon"; addOn: string[] };
+import type { AksiLangganan } from "./aksi";
 
 const CEPAT = [1, 2, 3, 5];
 

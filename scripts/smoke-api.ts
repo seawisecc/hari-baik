@@ -39,6 +39,12 @@ const DAFTAR: Uji[] = [
     harap: [401],
     kenapa: "sama",
   },
+  {
+    jalur: "/api/admin/profil",
+    metode: "POST",
+    harap: [401],
+    kenapa: "sama, dan route ini juga menarik mesin wariga ke sisi server",
+  },
 ];
 
 async function tungguSiap(batasDetik = 60) {

@@ -21,7 +21,7 @@ halaman pakai `|`. Ini permintaan tegas pemilik: em dash membuat produknya
 terlihat tidak profesional. Sebelum menerbitkan dokumen panjang, periksa
 dengan grep.
 
-**`npm run verify` sebelum push.** Merangkai lint, delapan suite tes, build,
+**`npm run verify` sebelum push.** Merangkai lint, sembilan suite tes, build,
 dan uji asap route API di build produksi asli. Perintah ini lahir dari
 kejadian nyata, lihat "Yang pernah menggigit" di bawah.
 
@@ -38,8 +38,8 @@ halamannya dan periksa DOM-nya.
 | Perintah               | Guna                                               |
 | ---------------------- | -------------------------------------------------- |
 | `npm run verify`       | Gerbang sebelum push: lint, tes, build, uji asap   |
-| `npm test`             | Delapan suite tes                                  |
-| `npm run smoke`        | Tembak kelima route API di build produksi asli     |
+| `npm test`             | Sembilan suite tes                                 |
+| `npm run smoke`        | Tembak keenam route API di build produksi asli     |
 | `npm run deploy-rules` | Terapkan `firestore.rules`                         |
 | `npm run set-admin`    | Beri custom claim admin                            |
 | `npm run protection`   | Nyalakan atau matikan Vercel Deployment Protection |
@@ -63,6 +63,37 @@ satu bulan tiap tiga tahun dan Nyepi bisa hilang dari sebuah tahun.
 **Warna kategori tidak boleh bergeser.** Biru, hijau, kuning, merah dari
 aplikasi lama, dikunci di suite kontras. Untuk teks pakai varian `-teks`, untuk
 bidang berlatar penuh pakai `-pekat`.
+
+**Tanggal lahir diisi sekali, lalu terkunci.** Pengguna mengonfirmasinya di
+layar kedua onboarding (tanggal panjang plus wetonnya dibacakan kembali), lalu
+Firestore Rules menolak setiap perubahan berikutnya dari klien: `fieldLahir()`
+hanya boleh disentuh selama `tanggalLahir` masih null. Perbaikan hanya lewat
+`/api/admin/profil`, yang menghitung ulang turunan warigannya di server dan
+mencatat nilai lama serta barunya ke jejak audit. Alasannya bukan keamanan,
+melainkan supaya hasil yang dilihat pengguna kemarin masih bisa dijelaskan
+hari ini. Dijaga `src/lib/__tests__/lahir.test.ts`.
+
+**Rules memakai daftar yang diizinkan.** Update dokumen pengguna dari klien
+dibatasi `hanyaFieldKlien()`, bukan sekadar daftar field terlarang, jadi field
+baru tertutup sampai sengaja dibuka. Bentuk dan panjangnya ikut diperiksa di
+rules supaya dokumen profil tidak bisa dipakai sebagai gudang data bebas.
+
+**Setiap aksi admin masuk jejak audit.** `catatJejak()` di `src/lib/audit.ts`
+menulis ke koleksi `jejak` yang hanya bisa dibaca admin dan tidak bisa ditulis
+klien mana pun. `lastChangedBy` di dokumen pengguna hanya menyimpan keadaan
+terakhir; jejak menyimpan riwayatnya. Tesnya menolak route admin yang mengubah
+data tanpa menulis jejak.
+
+**Permintaan aktivasi tidak boleh mencabut akses.** Pemohon yang langganannya
+masih berjalan tidak ditandai `pending`, dan penolakan mengembalikannya ke
+status sebenarnya lewat `statusSetelahDitolak()`. Sebelumnya pelanggan aktif
+yang memperpanjang lebih awal langsung kehilangan akses, dan pemegang
+langganan seumur hidup kehilangan statusnya untuk selamanya.
+
+**Harga publik selalu lewat `bacaHarga()`.** Selain menyaring add-on yang
+belum siap, fungsi itu membuang `diperbaruiOleh` (alamat email admin) karena
+hasilnya ikut terkirim ke HTML halaman depan dan ke `GET /api/admin/harga`
+yang terbuka. Dokumen `pengaturan/harga` sendiri tidak lagi bisa dibaca klien.
 
 **Add-on butuh dua saklar.** Terdaftar di `src/lib/addon-registry.ts` (fiturnya
 ada) DAN ditandai aktif di pengaturan harga (mau dijual). Daftar kesiapan ada
@@ -131,6 +162,7 @@ src/lib/content/       teks dan tabel yang diport dari aplikasi lama
 src/lib/gate.ts        semua keputusan akses, fungsi murni, ada tesnya
 src/lib/addon-registry add-on mana yang fiturnya sudah ada
 src/lib/harga-server   satu pintu baca harga di server
+src/lib/audit.ts       jejak audit, ditulis semua route admin yang mengubah data
 src/app/api/           route admin selalu requireAdmin, harga dihitung server
 docs/email/            template email Firebase dan batasnya
 ```

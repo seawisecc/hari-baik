@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, MessageCircle, Shield } from "lucide-react";
+import { Lock, LogOut, MessageCircle, Shield } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Memuat } from "@/components/ProGate";
@@ -8,7 +8,6 @@ import { PageContainer } from "@/components/shell/AppShell";
 import { Button } from "@/components/ui/Button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { EditTanggalLahir } from "@/components/EditTanggalLahir";
 import { ADMIN_WA, ADMIN_WA_DISPLAY } from "@/components/WhatsAppCard";
 import { cn } from "@/lib/cn";
 import { useLang, useT } from "@/lib/content/LangProvider";
@@ -68,9 +67,28 @@ export default function ProfilPage() {
               <Kotak label={t("profile.urip")} nilai={profile.uripLahir?.toString() ?? "-"} />
             </dl>
 
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <p className="text-xs text-ink-faint">{t("profile.dob.hint")}</p>
-              <EditTanggalLahir uid={profile.uid} tanggalLahir={profile.tanggalLahir} />
+            {/* Tanggal lahir terkunci setelah onboarding. Seluruh isi aplikasi
+                dihitung dari angka ini, jadi ia diperlakukan seperti data
+                identitas: dikonfirmasi sekali di awal, sesudah itu hanya admin
+                yang boleh memperbaikinya kalau ternyata keliru. */}
+            <div className="flex flex-wrap items-start gap-3 rounded-md bg-surface-sunk px-5 py-4 hb-sink">
+              <Lock className="mt-0.5 h-4 w-4 shrink-0 text-ink-faint" aria-hidden />
+              <div className="flex-1 space-y-1">
+                <p className="text-sm font-medium text-ink">{t("birth.locked")}</p>
+                <p className="text-xs leading-relaxed text-ink-faint">
+                  {t("birth.lockedDesc")}
+                </p>
+                <a
+                  href={`https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(
+                    t("birth.lockedWa", { email: profile.email ?? "" }),
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block pt-1 text-xs font-medium text-accent-deep underline underline-offset-2"
+                >
+                  {t("birth.lockedAsk")}
+                </a>
+              </div>
             </div>
           </CardBody>
         </Card>

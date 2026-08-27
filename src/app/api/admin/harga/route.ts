@@ -1,5 +1,6 @@
 import { revalidatePath } from "next/cache";
 import type { NextRequest } from "next/server";
+import { catatJejak } from "@/lib/audit";
 import { adminDb } from "@/lib/firebase/admin";
 import { AdminError, handleAdminError, requireAdmin } from "@/lib/firebase/requireAdmin";
 import { DOKUMEN_HARGA as DOKUMEN, bacaHarga } from "@/lib/harga-server";
@@ -120,6 +121,21 @@ export async function PUT(req: NextRequest) {
     // Halaman harga dirender di server dan disimpan sebagai statis. Tanpa ini
     // pengguna masih melihat harga lama sampai masa kedaluwarsanya lewat.
     for (const jalur of HALAMAN_BERHARGA) revalidatePath(jalur);
+
+    await catatJejak(
+      {
+        aksi: "harga",
+        aktor: admin.email ?? admin.uid,
+        aktorUid: admin.uid,
+        sasaran: null,
+        ringkasan: `Daftar harga disimpan: ${data.paket.length} paket, ${data.addOn.length} add-on.`,
+        detail: {
+          paket: data.paket.map((p) => ({ id: p.id, harga: p.harga, aktif: p.aktif })),
+          addOn: data.addOn.map((a) => ({ id: a.id, harga: a.harga, aktif: a.aktif })),
+        },
+      },
+      req,
+    );
 
     return Response.json({ ok: true, ...data });
   } catch (err) {

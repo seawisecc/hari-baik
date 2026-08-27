@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { catatJejak } from "@/lib/audit";
 import { adminDb } from "@/lib/firebase/admin";
 import { AdminError, handleAdminError, requireAdmin } from "@/lib/firebase/requireAdmin";
 import { HARGA_BAWAAN } from "@/lib/harga";
@@ -64,11 +65,23 @@ export async function POST(req: NextRequest) {
         throw new AdminError(400, `Add-on tidak dikenal: ${asing.join(", ")}.`);
       }
       const bersih = [...new Set(addOn)];
+      const sebelumAddOn = (snap.data() as { addOn?: string[] }).addOn ?? [];
       await ref.update({
         addOn: bersih,
         lastChangedBy: admin.email ?? admin.uid,
         lastChangedAt: new Date().toISOString(),
       });
+      await catatJejak(
+        {
+          aksi: "addon",
+          aktor: admin.email ?? admin.uid,
+          aktorUid: admin.uid,
+          sasaran: uid,
+          ringkasan: `Add-on ditetapkan menjadi: ${bersih.join(", ") || "kosong"}.`,
+          detail: { sebelum: sebelumAddOn, sesudah: bersih },
+        },
+        req,
+      );
       return Response.json({ ok: true, addOn: bersih });
     }
 
@@ -126,6 +139,25 @@ export async function POST(req: NextRequest) {
       lastChangedBy: admin.email ?? admin.uid,
       lastChangedAt: now.toISOString(),
     });
+
+    await catatJejak(
+      {
+        aksi: "langganan",
+        aktor: admin.email ?? admin.uid,
+        aktorUid: admin.uid,
+        sasaran: uid,
+        ringkasan: `Langganan diubah lewat aksi "${action}": status ${update.subscriptionStatus}, habis ${update.subscriptionExpiresAt ?? "tanpa batas"}.`,
+        detail: {
+          action,
+          sebelum: {
+            status: (snap.data() as { subscriptionStatus?: string }).subscriptionStatus ?? null,
+            expiresAt: current.subscriptionExpiresAt ?? null,
+          },
+          sesudah: update,
+        },
+      },
+      req,
+    );
 
     return Response.json({ ok: true, uid, ...update });
   } catch (err) {
