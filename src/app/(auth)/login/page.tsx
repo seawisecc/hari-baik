@@ -6,7 +6,7 @@ import { useState } from "react";
 import { AuthShell, BelumDikonfigurasi, Bidang } from "../AuthShell";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
-import { Input, Label } from "@/components/ui/Input";
+import { Input, InputSandi, Label } from "@/components/ui/Input";
 import { useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
 import { pesanAuth } from "@/lib/firebase/errors";
@@ -77,9 +77,8 @@ export default function LoginPage() {
               </div>
             }
           >
-            <Input
+            <InputSandi
               id="password"
-              type="password"
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

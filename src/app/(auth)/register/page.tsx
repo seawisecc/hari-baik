@@ -6,7 +6,7 @@ import { useState } from "react";
 import { AuthShell, BelumDikonfigurasi, Bidang } from "../AuthShell";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
-import { Input, Label } from "@/components/ui/Input";
+import { Input, InputSandi, Label } from "@/components/ui/Input";
 import { useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
 import { pesanAuth } from "@/lib/firebase/errors";
@@ -77,9 +77,8 @@ export default function RegisterPage() {
             label={<Label htmlFor="password">{t("auth.password")}</Label>}
             hint={t("auth.passwordHint")}
           >
-            <Input
+            <InputSandi
               id="password"
-              type="password"
               autoComplete="new-password"
               minLength={6}
               value={password}
@@ -92,9 +91,8 @@ export default function RegisterPage() {
             label={<Label htmlFor="ulangi">{t("auth.passwordRepeat")}</Label>}
             error={tidakCocok ? t("auth.passwordMismatch") : undefined}
           >
-            <Input
+            <InputSandi
               id="ulangi"
-              type="password"
               autoComplete="new-password"
               value={ulangi}
               onChange={(e) => setUlangi(e.target.value)}
