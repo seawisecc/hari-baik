@@ -1,7 +1,7 @@
 import "server-only";
 import { addOnSiapJual } from "@/lib/addon-registry";
 import { adminDb } from "@/lib/firebase/admin";
-import { HARGA_BAWAAN, type PengaturanHarga } from "@/lib/harga";
+import { HARGA_BAWAAN, gabungAddOn, type PengaturanHarga } from "@/lib/harga";
 
 /**
  * Paksa nonaktif setiap add-on yang fiturnya belum ada.
@@ -14,7 +14,11 @@ import { HARGA_BAWAAN, type PengaturanHarga } from "@/lib/harga";
 function saringAddOn(h: PengaturanHarga): PengaturanHarga {
   return {
     ...h,
-    addOn: h.addOn.map((a) => (addOnSiapJual(a.id) ? a : { ...a, aktif: false })),
+    // Digabung dulu dengan katalog di kode, baru disaring. Urutannya penting:
+    // add-on yang belum pernah tersimpan di Firestore harus ikut masuk supaya
+    // admin bisa melihatnya, dan tetap ikut disaring supaya yang fiturnya
+    // belum ada tidak langsung terjual begitu muncul.
+    addOn: gabungAddOn(h.addOn).map((a) => (addOnSiapJual(a.id) ? a : { ...a, aktif: false })),
     // Siapa yang terakhir menyimpan harga adalah urusan internal, dan
     // nilainya adalah alamat email admin. Daftar harga ini dibaca siapa pun:
     // lewat GET /api/admin/harga yang memang publik, dan ikut terkirim di

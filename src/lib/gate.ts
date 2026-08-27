@@ -47,6 +47,11 @@ export const RUTE_ADDON: Record<
     titleKey: "laporan.title",
     descKey: "addon.lock.desc",
   },
+  "/fengshui-nama": {
+    addOnId: "fengshui-nama",
+    titleKey: "fengshui.title",
+    descKey: "addon.lock.desc",
+  },
 };
 
 export interface KondisiAkses {

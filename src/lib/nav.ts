@@ -6,6 +6,7 @@ import {
   Route,
   Shield,
   Sparkles,
+  Store,
   Sun,
   User,
   UserCircle,
@@ -86,6 +87,12 @@ export const NAV_ADDON: NavItem[] = [
     labelKey: "laporan.title",
     shortKey: "nav.short.report",
     icon: FileText,
+  },
+  {
+    href: "/fengshui-nama",
+    labelKey: "fengshui.title",
+    shortKey: "nav.short.fengshui",
+    icon: Store,
   },
 ];
 

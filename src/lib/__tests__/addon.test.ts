@@ -12,7 +12,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { ADDON_SIAP, addOnSiapJual, periksaAddOn } from "../addon-registry";
 import { RUTE_ADDON } from "../gate";
-import { HARGA_BAWAAN } from "../harga";
+import { HARGA_BAWAAN, gabungAddOn } from "../harga";
 
 let fail = 0;
 const eq = (label: string, expected: unknown, actual: unknown) => {
@@ -134,6 +134,66 @@ for (const id of Object.keys(ADDON_SIAP)) {
   const e = periksaAddOn(["laporan-pdf", "laporan-pdf", 7], katalog, []);
   eq("duplikat dibuang", "laporan-pdf", e.bersih.join(","));
   eq("bukan teks ditolak", "7", e.asing.join(","));
+}
+
+/*
+ * 9. Add-on baru di kode harus tetap muncul meski pengaturan sudah tersimpan.
+ *
+ * Pengaturan harga disimpan sebagai satu dokumen utuh, dan daftar add-on di
+ * dalamnya menimpa daftar bawaan seluruhnya. Sebelum `gabungAddOn` ada, itu
+ * berarti add-on yang baru ditambahkan di kode tidak muncul di halaman harga
+ * DAN tidak muncul di panel admin, karena keduanya membaca sumber yang sama.
+ * Tidak ada jalan bagi admin untuk menjualnya sama sekali.
+ */
+{
+  // Dokumen lama yang cuma tahu dua add-on, salah satunya sudah diubah harganya.
+  const lama = HARGA_BAWAAN.addOn
+    .slice(0, 2)
+    .map((a, i) => (i === 0 ? { ...a, harga: 12_345, aktif: false } : a));
+
+  const gabung = gabungAddOn(lama);
+  eq("semua add-on di kode ikut muncul", HARGA_BAWAAN.addOn.length, gabung.length);
+  eq(
+    "urutannya mengikuti katalog di kode",
+    HARGA_BAWAAN.addOn.map((a) => a.id).join(","),
+    gabung.map((a) => a.id).join(","),
+  );
+  eq("pengaturan admin menang untuk yang sudah diatur", 12_345, gabung[0].harga);
+  eq("dan status aktifnya juga ikut", false, gabung[0].aktif);
+
+  const baru = HARGA_BAWAAN.addOn[HARGA_BAWAAN.addOn.length - 1];
+  eq(
+    "add-on yang belum pernah diatur pakai nilai bawaannya",
+    baru.harga,
+    gabung.find((a) => a.id === baru.id)?.harga,
+  );
+
+  // Id lama yang sudah dibuang dari kode tetap terbawa supaya admin bisa
+  // melihatnya dan membersihkannya lewat panel.
+  const adaYangUsang = gabungAddOn([
+    ...lama,
+    { ...HARGA_BAWAAN.addOn[0], id: "pengingat-whatsapp" },
+  ]);
+  eq(
+    "id yang sudah tidak ada di kode tetap terbawa",
+    true,
+    adaYangUsang.some((a) => a.id === "pengingat-whatsapp"),
+  );
+  eq("tapi tidak siap jual", false, addOnSiapJual("pengingat-whatsapp"));
+
+  // Dokumen kosong atau belum ada sama sekali harus menghasilkan katalog penuh.
+  eq("dokumen kosong", HARGA_BAWAAN.addOn.length, gabungAddOn([]).length);
+  eq("dokumen tanpa field addOn", HARGA_BAWAAN.addOn.length, gabungAddOn(undefined).length);
+
+  // Dan penyaringnya harus benar-benar dipanggil setelah digabung, bukan
+  // sebelum: kalau tidak, add-on baru lolos tanpa diperiksa kesiapannya.
+  const sumber = readFileSync("src/lib/harga-server.ts", "utf8");
+  eq("bacaHarga menggabungkan katalog", true, /gabungAddOn\(h\.addOn\)/.test(sumber));
+  eq(
+    "hasil gabungan tetap disaring",
+    true,
+    /gabungAddOn\(h\.addOn\)\.map\(\(a\) => \(addOnSiapJual/.test(sumber),
+  );
 }
 
 console.log(fail === 0 ? "✓ add-on: semua lolos" : `✗ add-on: ${fail} gagal`);

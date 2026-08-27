@@ -108,10 +108,48 @@ export const HARGA_BAWAAN: PengaturanHarga = {
       sekali: true,
       aktif: true, // fiturnya sudah ada di /laporan
     },
+    {
+      id: "fengshui-nama",
+      harga: 70_000,
+      nama: { id: "Fengshui Nama Usaha", en: "Business Name Fengshui" },
+      deskripsi: {
+        id: "Timbang nama usaha dan nama produk dengan sistem 81 angka: bandingkan sampai enam kandidat sekaligus, lalu lihat kata mana yang memperbaiki yang belum pas.",
+        en: "Weigh business and product names with the 81-number system: compare up to six candidates at once, then see which word improves the ones that fall short.",
+      },
+      sekali: true,
+      aktif: true, // fiturnya sudah ada di /fengshui-nama
+    },
   ],
   diperbaruiPada: null,
   diperbaruiOleh: null,
 };
+
+/**
+ * Gabungkan katalog add-on di kode dengan pengaturan yang tersimpan admin.
+ *
+ * Tanpa ini, add-on baru tidak akan pernah bisa dijual. Pengaturan harga
+ * disimpan sebagai satu dokumen utuh di Firestore, dan daftar `addOn` di sana
+ * menimpa daftar bawaan seluruhnya. Artinya begitu dokumen itu pernah
+ * tersimpan sekali, add-on yang ditambahkan di kode tidak muncul di halaman
+ * harga, dan juga tidak muncul di panel admin, karena panelnya membaca dari
+ * sumber yang sama. Admin jadi tidak punya cara apa pun untuk menghidupkannya.
+ *
+ * Aturannya: yang sudah diatur admin menang (harga, nama, aktif), yang belum
+ * pernah diatur ikut dengan nilai bawaannya. Id yang hanya ada di Firestore
+ * tetap dibawa, bukan dibuang, supaya add-on lama yang sudah dihapus dari kode
+ * masih terlihat di panel dan bisa dibersihkan di sana. Kesiapan fiturnya
+ * diperiksa terpisah lewat addon-registry, jadi yang lama itu tetap tidak
+ * bisa aktif.
+ */
+export function gabungAddOn(tersimpan: AddOn[] | undefined | null): AddOn[] {
+  const dariAdmin = new Map((tersimpan ?? []).map((a) => [a.id, a]));
+  const hasil = HARGA_BAWAAN.addOn.map((bawaan) => dariAdmin.get(bawaan.id) ?? bawaan);
+  const dikenal = new Set(HARGA_BAWAAN.addOn.map((a) => a.id));
+  for (const a of dariAdmin.values()) {
+    if (!dikenal.has(a.id)) hasil.push(a);
+  }
+  return hasil;
+}
 
 /** "Rp 150.000". Tanpa desimal: rupiah tidak memakainya dalam praktik. */
 export function rupiah(nilai: number): string {

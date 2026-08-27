@@ -21,7 +21,7 @@ halaman pakai `|`. Ini permintaan tegas pemilik: em dash membuat produknya
 terlihat tidak profesional. Sebelum menerbitkan dokumen panjang, periksa
 dengan grep.
 
-**`npm run verify` sebelum push.** Merangkai lint, sembilan suite tes, build,
+**`npm run verify` sebelum push.** Merangkai lint, sepuluh suite tes, build,
 dan uji asap route API di build produksi asli. Perintah ini lahir dari
 kejadian nyata, lihat "Yang pernah menggigit" di bawah.
 
@@ -38,7 +38,7 @@ halamannya dan periksa DOM-nya.
 | Perintah               | Guna                                               |
 | ---------------------- | -------------------------------------------------- |
 | `npm run verify`       | Gerbang sebelum push: lint, tes, build, uji asap   |
-| `npm test`             | Sembilan suite tes                                 |
+| `npm test`             | Sepuluh suite tes                                  |
 | `npm run smoke`        | Tembak keenam route API di build produksi asli     |
 | `npm run deploy-rules` | Terapkan `firestore.rules`                         |
 | `npm run set-admin`    | Beri custom claim admin                            |
@@ -90,6 +90,15 @@ status sebenarnya lewat `statusSetelahDitolak()`. Sebelumnya pelanggan aktif
 yang memperpanjang lebih awal langsung kehilangan akses, dan pemegang
 langganan seumur hidup kehilangan statusnya untuk selamanya.
 
+**Katalog add-on digabung, bukan ditimpa.** Pengaturan harga tersimpan
+sebagai satu dokumen utuh, jadi daftar `addOn` di Firestore dulu menimpa
+daftar bawaan seluruhnya. Akibatnya add-on baru yang ditambahkan di kode tidak
+muncul di halaman harga maupun di panel admin, dan tidak ada cara apa pun
+menjualnya. `gabungAddOn()` di `src/lib/harga.ts` menggabungkan keduanya:
+yang sudah diatur admin menang, yang belum ikut dengan nilai bawaannya, dan id
+lama yang cuma ada di Firestore tetap dibawa supaya bisa dibersihkan lewat
+panel. Penggabungan terjadi sebelum penyaringan kesiapan, bukan sesudah.
+
 **Harga publik selalu lewat `bacaHarga()`.** Selain menyaring add-on yang
 belum siap, fungsi itu membuang `diperbaruiOleh` (alamat email admin) karena
 hasilnya ikut terkirim ke HTML halaman depan dan ke `GET /api/admin/harga`
@@ -99,6 +108,19 @@ yang terbuka. Dokumen `pengaturan/harga` sendiri tidak lagi bisa dibaca klien.
 ada) DAN ditandai aktif di pengaturan harga (mau dijual). Daftar kesiapan ada
 di kode, bukan di pengaturan, karena pengaturan bisa diubah admin: pernah ada
 empat add-on dijual padahal tidak satu pun fiturnya ada.
+
+**Fengshui nama: reduksi dikurangi 80, bukan sisa bagi 80.** `reduksi81()` di
+`src/lib/content/fengshui.ts` mengurangi 80 berulang sampai masuk rentang 1
+sampai 81. Aplikasi yang metodenya dibedah untuk fitur ini memakai `nilai % 80`
+dan salah di dua tempat: jumlah 160 memberi 0 lalu menunjuk indeks -1 di luar
+tabel (hasilnya `undefined` di layar), dan 161 turun ke 1 padahal seharusnya
+berhenti di 81. Keempat kasus itu dikunci di `fengshui.test.ts`.
+
+**Nada 81 angka menentukan peringkat kandidat.** Pembagian baik, bercampur,
+kurang bukan hiasan warna: itu yang dipakai `bandingkanNama()` untuk mengurutkan
+kandidat, dan yang menentukan kapan saran perbaikan muncul. Mengubah nada satu
+angka menggeser seluruh peringkat. Warnanya meminjam token kategori hari yang
+sudah dikunci suite kontras, bukan warna baru.
 
 **Fungsi berjalan di Singapura, bukan Virginia.** `vercel.json` mematok
 `regions: ["sin1"]`. Bawaan Vercel untuk project baru adalah `iad1`
@@ -168,6 +190,7 @@ yang pasti, bukan setelah "impor terakhir".
 ```
 src/lib/wariga/        mesin perhitungan, murni fungsi, paling dijaga
 src/lib/content/       teks dan tabel yang diport dari aplikasi lama
+src/lib/content/fengshui  sistem 81 angka untuk nama usaha, add-on sekali bayar
 src/lib/gate.ts        semua keputusan akses, fungsi murni, ada tesnya
 src/lib/addon-registry add-on mana yang fiturnya sudah ada
 src/lib/harga-server   satu pintu baca harga di server

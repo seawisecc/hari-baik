@@ -23,6 +23,7 @@ export const ADDON_SIAP: Record<string, AddOnSiap> = {
   "cari-hari-acara": { rute: "/pencari-hari" },
   "profil-keluarga": { rute: "/keluarga" },
   "laporan-pdf": { rute: "/laporan" },
+  "fengshui-nama": { rute: "/fengshui-nama" },
 };
 
 /** True bila fitur di balik add-on ini sudah benar-benar ada. */

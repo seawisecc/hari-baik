@@ -518,6 +518,41 @@ const dict = {
     "acara.tanda.kajengKliwon": "Kajeng Kliwon",
     "acara.tanda.hariRaya": "Bertepatan hari raya",
     "acara.tanda.libur": "Libur nasional",
+    "nav.short.fengshui": "Fengshui",
+    "fengshui.title": "Fengshui Nama Usaha",
+    "fengshui.subtitle":
+      "Timbang nama usaha dan nama produk lewat sistem 81 angka, sebelum namanya terlanjur dicetak.",
+    "fengshui.label": "Nama yang ditimbang",
+    "fengshui.placeholder": "Nama usaha atau nama produk",
+    "fengshui.add": "Tambah kandidat",
+    "fengshui.remove": "Hapus kandidat",
+    "fengshui.cta": "Timbang nama",
+    "fengshui.empty": "Tulis dulu satu nama, lalu tekan Timbang nama.",
+    "fengshui.best": "Paling mendukung",
+    "fengshui.number": "Angka {n}",
+    "fengshui.sum": "Jumlah huruf {n}",
+    "fengshui.element": "Unsur {u}",
+    "fengshui.tone.baik": "Mendukung",
+    "fengshui.tone.campur": "Bercampur",
+    "fengshui.tone.kurang": "Kurang mendukung",
+    "fengshui.breakdown": "Rincian huruf",
+    "fengshui.ignored":
+      "{n} karakter bukan huruf diabaikan, jadi angka dan tanda baca tidak mengubah hasilnya.",
+    "fengshui.trimmed": "Namanya sangat panjang, jadi hanya {n} huruf pertama yang dihitung.",
+    "fengshui.suggest.title": "Cara memperbaikinya",
+    "fengshui.suggest.word": "Sandingkan satu kata",
+    "fengshui.suggest.wordDesc":
+      "Menambahkan kata ini di depan atau di belakang memindahkan namanya ke angka yang mendukung.",
+    "fengshui.suggest.letter": "Sesuaikan satu huruf",
+    "fengshui.suggest.letterDesc":
+      "Menambah satu huruf bernilai {n} sudah cukup: {huruf}.",
+    "fengshui.suggest.none":
+      "Angka ini sudah mendukung, jadi tidak ada yang perlu diubah.",
+    "fengshui.method": "Cara menghitungnya",
+    "fengshui.methodDesc":
+      "Setiap huruf diberi nilai 1 sampai 9 secara berulang (A sampai I bernilai 1 sampai 9, lalu J kembali ke 1). Nilainya dijumlahkan, lalu dikurangi 80 sampai masuk rentang 1 sampai 81, dan angka itu dibaca di tabel 81 angka. Digit terakhirnya menentukan unsurnya.",
+    "fengshui.disclaimer":
+      "Angka membantu memilih di antara nama yang sama-sama kamu suka, bukan menentukan nasib usaha. Nama yang baik tetap kalah oleh produk yang buruk, dan nama yang angkanya biasa saja bisa besar karena pelayanannya.",
     "studio.by": "Dibuat oleh Seawise Studio",
     "studio.name": "Seawise Studio",
     "studio.about":
@@ -1023,6 +1058,39 @@ const dict = {
     "acara.tanda.kajengKliwon": "Kajeng Kliwon",
     "acara.tanda.hariRaya": "Falls on a holy day",
     "acara.tanda.libur": "Public holiday",
+    "nav.short.fengshui": "Fengshui",
+    "fengshui.title": "Business Name Fengshui",
+    "fengshui.subtitle":
+      "Weigh business and product names with the 81-number system, before the name goes to print.",
+    "fengshui.label": "Names to weigh",
+    "fengshui.placeholder": "Business or product name",
+    "fengshui.add": "Add candidate",
+    "fengshui.remove": "Remove candidate",
+    "fengshui.cta": "Weigh names",
+    "fengshui.empty": "Write one name first, then press Weigh names.",
+    "fengshui.best": "Most supportive",
+    "fengshui.number": "Number {n}",
+    "fengshui.sum": "Letter sum {n}",
+    "fengshui.element": "{u} element",
+    "fengshui.tone.baik": "Supportive",
+    "fengshui.tone.campur": "Mixed",
+    "fengshui.tone.kurang": "Less supportive",
+    "fengshui.breakdown": "Letter breakdown",
+    "fengshui.ignored":
+      "{n} non-letter characters were ignored, so digits and punctuation do not change the result.",
+    "fengshui.trimmed": "The name is very long, so only the first {n} letters were counted.",
+    "fengshui.suggest.title": "How to improve it",
+    "fengshui.suggest.word": "Pair it with one word",
+    "fengshui.suggest.wordDesc":
+      "Adding this word in front or behind moves the name to a supportive number.",
+    "fengshui.suggest.letter": "Adjust one letter",
+    "fengshui.suggest.letterDesc": "One extra letter worth {n} is enough: {huruf}.",
+    "fengshui.suggest.none": "This number is already supportive, so nothing needs changing.",
+    "fengshui.method": "How it is calculated",
+    "fengshui.methodDesc":
+      "Each letter is given a value from 1 to 9, repeating (A through I are 1 through 9, then J returns to 1). The values are summed, then reduced by 80 until they fall between 1 and 81, and that number is read in the 81-number table. Its last digit sets the element.",
+    "fengshui.disclaimer":
+      "The number helps you choose between names you already like; it does not decide the fate of a business. A good name still loses to a poor product, and an ordinary number can grow large on service alone.",
     "studio.by": "Made by Seawise Studio",
     "studio.name": "Seawise Studio",
     "studio.about":
