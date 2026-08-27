@@ -69,6 +69,18 @@ export const viewport: Viewport = {
   themeColor: "#f2f0ec",
   width: "device-width",
   initialScale: 1,
+  /*
+   * Wajib ada selama ada yang memakai `env(safe-area-inset-*)`.
+   *
+   * Tanpa `viewport-fit=cover`, iOS tidak pernah mengisi keempat inset itu:
+   * nilainya 0 di semua perangkat, jadi `pb-[env(safe-area-inset-bottom)]`
+   * pada bilah bawah tidak menghasilkan apa-apa. Digabung dengan
+   * `appleWebApp.capable` di atas, yang menaruh aplikasi ini dalam mode
+   * standalone dan memberinya seluruh tinggi layar, bilah bawah jadi
+   * berhimpit dengan home indicator dan tidak punya ruang yang dijanjikan
+   * kodenya. Dijaga `src/lib/__tests__/viewport.test.ts`.
+   */
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

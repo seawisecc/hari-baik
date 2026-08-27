@@ -21,7 +21,7 @@ halaman pakai `|`. Ini permintaan tegas pemilik: em dash membuat produknya
 terlihat tidak profesional. Sebelum menerbitkan dokumen panjang, periksa
 dengan grep.
 
-**`npm run verify` sebelum push.** Merangkai lint, sepuluh suite tes, build,
+**`npm run verify` sebelum push.** Merangkai lint, sebelas suite tes, build,
 dan uji asap route API di build produksi asli. Perintah ini lahir dari
 kejadian nyata, lihat "Yang pernah menggigit" di bawah.
 
@@ -38,7 +38,7 @@ halamannya dan periksa DOM-nya.
 | Perintah               | Guna                                               |
 | ---------------------- | -------------------------------------------------- |
 | `npm run verify`       | Gerbang sebelum push: lint, tes, build, uji asap   |
-| `npm test`             | Sepuluh suite tes                                  |
+| `npm test`             | Sebelas suite tes                                  |
 | `npm run smoke`        | Tembak keenam route API di build produksi asli     |
 | `npm run deploy-rules` | Terapkan `firestore.rules`                         |
 | `npm run set-admin`    | Beri custom claim admin                            |
@@ -141,6 +141,16 @@ Firebase, bukan objek User di state React.
 **Harga dibaca di server.** `bacaHarga()` di `src/lib/harga-server.ts` adalah
 satu pintu yang menyaring add-on yang belum siap. Jangan mengambil harga lewat
 fetch dari klien lagi.
+
+**`env(safe-area-inset-*)` mati tanpa `viewport-fit=cover`.** Bilah bawah
+memberi dirinya `pb-[env(safe-area-inset-bottom)]`, tapi iOS hanya mengisi
+inset itu bila viewport dideklarasikan `viewport-fit=cover`. Tanpa itu nilainya
+0 di semua perangkat, dan karena `appleWebApp.capable` menaruh aplikasi ini
+dalam mode standalone yang memakai seluruh tinggi layar, bilahnya berhimpit
+dengan home indicator. Terukur di WebKit: `padding-bottom` bilah terkomputasi
+`0px` sebelum diperbaiki. Keduanya ada di berkas berbeda dan tidak saling
+menyebut, jadi `viewport.test.ts` yang menahannya: selama ada yang memakai
+`env(safe-area-inset-*)`, `viewportFit: "cover"` wajib ada.
 
 ## Yang pernah menggigit
 
