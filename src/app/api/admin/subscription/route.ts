@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { periksaAddOn } from "@/lib/addon-registry";
 import { catatJejak } from "@/lib/audit";
 import { adminDb } from "@/lib/firebase/admin";
 import { AdminError, handleAdminError, requireAdmin } from "@/lib/firebase/requireAdmin";
@@ -57,15 +58,18 @@ export async function POST(req: NextRequest) {
     // sekali, karena keduanya memang dibeli terpisah.
     if (action === "addon") {
       if (!Array.isArray(addOn)) throw new AdminError(400, "addOn harus berupa daftar id.");
-      // Hanya id yang benar-benar ada di katalog yang diterima. Tanpa ini,
-      // salah ketik akan tersimpan diam-diam dan tidak pernah membuka apa pun.
-      const dikenal = new Set(HARGA_BAWAAN.addOn.map((a) => a.id));
-      const asing = addOn.filter((id) => typeof id !== "string" || !dikenal.has(id));
+      const sebelumAddOn = (snap.data() as { addOn?: string[] }).addOn ?? [];
+      // Salah ketik tetap ditolak, tapi id lama yang sudah menempel di dokumen
+      // orang ini boleh ikut tersimpan; kalau tidak, admin tidak akan pernah
+      // bisa membuangnya. Lihat periksaAddOn().
+      const { bersih, asing } = periksaAddOn(
+        addOn,
+        HARGA_BAWAAN.addOn.map((a) => a.id),
+        sebelumAddOn,
+      );
       if (asing.length) {
         throw new AdminError(400, `Add-on tidak dikenal: ${asing.join(", ")}.`);
       }
-      const bersih = [...new Set(addOn)];
-      const sebelumAddOn = (snap.data() as { addOn?: string[] }).addOn ?? [];
       await ref.update({
         addOn: bersih,
         lastChangedBy: admin.email ?? admin.uid,

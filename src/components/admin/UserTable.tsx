@@ -71,130 +71,297 @@ export function UserTable({
   }
 
   return (
-    // Tabel lebar harus bisa digulir sendiri, bukan mendorong lebar halaman.
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[820px] text-sm">
-        <thead>
-          <tr className="text-left text-[11px] uppercase tracking-wider text-ink-faint">
-            <th className="px-3 py-2 font-semibold">{t("admin.col.user")}</th>
-            <th className="px-3 py-2 font-semibold">{t("admin.col.status")}</th>
-            <th className="px-3 py-2 font-semibold">{t("admin.col.validUntil")}</th>
-            <th className="px-3 py-2 font-semibold">{t("admin.col.birth")}</th>
-            <th className="px-3 py-2 font-semibold">{t("admin.col.addon")}</th>
-            <th className="px-3 py-2 text-right font-semibold">{t("admin.col.action")}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((u) => {
-            const seumurHidup = u.subscriptionStatus === "lifetime";
-            const aktif = seumurHidup || u.subscriptionStatus === "active";
-            const dibuka = terbuka === u.uid;
+    <>
+      {/*
+       * Ponsel: satu kartu per pengguna.
+       *
+       * Tabel enam kolom memaksa geser ke samping di layar selebar telapak
+       * tangan, dan status yang ingin dilihat justru yang paling kanan.
+       * Menggeser sambil mengatur langganan orang adalah cara paling mudah
+       * salah pencet, jadi di ponsel setiap orang dapat kartunya sendiri
+       * yang bisa dibaca dari atas ke bawah tanpa menggeser apa pun.
+       */}
+      <div className="space-y-3 md:hidden">
+        {users.map((u) => (
+          <KartuPengguna
+            key={u.uid}
+            u={u}
+            katalogAddOn={katalogAddOn}
+            busy={busy === u.uid}
+            dibuka={terbuka === u.uid}
+            onBuka={() => setTerbuka(terbuka === u.uid ? null : u.uid)}
+            onAksi={(aksi) => jalankan(u.uid, aksi)}
+          />
+        ))}
+      </div>
 
-            return (
-              // Panel pengaturan harus jadi baris sendiri; kalau ditaruh di baris
-              // yang sama, sel colSpan menghimpit kolom-kolom lainnya.
-              <Fragment key={u.uid}>
-                <tr className="border-t border-border-soft align-middle">
-                  <td className="px-3 py-3">
-                    <p className="font-medium text-ink">{u.nama || t("profile.noName")}</p>
-                    <p className="text-xs text-ink-faint">{u.email}</p>
-                    {u.phoneNumber && (
-                      <a
-                        href={`https://wa.me/${nomorWa(u.phoneNumber)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs text-ink-soft underline underline-offset-2"
-                      >
-                        {u.phoneNumber}
-                      </a>
-                    )}
-                  </td>
+      {/* Layar lebar: tabel, karena membandingkan banyak orang sekaligus
+          lebih mudah kalau angkanya sebaris. */}
+      <div className="hidden overflow-x-auto md:block">
+        <table className="w-full min-w-[820px] text-sm">
+          <thead>
+            <tr className="text-left text-[11px] uppercase tracking-wider text-ink-faint">
+              <th className="px-3 py-2 font-semibold">{t("admin.col.user")}</th>
+              <th className="px-3 py-2 font-semibold">{t("admin.col.status")}</th>
+              <th className="px-3 py-2 font-semibold">{t("admin.col.validUntil")}</th>
+              <th className="px-3 py-2 font-semibold">{t("admin.col.birth")}</th>
+              <th className="px-3 py-2 font-semibold">{t("admin.col.addon")}</th>
+              <th className="px-3 py-2 text-right font-semibold">{t("admin.col.action")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((u) => {
+              const dibuka = terbuka === u.uid;
 
-                  <td className="px-3 py-3">
-                    <span
-                      className={cn(
-                        "inline-block rounded-pill px-2.5 py-1 text-xs font-medium",
-                        STATUS_STYLE[u.subscriptionStatus],
+              return (
+                // Panel pengaturan harus jadi baris sendiri; kalau ditaruh di baris
+                // yang sama, sel colSpan menghimpit kolom-kolom lainnya.
+                <Fragment key={u.uid}>
+                  <tr className="border-t border-border-soft align-middle">
+                    <td className="px-3 py-3">
+                      <p className="font-medium text-ink">{u.nama || t("profile.noName")}</p>
+                      <p className="text-xs text-ink-faint">{u.email}</p>
+                      {u.phoneNumber && <TautanWa phone={u.phoneNumber} />}
+                    </td>
+
+                    <td className="px-3 py-3">
+                      <Status status={u.subscriptionStatus} />
+                    </td>
+
+                    <td className="px-3 py-3 text-ink-soft">
+                      {u.subscriptionStatus === "lifetime" ? (
+                        <span className="text-ink">{t("admin.noExpiry")}</span>
+                      ) : (
+                        tanggal(u.subscriptionExpiresAt)
                       )}
-                    >
-                      {t(STATUS_KEY[u.subscriptionStatus])}
-                    </span>
-                  </td>
+                    </td>
 
-                  <td className="px-3 py-3 text-ink-soft">
-                    {seumurHidup ? (
-                      <span className="text-ink">{t("admin.noExpiry")}</span>
-                    ) : (
-                      tanggal(u.subscriptionExpiresAt)
-                    )}
-                  </td>
+                    <td className="px-3 py-3 text-ink-soft">
+                      {u.tanggalLahir ?? "-"}
+                      {u.uripLahir !== null && (
+                        <span className="block text-xs text-ink-faint">urip {u.uripLahir}</span>
+                      )}
+                    </td>
 
-                  <td className="px-3 py-3 text-ink-soft">
-                    {u.tanggalLahir ?? "-"}
-                    {u.uripLahir !== null && (
-                      <span className="block text-xs text-ink-faint">urip {u.uripLahir}</span>
-                    )}
-                  </td>
+                    <td className="px-3 py-3">
+                      <SelAddOn dimiliki={u.addOn ?? []} katalog={katalogAddOn} />
+                    </td>
 
-                  <td className="px-3 py-3">
-                    <SelAddOn dimiliki={u.addOn ?? []} katalog={katalogAddOn} />
-                  </td>
-
-                  <td className="px-3 py-3">
-                    <div className="flex justify-end">
-                      <Button
-                        size="sm"
-                        variant={dibuka ? "surface" : "primary"}
-                        disabled={busy === u.uid}
-                        onClick={() => setTerbuka(dibuka ? null : u.uid)}
-                      >
-                        <Settings2 className="h-3.5 w-3.5" aria-hidden />
-                        {t("admin.manage")}
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-
-                {dibuka && (
-                  <tr>
-                    <td colSpan={6} className="px-3 pb-4">
-                      <div className="grid gap-5 lg:grid-cols-2 lg:items-start">
-                        <AturLangganan
-                          aktif={aktif}
-                          busy={busy === u.uid}
-                          onTutup={() => setTerbuka(null)}
-                          onPilih={(aksi) => jalankan(u.uid, aksi)}
-                        />
-                        <AturAddOn
-                          katalog={katalogAddOn}
-                          dimiliki={u.addOn ?? []}
-                          busy={busy === u.uid}
-                          onSimpan={(addOn) => jalankan(u.uid, { action: "addon", addOn })}
-                        />
-                        {/* Pengguna tidak bisa lagi mengubah tanggal lahirnya
-                            sendiri setelah onboarding, jadi perbaikannya ada
-                            di sini. */}
-                        <AturTanggalLahir
-                          sekarang={u.tanggalLahir}
-                          busy={busy === u.uid}
-                          onSimpan={(tanggalLahir) =>
-                            jalankan(u.uid, { action: "lahir", tanggalLahir })
-                          }
-                        />
+                    <td className="px-3 py-3">
+                      <div className="flex justify-end">
+                        <Button
+                          size="sm"
+                          variant={dibuka ? "surface" : "primary"}
+                          disabled={busy === u.uid}
+                          onClick={() => setTerbuka(dibuka ? null : u.uid)}
+                        >
+                          <Settings2 className="h-3.5 w-3.5" aria-hidden />
+                          {t("admin.manage")}
+                        </Button>
                       </div>
                     </td>
                   </tr>
-                )}
-              </Fragment>
-            );
-          })}
-        </tbody>
-      </table>
+
+                  {dibuka && (
+                    <tr>
+                      <td colSpan={6} className="px-3 pb-4">
+                        <PanelKelola
+                          u={u}
+                          katalogAddOn={katalogAddOn}
+                          busy={busy === u.uid}
+                          onTutup={() => setTerbuka(null)}
+                          onAksi={(aksi) => jalankan(u.uid, aksi)}
+                        />
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+/** Satu pengguna sebagai kartu, untuk layar sempit. */
+function KartuPengguna({
+  u,
+  katalogAddOn,
+  busy,
+  dibuka,
+  onBuka,
+  onAksi,
+}: {
+  u: UserProfile;
+  katalogAddOn: AddOn[];
+  busy: boolean;
+  dibuka: boolean;
+  onBuka: () => void;
+  onAksi: (aksi: AksiPengguna) => void;
+}) {
+  const t = useT();
+
+  return (
+    <div className="rounded-md bg-surface px-5 py-4 hb-raise-1">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="truncate font-medium text-ink">{u.nama || t("profile.noName")}</p>
+          <p className="truncate text-xs text-ink-faint">{u.email}</p>
+        </div>
+        <Status status={u.subscriptionStatus} />
+      </div>
+
+      {u.phoneNumber && (
+        <div className="mt-1">
+          <TautanWa phone={u.phoneNumber} />
+        </div>
+      )}
+
+      {/* Dua kolom: label kiri, nilai kanan. Di lebar ponsel ini lebih cepat
+          dipindai daripada label di atas nilainya, yang membuat kartunya
+          panjang dua kali lipat. */}
+      <dl className="mt-4 space-y-2 border-t border-border-soft pt-3 text-sm">
+        <Baris label={t("admin.col.validUntil")}>
+          {u.subscriptionStatus === "lifetime" ? (
+            <span className="text-ink">{t("admin.noExpiry")}</span>
+          ) : (
+            tanggal(u.subscriptionExpiresAt)
+          )}
+        </Baris>
+
+        <Baris label={t("admin.col.birth")}>
+          {u.tanggalLahir ?? "-"}
+          {u.uripLahir !== null && (
+            <span className="text-ink-faint"> · urip {u.uripLahir}</span>
+          )}
+        </Baris>
+
+        <div>
+          <dt className="mb-1.5 text-xs text-ink-faint">{t("admin.col.addon")}</dt>
+          <dd>
+            <SelAddOn dimiliki={u.addOn ?? []} katalog={katalogAddOn} />
+          </dd>
+        </div>
+      </dl>
+
+      <Button
+        className="mt-4"
+        block
+        size="sm"
+        variant={dibuka ? "surface" : "primary"}
+        disabled={busy}
+        onClick={onBuka}
+      >
+        <Settings2 className="h-3.5 w-3.5" aria-hidden />
+        {dibuka ? t("common.close") : t("admin.manage")}
+      </Button>
+
+      {dibuka && (
+        <div className="mt-4">
+          <PanelKelola
+            u={u}
+            katalogAddOn={katalogAddOn}
+            busy={busy}
+            onTutup={onBuka}
+            onAksi={onAksi}
+          />
+        </div>
+      )}
     </div>
   );
 }
 
-/** Ringkasan add-on di baris tabel: cukup untuk memindai, tidak untuk membaca. */
+function Baris({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4">
+      <dt className="shrink-0 text-xs text-ink-faint">{label}</dt>
+      <dd className="text-right text-ink-soft">{children}</dd>
+    </div>
+  );
+}
+
+/**
+ * Tiga pengatur untuk satu pengguna.
+ *
+ * Dipakai kartu ponsel maupun baris tabel, jadi keduanya tidak bisa berbeda
+ * isi: menambah pengatur di satu tempat otomatis muncul di keduanya.
+ */
+function PanelKelola({
+  u,
+  katalogAddOn,
+  busy,
+  onTutup,
+  onAksi,
+}: {
+  u: UserProfile;
+  katalogAddOn: AddOn[];
+  busy: boolean;
+  onTutup: () => void;
+  onAksi: (aksi: AksiPengguna) => void;
+}) {
+  const aktif = u.subscriptionStatus === "lifetime" || u.subscriptionStatus === "active";
+
+  return (
+    <div className="grid gap-5 lg:grid-cols-2 lg:items-start">
+      <AturLangganan
+        aktif={aktif}
+        busy={busy}
+        onTutup={onTutup}
+        onPilih={(aksi) => onAksi(aksi)}
+      />
+      <AturAddOn
+        katalog={katalogAddOn}
+        dimiliki={u.addOn ?? []}
+        busy={busy}
+        onSimpan={(addOn) => onAksi({ action: "addon", addOn })}
+      />
+      {/* Pengguna tidak bisa lagi mengubah tanggal lahirnya sendiri setelah
+          onboarding, jadi perbaikannya ada di sini. */}
+      <AturTanggalLahir
+        sekarang={u.tanggalLahir}
+        busy={busy}
+        onSimpan={(tanggalLahir) => onAksi({ action: "lahir", tanggalLahir })}
+      />
+    </div>
+  );
+}
+
+function Status({ status }: { status: SubscriptionStatus }) {
+  const t = useT();
+  return (
+    <span
+      className={cn(
+        "shrink-0 rounded-pill px-2.5 py-1 text-xs font-medium",
+        STATUS_STYLE[status],
+      )}
+    >
+      {t(STATUS_KEY[status])}
+    </span>
+  );
+}
+
+function TautanWa({ phone }: { phone: string }) {
+  return (
+    <a
+      href={`https://wa.me/${nomorWa(phone)}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-xs text-ink-soft underline underline-offset-2"
+    >
+      {phone}
+    </a>
+  );
+}
+
+/**
+ * Ringkasan add-on: cukup untuk memindai, tidak untuk membaca.
+ *
+ * Id yang tidak ada lagi di katalog ditandai berbeda, bukan dibiarkan tampil
+ * seperti add-on biasa. Itu yang membuat sisa lama seperti
+ * "pengingat-whatsapp" terbaca sebagai sesuatu yang perlu dibersihkan.
+ */
 function SelAddOn({ dimiliki, katalog }: { dimiliki: string[]; katalog: AddOn[] }) {
   const t = useT();
   const { lang } = useLang();
@@ -207,13 +374,24 @@ function SelAddOn({ dimiliki, katalog }: { dimiliki: string[]; katalog: AddOn[] 
     <div className="flex flex-wrap gap-1">
       {dimiliki.map((id) => {
         const a = katalog.find((x) => x.id === id);
+        if (!a) {
+          return (
+            <span
+              key={id}
+              title={t("admin.addon.legacy")}
+              className="rounded-pill bg-lara/20 px-2 py-0.5 text-[10px] font-medium text-lara-teks"
+            >
+              {id} · {t("admin.addon.unknown")}
+            </span>
+          );
+        }
         return (
           <span
             key={id}
-            title={a ? teks(a.nama, lang) : id}
+            title={teks(a.nama, lang)}
             className="rounded-pill bg-accent-wash px-2 py-0.5 text-[10px] font-medium text-accent-deep"
           >
-            {a ? teks(a.nama, lang) : id}
+            {teks(a.nama, lang)}
           </span>
         );
       })}

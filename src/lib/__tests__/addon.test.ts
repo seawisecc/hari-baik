@@ -10,7 +10,7 @@
  * Tiga uji di bawah menjaga ketiganya.
  */
 import { existsSync, readFileSync } from "node:fs";
-import { ADDON_SIAP, addOnSiapJual } from "../addon-registry";
+import { ADDON_SIAP, addOnSiapJual, periksaAddOn } from "../addon-registry";
 import { RUTE_ADDON } from "../gate";
 import { HARGA_BAWAAN } from "../harga";
 
@@ -96,7 +96,44 @@ for (const id of Object.keys(ADDON_SIAP)) {
     rute.includes("HARGA_BAWAAN.addOn.map((a) => a.id)"),
   );
   eq("id asing ditolak", true, /Add-on tidak dikenal/.test(rute));
-  eq("daftar dibersihkan dari duplikat", true, rute.includes("[...new Set(addOn)]"));
+  eq("route memakai penyaring bersama", true, rute.includes("periksaAddOn("));
+}
+
+/*
+ * 8. Id lama yang sudah dihapus dari katalog.
+ *
+ * "pengingat-whatsapp" pernah dijual lalu dibuang dari katalog, dan id itu
+ * tertinggal di dokumen orang yang sempat membelinya. Karena panel admin
+ * menyimpan daftar penuh, id itu ikut terkirim setiap kali menyimpan dan
+ * ditolak sebagai tidak dikenal: admin jadi tidak bisa mengubah add-on orang
+ * itu sama sekali, termasuk untuk membuang id lamanya. Yang tetap harus
+ * ditolak adalah id asing yang benar-benar baru.
+ */
+{
+  const katalog = ["profil-keluarga", "cari-hari-acara", "laporan-pdf"];
+
+  const a = periksaAddOn(["profil-keluarga", "pengingat-whatsapp"], katalog, [
+    "profil-keluarga",
+    "pengingat-whatsapp",
+  ]);
+  eq("id lama yang sudah dimiliki boleh tersimpan", "", a.asing.join(","));
+  eq("daftarnya utuh", "profil-keluarga,pengingat-whatsapp", a.bersih.join(","));
+
+  const b = periksaAddOn(["profil-keluarga"], katalog, [
+    "profil-keluarga",
+    "pengingat-whatsapp",
+  ]);
+  eq("id lama bisa dibuang", "profil-keluarga", b.bersih.join(","));
+
+  const c = periksaAddOn(["profil-kelaurga"], katalog, ["profil-keluarga"]);
+  eq("salah ketik tetap ditolak", "profil-kelaurga", c.asing.join(","));
+
+  const d = periksaAddOn(["pengingat-whatsapp"], katalog, []);
+  eq("id lama yang tidak dimiliki juga ditolak", "pengingat-whatsapp", d.asing.join(","));
+
+  const e = periksaAddOn(["laporan-pdf", "laporan-pdf", 7], katalog, []);
+  eq("duplikat dibuang", "laporan-pdf", e.bersih.join(","));
+  eq("bukan teks ditolak", "7", e.asing.join(","));
 }
 
 console.log(fail === 0 ? "✓ add-on: semua lolos" : `✗ add-on: ${fail} gagal`);

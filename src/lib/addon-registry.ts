@@ -28,3 +28,40 @@ export const ADDON_SIAP: Record<string, AddOnSiap> = {
 /** True bila fitur di balik add-on ini sudah benar-benar ada. */
 export const addOnSiapJual = (id: string): boolean =>
   Object.prototype.hasOwnProperty.call(ADDON_SIAP, id);
+
+/**
+ * Pisahkan id add-on yang boleh disimpan dari yang benar benar asing.
+ *
+ * Id yang sudah dimiliki pengguna tetap lolos meski tidak ada lagi di katalog.
+ * Ini bukan kelonggaran, melainkan jalan keluar dari kebuntuan yang nyata:
+ * "pengingat-whatsapp" pernah dijual lalu dihapus dari katalog, dan id itu
+ * tertinggal di dokumen orang yang sempat membelinya. Karena panel admin
+ * menyimpan daftar penuh, setiap penyimpanan untuk orang itu ikut mengirim id
+ * lamanya, ditolak sebagai tidak dikenal, dan admin jadi tidak bisa mengubah
+ * add-on orang itu sama sekali, termasuk untuk membuang id lamanya.
+ *
+ * Yang tetap ditolak adalah id asing yang BARU: salah ketik tidak boleh
+ * tersimpan diam-diam dan tidak pernah membuka apa pun.
+ */
+export function periksaAddOn(
+  diminta: unknown[],
+  dikenal: string[],
+  dimiliki: string[],
+): { bersih: string[]; asing: string[] } {
+  const sah = new Set(dikenal);
+  const lama = new Set(dimiliki);
+  const bersih: string[] = [];
+  const asing: string[] = [];
+
+  for (const id of diminta) {
+    if (typeof id !== "string") {
+      asing.push(String(id));
+    } else if (sah.has(id) || lama.has(id)) {
+      if (!bersih.includes(id)) bersih.push(id);
+    } else {
+      asing.push(id);
+    }
+  }
+
+  return { bersih, asing };
+}
