@@ -100,6 +100,15 @@ ada) DAN ditandai aktif di pengaturan harga (mau dijual). Daftar kesiapan ada
 di kode, bukan di pengaturan, karena pengaturan bisa diubah admin: pernah ada
 empat add-on dijual padahal tidak satu pun fiturnya ada.
 
+**Fungsi berjalan di Singapura, bukan Virginia.** `vercel.json` mematok
+`regions: ["sin1"]`. Bawaan Vercel untuk project baru adalah `iad1`
+(Washington DC), sementara Firestore project ini ada di `asia-southeast2`
+(Jakarta). Artinya setiap route API menyeberangi Pasifik dua kali: pengguna di
+Bali, fungsi di Virginia, data di Jakarta. Terukur 0,7 sampai 1,9 detik untuk
+satu kali baca dokumen harga. Kalau suatu hari Firestore dipindah, region ini
+harus ikut pindah ke yang terdekat dengannya, bukan ke yang terdekat dengan
+pengguna.
+
 **Firebase diimpor dinamis.** `src/lib/firebase/client.ts` memiliki SDK-nya;
 komponen lain hanya boleh mengimpor tipe. Impor statis mengembalikan 640 KB
 Firebase ke setiap halaman, termasuk halaman depan yang tidak memakainya.
