@@ -2,12 +2,15 @@
 
 import {
   ArrowRight,
+  Calculator,
   CalendarDays,
   CalendarSearch,
   Check,
   FileText,
+  Fingerprint,
   Heart,
   Route,
+  ShieldCheck,
   Sparkles,
   Sun,
   User,
@@ -76,7 +79,24 @@ const KATEGORI_BG: Record<(typeof KATEGORI)[number], string> = {
   pati: "bg-pati",
 };
 
-const FAQ = [1, 2, 3, 4] as const;
+const FAQ = [1, 2, 3, 4, 5, 6] as const;
+
+/**
+ * Tiga bentuk dari satu masalah yang sama.
+ *
+ * Halaman ini dulu langsung memperkenalkan produknya. Yang membuka halaman
+ * depan belum tentu sedang mencari kalender Bali; sebagian besar sedang
+ * memikirkan sesuatu yang tidak berjalan. Tiga kartu ini menyebutkan hal itu
+ * lebih dulu, baru produknya diperkenalkan sebagai jawabannya.
+ */
+const MASALAH = [1, 2, 3] as const;
+
+/** Tiga alasan kenapa ini perhitungan, bukan ramalan. */
+const ALASAN = [
+  { icon: Calculator, kunci: "point1" },
+  { icon: ShieldCheck, kunci: "point2" },
+  { icon: Fingerprint, kunci: "point3" },
+] as const;
 
 function Section({
   title,
@@ -146,13 +166,25 @@ export function LandingClient({
         </div>
       </header>
 
+      {/*
+       * Hero dibuka dengan pertanyaan, bukan dengan nama produk.
+       *
+       * Nama Hari Baik tetap terbaca di wordmark header tepat di atasnya, jadi
+       * tidak ada yang hilang. Yang berubah urutan perhatiannya: pengunjung
+       * pertama kali belum peduli pada nama sebuah aplikasi, dia peduli pada
+       * hal yang sedang mengganjal di kepalanya. Tagline lama tetap ada,
+       * turun satu tingkat jadi penutup bagian ini.
+       */}
       <section className="py-16 text-center sm:py-24">
-        <Logo size={76} className="mx-auto mb-7" />
-        <h1 className="font-heading text-5xl font-bold italic text-ink sm:text-7xl">
-          Hari Baik
+        <Logo size={68} className="mx-auto mb-7" />
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">
+          {t("landing.hero.eyebrow")}
+        </p>
+        <h1 className="mx-auto mt-4 max-w-3xl font-heading text-3xl font-bold leading-tight text-ink sm:text-5xl">
+          {t("landing.hero.hook")}
         </h1>
-        <p className="mx-auto mt-6 max-w-xl font-heading text-lg font-semibold text-ink sm:text-2xl">
-          &ldquo;{t("app.tagline")}&rdquo;
+        <p className="mx-auto mt-5 max-w-2xl font-heading text-lg font-semibold leading-snug text-ink sm:text-xl">
+          {t("landing.hero.sub")}
         </p>
         <p className="mx-auto mt-4 max-w-lg leading-relaxed text-ink-soft">
           {t("landing.hero.lead")}
@@ -165,6 +197,52 @@ export function LandingClient({
       </section>
 
       <div className="space-y-24">
+        <Section title={t("landing.problem.title")} lead={t("landing.problem.lead")}>
+          <div className="grid gap-5 sm:grid-cols-3">
+            {MASALAH.map((n) => (
+              <Card key={n} className="p-6">
+                <h3 className="font-heading text-lg font-semibold text-ink">
+                  {t(`landing.problem.${n}.title`)}
+                </h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
+                  {t(`landing.problem.${n}.desc`)}
+                </p>
+              </Card>
+            ))}
+          </div>
+        </Section>
+
+        {/* Jawaban atas bagian di atas, dan sekaligus tempat menegaskan bahwa
+            ini perhitungan, bukan ramalan. Itu keberatan pertama yang muncul
+            di kepala kebanyakan orang, dan lebih baik dijawab sebelum
+            ditanyakan. */}
+        <Section title={t("landing.why.title")}>
+          <Card className="p-8 text-center">
+            <p className="mx-auto max-w-2xl text-[15px] leading-relaxed text-ink-soft">
+              {t("landing.why.body")}
+            </p>
+            <p className="mx-auto mt-5 max-w-xl font-heading text-lg font-semibold text-ink">
+              &ldquo;{t("app.tagline")}&rdquo;
+            </p>
+          </Card>
+
+          <div className="grid gap-5 sm:grid-cols-3">
+            {ALASAN.map((a) => (
+              <Card key={a.kunci} className="p-6">
+                <span className="mb-4 grid h-11 w-11 place-items-center rounded-pill bg-accent-wash hb-raise-1">
+                  <a.icon className="h-5 w-5 text-accent-deep" aria-hidden />
+                </span>
+                <h3 className="font-heading text-lg font-semibold text-ink">
+                  {t(`landing.why.${a.kunci}.title`)}
+                </h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
+                  {t(`landing.why.${a.kunci}.desc`)}
+                </p>
+              </Card>
+            ))}
+          </div>
+        </Section>
+
         <Section title={t("landing.how.title")}>
           <div className="grid gap-5 sm:grid-cols-3">
             {LANGKAH.map((l) => (

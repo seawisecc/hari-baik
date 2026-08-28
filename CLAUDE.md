@@ -377,6 +377,15 @@ tidak berubah akan memakai ulang hasil render lama, termasuk datanya. Route
 PUT harga memanggil `revalidatePath`; kalau butuh segar segera di luar itu,
 sentuh kode halamannya.
 
+**`vercel env pull` mengosongkan env var yang ditandai sensitif.** Berkas yang
+dihasilkan tetap memuat semua namanya, tapi nilainya `""`, karena env var
+sensitif memang tidak bisa dibaca balik oleh siapa pun. Menjalankannya begitu
+saja akan menimpa `.env.local` yang sedang bekerja dengan berkas yang semuanya
+kosong, dan gejalanya baru muncul jauh kemudian sebagai "kredensial Firebase
+belum lengkap". Salin dulu sebelum menarik. Konsekuensi lain: kunci pihak
+ketiga tidak bisa diperiksa dari sini, jadi kegagalan pengiriman ditelusuri
+lewat `vercel logs`, bukan dengan memanggil API penyedianya.
+
 **Grep pada HTML ikut mengenai payload RSC.** Untuk memeriksa apa yang
 benar-benar terlihat, buang `<script>` dan tag dulu. Dua kali aku salah lapor
 karena ini.

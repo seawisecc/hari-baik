@@ -423,6 +423,40 @@ const dict = {
     "admin.sub.pricing": "Perubahan langsung berlaku di halaman langganan.",
     "landing.hero.lead":
       "Kalender Siklus Personal yang dihitung dari tanggal lahirmu, memadukan Wariga dan kalender Bali dengan kalender Masehi.",
+    "landing.hero.eyebrow": "Kalender siklus personal Bali",
+    "landing.hero.hook": "Sudah kerja keras, tapi kenapa hasilnya sering meleset?",
+    "landing.hero.sub":
+      "Bukan cuma soal seberapa keras kamu berusaha, tapi seberapa tepat kapan kamu memulai.",
+    "landing.problem.title": "Usaha yang sama, hasil yang berbeda",
+    "landing.problem.lead":
+      "Kalau kamu pernah merasa sudah melakukan semuanya dengan benar tapi hasilnya tetap seret, kemungkinan besar yang salah bukan caranya.",
+    "landing.problem.1.title": "Rencananya matang, waktunya meleset",
+    "landing.problem.1.desc":
+      "Penawaran dikirim di hari yang salah, dan yang membaca sedang tidak dalam keadaan menerima apa pun.",
+    "landing.problem.2.title": "Orang lain terlihat lebih mudah",
+    "landing.problem.2.desc":
+      "Bukan karena lebih pintar atau lebih beruntung. Mereka bergerak saat arusnya searah, bukan melawan.",
+    "landing.problem.3.title": "Sebenarnya kamu sudah merasakannya",
+    "landing.problem.3.desc":
+      "Ada hari yang semuanya mengalir tanpa bisa dijelaskan, dan ada hari yang semuanya berat padahal tidak ada yang berbeda.",
+    "landing.why.title": "Waktu yang tepat bukan keberuntungan",
+    "landing.why.body":
+      "Leluhur di Bali sudah menghitungnya jauh sebelum ada aplikasi. Wariga bukan kepercayaan yang harus kamu anut, melainkan sistem perhitungan: urip hari lahirmu bertemu urip hari yang sedang berjalan, dan dari pertemuan itu lahir kategori harinya.",
+    "landing.why.point1.title": "Angkanya tetap",
+    "landing.why.point1.desc":
+      "Tanggal yang sama selalu memberi hasil yang sama, dan siapa pun bisa menghitung ulang.",
+    "landing.why.point2.title": "Bukan AI, bukan tebakan",
+    "landing.why.point2.desc":
+      "Tidak ada model yang mengarang jawaban. Yang berjalan rumus yang sama tuanya dengan kalender Bali.",
+    "landing.why.point3.title": "Milikmu sendiri",
+    "landing.why.point3.desc":
+      "Kalender Bali berlaku sama untuk semua orang. Ini dihitung dari tanggal lahirmu, jadi harimu bukan hari orang lain.",
+    "landing.faq.5.q": "Saya bukan orang Bali dan bukan Hindu. Tetap bisa dipakai?",
+    "landing.faq.5.a":
+      "Bisa. Yang dipakai sistem perhitungannya, bukan ritualnya. Kamu cuma perlu tanggal lahir Masehi, dan yang keluar adalah keterangan tentang hari, bukan tuntunan ibadah.",
+    "landing.faq.6.q": "Apakah ini memakai AI?",
+    "landing.faq.6.a":
+      "Tidak. Tidak ada model yang mengarang jawaban di sini. Semuanya rumus tetap, dijalankan apa adanya, dan diuji terhadap 210 hari siklus pawukon penuh serta 41 tanggal acuan.",
     "landing.cta.trial": "Coba gratis {n} hari",
     "landing.cta.noCard": "Tanpa kartu kredit. Cukup email dan tanggal lahir.",
     "landing.cta.subscribe": "Lihat paket langganan",
@@ -1005,6 +1039,40 @@ const dict = {
     "admin.sub.pricing": "Changes take effect immediately on the subscription page.",
     "landing.hero.lead":
       "A personal cycle calendar calculated from your birth date, weaving Wariga and the Balinese calendar into the Gregorian one.",
+    "landing.hero.eyebrow": "Balinese personal cycle calendar",
+    "landing.hero.hook": "Working this hard, so why does it so often fall flat?",
+    "landing.hero.sub":
+      "It is not only how hard you push, but how well you pick the moment you start.",
+    "landing.problem.title": "Same effort, different results",
+    "landing.problem.lead":
+      "If you have ever done everything right and still watched it stall, the method is probably not what went wrong.",
+    "landing.problem.1.title": "The plan was solid, the timing was not",
+    "landing.problem.1.desc":
+      "The pitch goes out on the wrong day, and the person reading it is in no state to take anything on.",
+    "landing.problem.2.title": "It looks easier for other people",
+    "landing.problem.2.desc":
+      "Not because they are smarter or luckier. They move when the current runs with them, not against.",
+    "landing.problem.3.title": "You have felt it already",
+    "landing.problem.3.desc":
+      "Some days everything flows and nobody can say why, and some days everything drags though nothing has changed.",
+    "landing.why.title": "Good timing is not luck",
+    "landing.why.body":
+      "People in Bali were calculating this long before there were apps. Wariga is not a belief you have to hold; it is a system of reckoning. The urip of your birth day meets the urip of the day at hand, and their meeting is what gives the day its category.",
+    "landing.why.point1.title": "The numbers hold still",
+    "landing.why.point1.desc":
+      "The same date always gives the same answer, and anyone can work it out again.",
+    "landing.why.point2.title": "Not AI, not guesswork",
+    "landing.why.point2.desc":
+      "No model is inventing answers here. What runs is arithmetic as old as the Balinese calendar itself.",
+    "landing.why.point3.title": "Yours, not everyone's",
+    "landing.why.point3.desc":
+      "A Balinese calendar reads the same for everybody. This is worked out from your birth date, so your day is not someone else's day.",
+    "landing.faq.5.q": "I am not Balinese and not Hindu. Can I still use it?",
+    "landing.faq.5.a":
+      "Yes. What you are using is the reckoning, not the ritual. All it needs is your Gregorian birth date, and what comes back is a reading of the day, not religious instruction.",
+    "landing.faq.6.q": "Does this use AI?",
+    "landing.faq.6.a":
+      "No. Nothing here invents an answer. It is fixed arithmetic, run as written, and checked against all 210 days of the pawukon cycle plus 41 reference dates.",
     "landing.cta.trial": "Try {n} days free",
     "landing.cta.noCard": "No credit card. Just an email and your birth date.",
     "landing.cta.subscribe": "See subscription plans",
