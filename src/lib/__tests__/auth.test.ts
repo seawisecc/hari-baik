@@ -14,7 +14,8 @@
  * "getIdToken is not a function". Yang rusak bukan verifikasinya, melainkan
  * tombol "Saya sudah bayar" dan seluruh panel admin.
  */
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import { detailAuth, pesanAuth } from "../firebase/errors";
 
 let fail = 0;
@@ -273,6 +274,43 @@ for (const f of [
   eq("dan keterangannya ikut", true, pesan.includes("OPERATION_NOT_ALLOWED"));
 
   console.error = asli;
+}
+
+// ── CSP harus mengizinkan host yang dimuat SDK Firebase ──────────────────
+//
+// Masuk dengan Google gagal di produksi dengan auth/internal-error, tanpa
+// keterangan apa pun dan tanpa satu pun permintaan ke identitytoolkit. Sebabnya
+// bukan Firebase dan bukan Safari: @firebase/auth memuat
+// https://apis.google.com/js/api.js saat berjalan untuk membangun jembatan
+// komunikasi dengan jendela popup, dan CSP kita hanya mengizinkan 'self'.
+// Skripnya ditolak sebelum ada server yang sempat menjawab.
+//
+// URL-nya dirangkai saat berjalan, jadi ia tidak muncul sebagai untaian utuh di
+// bundel dan tidak akan ketahuan dengan membaca hasil build. Yang dibaca di
+// sini paket SDK-nya sendiri: host mana pun yang dipakainya memuat skrip wajib
+// ada di script-src.
+{
+  const csp = readFileSync("next.config.ts", "utf8");
+  const scriptSrc = csp.match(/"script-src ([^"]*)"/)?.[1] ?? "";
+  eq("script-src ditemukan di next.config.ts", true, scriptSrc.length > 0);
+
+  // Berkasnya bernama ber-hash dan namanya berubah tiap versi, jadi yang dibaca
+  // seluruh isi foldernya, bukan satu nama yang pasti akan basi.
+  const dir = "node_modules/@firebase/auth/dist/esm";
+  const sdk = readdirSync(dir)
+    .filter((f) => f.endsWith(".js"))
+    .map((f) => readFileSync(join(dir, f), "utf8"))
+    .join("\n");
+  const hostSkrip = new Set(
+    [...sdk.matchAll(/https?:\/\/([a-z0-9.-]+)\/js\//g)].map((m) => m[1]),
+  );
+
+  // Kalau suatu hari SDK-nya berhenti memuat skrip dari luar, blok ini boleh
+  // dibuang. Selama masih ada, izinnya wajib menyertainya.
+  eq("SDK memang memuat skrip dari luar", true, hostSkrip.size > 0);
+  for (const host of hostSkrip) {
+    eq(`script-src mengizinkan ${host}`, true, scriptSrc.includes(host));
+  }
 }
 
 console.log(fail === 0 ? "✓ auth: semua lolos" : `✗ auth: ${fail} gagal`);

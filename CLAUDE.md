@@ -281,6 +281,21 @@ bisa berbuat apa-apa dan yang dilapori tidak bisa mencari apa-apa. Satu putaran
 penuh terbuang hanya untuk mengetahui kode yang sudah ada di tangan
 penggunanya sejak awal.
 
+**CSP harus mengizinkan `apis.google.com` di `script-src`.** `@firebase/auth`
+memuat `https://apis.google.com/js/api.js` saat berjalan untuk membangun
+jembatan komunikasi dengan jendela popup Google. Host itu TIDAK tercakup oleh
+`*.googleapis.com`: berbeda. Tanpa izin ini, masuk dengan Google gagal dengan
+`auth/internal-error` tanpa keterangan apa pun dan tanpa satu pun permintaan ke
+identitytoolkit, karena skripnya ditolak sebelum ada server yang sempat
+menjawab. Sempat dikira masalah Safari selama beberapa putaran; sebenarnya
+berlaku di semua peramban. Email dan kata sandi tetap jalan sepanjang itu,
+karena jalur itu cuma fetch ke `identitytoolkit.googleapis.com` yang memang ada
+di `connect-src`, dan itulah yang membuatnya lama tidak ketahuan. URL-nya
+dirangkai saat berjalan, jadi tidak muncul sebagai untaian utuh di bundel dan
+tidak bisa ditemukan dengan membaca hasil build. `auth.test.ts` membaca paket
+SDK-nya langsung: host mana pun yang dipakainya memuat skrip wajib ada di
+`script-src`.
+
 **`authDomain` masih `hari-baik-7e56c.firebaseapp.com`.** Artinya penangan
 OAuth berjalan di domain pihak ketiga, dan itulah sumber kerapuhan masuk dengan
 Google di Safari. Perbaikannya membuatnya satu domain dengan aplikasi: proxy

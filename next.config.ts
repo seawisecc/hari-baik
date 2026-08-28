@@ -27,11 +27,22 @@ const CSP = [
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
   "style-src 'self' 'unsafe-inline'",
-  "script-src 'self' 'unsafe-inline'",
+  // apis.google.com dibutuhkan alur masuk dengan Google, dan ia tidak tercakup
+  // oleh *.googleapis.com yang ada di connect-src: itu host yang berbeda.
+  // Firebase memuat apis.google.com/js/api.js untuk membangun jembatan
+  // komunikasi antara halaman dan jendela popup Google. Tanpa izin ini
+  // skripnya ditolak sebelum satu pun permintaan jaringan terjadi, dan
+  // Firebase melaporkannya sebagai auth/internal-error tanpa keterangan apa
+  // pun, karena memang tidak ada server yang sempat menjawab. Sempat dikira
+  // masalah Safari selama beberapa putaran; sebenarnya berlaku di semua
+  // peramban.
+  "script-src 'self' 'unsafe-inline' https://apis.google.com",
   "worker-src 'self'",
   "manifest-src 'self'",
-  "frame-src 'self' https://*.firebaseapp.com",
-  "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com",
+  // Jembatan gapi hidup di dalam iframe apis.google.com, dan pemilih akun
+  // Google bisa muncul dari accounts.google.com.
+  "frame-src 'self' https://*.firebaseapp.com https://apis.google.com https://accounts.google.com",
+  "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://apis.google.com https://accounts.google.com",
   "upgrade-insecure-requests",
 ].join("; ");
 
