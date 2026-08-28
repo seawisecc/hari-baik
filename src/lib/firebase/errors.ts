@@ -50,18 +50,39 @@ const PESAN: Record<string, string> = {
 };
 
 /**
- * Kalimat untuk pengguna, dan kode aslinya kalau kalimatnya belum ada.
+ * Keterangan mentah yang dibawa error, kalau ada.
+ *
+ * `auth/internal-error` adalah pembungkus, bukan sebab. Sebab sesungguhnya
+ * datang dari server dan diselipkan Firebase ke `customData.message` sebagai
+ * untaian JSON, misalnya `{"error":{"message":"..."}}`. Tanpa dibongkar, semua
+ * kegagalan yang berbeda-beda terlihat sama persis di layar, dan penyebabnya
+ * hanya bisa ditebak.
+ */
+export function detailAuth(err: unknown): string | null {
+  const mentah = (err as { customData?: { message?: unknown } })?.customData?.message;
+  if (typeof mentah !== "string" || mentah === "") return null;
+
+  // Kalau isinya JSON, ambil kalimatnya saja. Kalau bukan, pakai apa adanya.
+  try {
+    const isi = JSON.parse(mentah) as { error?: { message?: string } };
+    return isi.error?.message ?? mentah;
+  } catch {
+    return mentah;
+  }
+}
+
+/**
+ * Kalimat untuk pengguna, ditambah keterangan yang bisa ditindaklanjuti.
  *
  * Sebelumnya setiap kode yang tidak terdaftar berubah jadi "Terjadi kesalahan.
  * Coba lagi." Itu terbaca sopan tapi menelan satu-satunya keterangan yang
- * berguna: yang melihatnya tidak bisa berbuat apa-apa, dan yang dilapori
- * tidak bisa mencari apa-apa. Sudah terjadi pada alur masuk dengan Google di
- * Safari, dan butuh satu putaran penuh hanya untuk mengetahui kodenya.
+ * berguna: yang melihatnya tidak bisa berbuat apa-apa, dan yang dilapori tidak
+ * bisa mencari apa-apa.
  *
- * Jadi kode yang belum dikenali ikut ditampilkan dalam kurung, dan errornya
- * dicatat utuh ke console. Kode mentah memang bukan bahasa pengguna, tapi
- * satu potong teks yang bisa disalin dan dikirimkan jauh lebih berguna
- * daripada kalimat yang tidak menunjuk apa pun.
+ * Errornya SELALU dicatat utuh ke console, bukan hanya ketika kodenya belum
+ * dikenal. Itu kesalahan yang sudah terjadi sekali: `auth/internal-error`
+ * punya kalimatnya sendiri, jadi ia lolos dari pencatatan, dan yang tersisa
+ * cuma kalimat sopan tanpa satu pun petunjuk tentang sebab di baliknya.
  */
 export function pesanAuth(err: unknown): string {
   const code =
@@ -69,8 +90,11 @@ export function pesanAuth(err: unknown): string {
       ? String((err as { code: unknown }).code)
       : "";
 
-  if (PESAN[code]) return PESAN[code];
+  console.error("[auth]", code || "(tanpa kode)", err);
 
-  console.error("[auth] kode belum dikenali:", code || "(tanpa kode)", err);
+  const detail = detailAuth(err);
+  const kalimat = PESAN[code];
+
+  if (kalimat) return detail ? `${kalimat} (${detail})` : kalimat;
   return code ? `Terjadi kesalahan. Coba lagi. (${code})` : "Terjadi kesalahan. Coba lagi.";
 }

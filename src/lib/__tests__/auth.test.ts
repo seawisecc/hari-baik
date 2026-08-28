@@ -15,6 +15,7 @@
  * tombol "Saya sudah bayar" dan seluruh panel admin.
  */
 import { readFileSync } from "node:fs";
+import { detailAuth, pesanAuth } from "../firebase/errors";
 
 let fail = 0;
 const eq = (label: string, expected: unknown, actual: unknown) => {
@@ -182,7 +183,29 @@ for (const f of [
    * kode yang sebenarnya sudah ada di tangan pengguna sejak awal.
    */
   eq("kode yang belum dikenali ikut ditampilkan", true, galatSumber.includes("(${code})"));
-  eq("dan dicatat utuh ke console", true, galatSumber.includes("console.error"));
+
+  /*
+   * Errornya dicatat SELALU, bukan hanya ketika kodenya belum dikenal.
+   *
+   * Kesalahan itu sudah terjadi sekali: auth/internal-error punya kalimatnya
+   * sendiri, jadi ia lolos dari pencatatan, dan yang tersisa cuma kalimat
+   * sopan tanpa satu pun petunjuk. Pencatatannya harus mendahului pencarian
+   * di tabel kalimat, kalau tidak ia gampang tergeser ke cabang yang salah.
+   */
+  eq(
+    "error selalu dicatat, sebelum kalimatnya dicari",
+    true,
+    galatSumber.indexOf('console.error("[auth]"') <
+      galatSumber.indexOf("const kalimat = PESAN[code]"),
+  );
+
+  /*
+   * auth/internal-error adalah pembungkus, bukan sebab. Sebabnya diselipkan
+   * Firebase ke customData.message sebagai untaian JSON, dan tanpa dibongkar
+   * semua kegagalan yang berbeda terlihat sama persis di layar.
+   */
+  eq("keterangan di balik pembungkus dibongkar", true, galatSumber.includes("customData"));
+  eq("dan ikut ditampilkan", true, galatSumber.includes("${kalimat} (${detail})"));
 
   // Email yang sudah punya sandi lalu ditekan tombol Google akan ditolak
   // Firebase dengan kode ini. Tanpa pesan yang menyebut jalan keluarnya,
@@ -208,6 +231,48 @@ for (const f of [
     true,
     provider.includes("createUserWithEmailAndPassword"),
   );
+}
+
+// ── Pesan error: perilakunya, bukan cuma sumbernya ────────────────────────
+{
+  // pesanAuth mencatat ke console dengan sengaja. Di sini catatannya dibungkam
+  // supaya keluaran tes tetap terbaca, lalu dikembalikan.
+  const asli = console.error;
+  console.error = () => {};
+
+  const bungkus = (kode: string, mentah?: string) => ({
+    code: kode,
+    ...(mentah === undefined ? {} : { customData: { message: mentah } }),
+  });
+
+  eq("tanpa keterangan, null", null, detailAuth(bungkus("auth/internal-error")));
+  eq(
+    "JSON dari server dibongkar sampai kalimatnya",
+    "OPERATION_NOT_ALLOWED",
+    detailAuth(bungkus("auth/internal-error", '{"error":{"message":"OPERATION_NOT_ALLOWED"}}')),
+  );
+  eq(
+    "yang bukan JSON dipakai apa adanya",
+    "sesuatu yang tidak berbentuk JSON",
+    detailAuth(bungkus("auth/internal-error", "sesuatu yang tidak berbentuk JSON")),
+  );
+
+  // Kode yang tidak dikenal harus terbaca oleh yang melihatnya, supaya bisa
+  // disalin dan dikirimkan.
+  eq(
+    "kode asing muncul di pesannya",
+    true,
+    pesanAuth(bungkus("auth/entah-apa")).includes("auth/entah-apa"),
+  );
+
+  // Dan kode yang dikenal tetap membawa keterangan di baliknya, kalau ada.
+  const pesan = pesanAuth(
+    bungkus("auth/internal-error", '{"error":{"message":"OPERATION_NOT_ALLOWED"}}'),
+  );
+  eq("kalimatnya tetap bahasa manusia", true, pesan.startsWith("Google menolak"));
+  eq("dan keterangannya ikut", true, pesan.includes("OPERATION_NOT_ALLOWED"));
+
+  console.error = asli;
 }
 
 console.log(fail === 0 ? "✓ auth: semua lolos" : `✗ auth: ${fail} gagal`);

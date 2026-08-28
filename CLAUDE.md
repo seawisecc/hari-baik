@@ -258,6 +258,22 @@ selama satu commit. Dan karena `getRedirectResult()` tidak melempar apa pun
 ketika kembali tanpa hasil, penanda di `sessionStorage` domain sendiri yang
 membuat kepulangan kosong tetap bisa dilaporkan.
 
+**`auth/internal-error` adalah pembungkus, bukan sebab.** Sebabnya diselipkan
+Firebase ke `customData.message` sebagai untaian JSON, dan `detailAuth()` yang
+membongkarnya. Tanpa itu semua kegagalan yang berbeda-beda terlihat sama persis
+di layar. Errornya juga SELALU dicatat ke console, bukan hanya ketika kodenya
+belum dikenal: kode yang sudah punya kalimatnya sendiri justru lolos dari
+pencatatan, dan itu persis yang menutupi sebab kegagalan masuk Google selama
+satu putaran penuh.
+
+**Halaman ini menolak ditaruh di dalam iframe.** CSP mengirim
+`frame-ancestors 'none'` plus `X-Frame-Options: DENY`, jadi alat pratinjau
+ponsel yang bekerja dengan menyematkan halaman menampilkan "refused to
+connect". Itu bukan kerusakan, itu penjaga clickjacking yang bekerja. Di
+ponsel sungguhan tidak ada iframe, jadi tidak ada masalah. Jangan dilonggarkan
+demi alat pratinjau; pakai Responsive Design Mode peramban, yang mengubah
+ukuran viewport tanpa menyematkan apa pun.
+
 **Kode error yang belum dikenali ikut ditampilkan.** `pesanAuth()` dulu
 mengubah setiap kode asing jadi "Terjadi kesalahan. Coba lagi." Itu terbaca
 sopan tapi menelan satu-satunya keterangan yang berguna: yang melihatnya tidak
