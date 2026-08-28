@@ -21,7 +21,7 @@ halaman pakai `|`. Ini permintaan tegas pemilik: em dash membuat produknya
 terlihat tidak profesional. Sebelum menerbitkan dokumen panjang, periksa
 dengan grep.
 
-**`npm run verify` sebelum push.** Merangkai lint, dua belas suite tes, build,
+**`npm run verify` sebelum push.** Merangkai lint, tiga belas suite tes, build,
 dan uji asap route API di build produksi asli. Perintah ini lahir dari
 kejadian nyata, lihat "Yang pernah menggigit" di bawah.
 
@@ -38,8 +38,8 @@ halamannya dan periksa DOM-nya.
 | Perintah               | Guna                                               |
 | ---------------------- | -------------------------------------------------- |
 | `npm run verify`       | Gerbang sebelum push: lint, tes, build, uji asap   |
-| `npm test`             | Dua belas suite tes                                |
-| `npm run smoke`        | Tembak keenam route API di build produksi asli     |
+| `npm test`             | Tiga belas suite tes                               |
+| `npm run smoke`        | Tembak kedelapan route API di build produksi asli  |
 | `npm run deploy-rules` | Terapkan `firestore.rules`                         |
 | `npm run set-admin`    | Beri custom claim admin                            |
 | `npm run protection`   | Nyalakan atau matikan Vercel Deployment Protection |
@@ -132,6 +132,48 @@ dan 48 sebagai BMP mentah supaya dibaca pengurai setua apa pun, 256 sebagai PNG
 supaya berkasnya tidak meledak. Hasilnya biner yang di-commit dan tidak
 terhubung ke logonya lewat kode apa pun, jadi `ikon.test.ts` membandingkan warna
 di dalam .ico dengan warna yang tertulis di logo.svg.
+
+**Pencarian pengguna dikerjakan di server.** Firestore tidak bisa mencari
+substring, jadi dokumennya dibaca lalu dicocokkan `cariPengguna()` di memori.
+Godaannya menyaring di browser saja, karena datanya sudah ada di sana. Itu
+salah: yang ada di browser cuma sehalaman, dan pencarian yang hanya melihat
+sehalaman akan menjawab "tidak ada" untuk pelanggan yang sebenarnya ada.
+Jawaban salah lebih berbahaya daripada tidak ada pencarian. Batas pindainya
+1000 dokumen dan kalau kena, jawabannya mengatakan itu. Nomor HP diseragamkan
+lebih dulu, jadi 0812 dan 62812 saling menemukan.
+
+**Nilai CSV yang diawali `=`, `+`, `-`, atau `@` diberi kutip tunggal.** Nama
+diisi sendiri oleh pengguna, dan Excel maupun Sheets menjalankan sel yang
+diawali tanda itu sebagai rumus. Yang membuka berkas ekspor adalah pemilik
+aplikasi ini sendiri. Nomor HP `+62...` ikut kena dan itu memang benar: tanpa
+kutip tunggal Excel membacanya sebagai rumus yang gagal. Berkasnya ber-BOM
+UTF-8, kalau tidak Excel di Windows mengubah nama berhuruf non-ASCII jadi
+kotak-kotak. Dikunci di `admin.test.ts`.
+
+**Ekspor menulis jejak audit walau tidak mengubah apa pun.** Pemeriksa di
+`lahir.test.ts` hanya menangkap POST, PUT, PATCH, dan DELETE, jadi route
+ekspor lolos darinya. Tetap dicatat karena sekali ditekan, seluruh daftar
+pelanggan berikut nomor HP dan tanggal lahirnya keluar dari sistem, dan itu
+justru yang paling ingin bisa ditelusuri kalau suatu hari ada yang bocor.
+
+**Hapus akun berarti Auth dan dokumen sekaligus, Auth dulu.** Menghapus
+dokumen Firestore saja tidak menghapus siapa pun: akun Auth-nya tetap hidup
+dan begitu orang itu masuk lagi, `/api/auth/bootstrap` membuatkan profil baru
+lengkap dengan trial 3 hari yang segar. Tombol hapus setengah begitu bukan
+tidak berguna, ia jadi tombol reset trial gratis. Urutannya Auth dulu supaya
+kegagalan meninggalkan keadaan yang utuh, bukan akun tanpa profil yang justru
+memicu trial baru itu. Salinan penuh dokumennya masuk jejak audit sebelum
+dihapus, jadi salah pencet masih bisa disusun ulang tanpa perlu gudang arsip
+tersendiri. Dokumen aktivasi miliknya tidak ikut dihapus: itu catatan uang.
+
+**Siapa yang tidak boleh dihapus diputuskan `alasanTolak()`.** Satu fungsi
+murni yang dipakai tampilan dan server sekaligus, jadi tombol yang menyala di
+layar tidak bisa ditolak API. Yang ditolak: admin, yang permintaan aktivasinya
+masih menunggu, dan siapa pun yang aksesnya masih hidup. "Masih hidup"
+ditanyakan ke `evaluateAccess()`, bukan dibaca dari field status, supaya
+langganan yang tanggalnya sudah lewat tapi statusnya belum sempat diperbarui
+tetap terbaca apa adanya. Trial yang belum habis termasuk yang ditolak: itu
+calon pelanggan yang mungkin baru mendaftar setengah jam lalu.
 
 **Fungsi berjalan di Singapura, bukan Virginia.** `vercel.json` mematok
 `regions: ["sin1"]`. Bawaan Vercel untuk project baru adalah `iad1`

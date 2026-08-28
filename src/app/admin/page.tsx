@@ -1,15 +1,18 @@
 "use client";
 
+import { Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { AksiPengguna } from "@/components/admin/aksi";
 import { AturHarga } from "@/components/admin/AturHarga";
 import { DaftarPermintaan } from "@/components/admin/DaftarPermintaan";
+import { TombolEkspor } from "@/components/admin/TombolEkspor";
 import { UserTable } from "@/components/admin/UserTable";
 import { Alert } from "@/components/ui/Alert";
 import { Memuat } from "@/components/ProGate";
 import { PageContainer } from "@/components/shell/AppShell";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
+import { Input } from "@/components/ui/Input";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
@@ -38,6 +41,15 @@ export default function AdminPage() {
   const [tab, setTab] = useState<"pengguna" | "permintaan" | "harga">("pengguna");
   /** Katalog add-on, dipakai kolom dan pengatur add-on di tabel pengguna. */
   const [katalogAddOn, setKatalogAddOn] = useState<AddOn[]>(HARGA_BAWAAN.addOn);
+  /** Yang sedang diketik, dan yang sudah benar-benar dikirim ke server. */
+  const [cari, setCari] = useState("");
+  const [cariAktif, setCariAktif] = useState("");
+  /** Ada hasil cocok yang tidak muat di halaman ini. */
+  const [lebih, setLebih] = useState(false);
+  /** Batas pindai kena: mungkin ada yang cocok tapi tidak sempat dilihat. */
+  const [terpotong, setTerpotong] = useState(false);
+  /** Berapa dokumen yang sempat dilihat server pada pencarian terakhir. */
+  const [dipindai, setDipindai] = useState(0);
 
   useEffect(() => {
     let batal = false;
@@ -55,6 +67,23 @@ export default function AdminPage() {
     };
   }, []);
 
+  /*
+   * Jeda sebelum mengetik dianggap selesai.
+   *
+   * Setiap pencarian membaca sampai seribu dokumen di server, dan itu ditagih
+   * per dokumen. Tanpa jeda ini, mengetik "wayan" berarti lima pencarian
+   * berturut-turut dan lima kali biaya itu, empat di antaranya untuk kata
+   * yang belum selesai diketik.
+   */
+  useEffect(() => {
+    if (cari === cariAktif) return;
+    const jeda = setTimeout(() => {
+      setMemuat(true);
+      setCariAktif(cari);
+    }, 400);
+    return () => clearTimeout(jeda);
+  }, [cari, cariAktif]);
+
   useEffect(() => {
     if (!user) return;
     // Balapan antar-permintaan: hasil dari filter lama tidak boleh menimpa
@@ -65,14 +94,19 @@ export default function AdminPage() {
       try {
         const token = await ambilToken();
         if (batal) return;
-        const q = filter === "all" ? "" : `?status=${filter}`;
-        const res = await fetch(`/api/admin/users${q}`, {
+        const q = new URLSearchParams();
+        if (filter !== "all") q.set("status", filter);
+        if (cariAktif.trim()) q.set("q", cariAktif.trim());
+        const res = await fetch(`/api/admin/users?${q}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
         if (batal) return;
         if (!res.ok) throw new Error(data.error ?? t("admin.loadFailed"));
         setUsers(data.users);
+        setLebih(Boolean(data.lebih));
+        setTerpotong(Boolean(data.terpotong));
+        setDipindai(Number(data.dipindai ?? 0));
         setError(null);
       } catch (err) {
         if (batal) return;
@@ -85,7 +119,7 @@ export default function AdminPage() {
     return () => {
       batal = true;
     };
-  }, [user, filter, refresh, t]);
+  }, [user, filter, cariAktif, refresh, t]);
 
   const aksi = async (uid: string, perintah: AksiPengguna) => {
     if (!user) return;
@@ -95,7 +129,11 @@ export default function AdminPage() {
       // Tanggal lahir bukan urusan langganan: ia diperiksa dan dihitung ulang
       // di route profil, yang juga mencatatnya ke jejak audit.
       const jalur =
-        perintah.action === "lahir" ? "/api/admin/profil" : "/api/admin/subscription";
+        perintah.action === "lahir"
+          ? "/api/admin/profil"
+          : perintah.action === "hapus"
+            ? "/api/admin/hapus"
+            : "/api/admin/subscription";
       const res = await fetch(jalur, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -205,11 +243,58 @@ export default function AdminPage() {
               ))}
             </div>
 
+            {/* Pencarian dan ekspor berdampingan karena keduanya bekerja pada
+                tampilan yang sama: yang terekspor adalah yang tersaring. */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="relative min-w-0 flex-1 sm:max-w-md">
+                <Search
+                  className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint"
+                  aria-hidden
+                />
+                <Input
+                  type="search"
+                  value={cari}
+                  onChange={(e) => setCari(e.target.value)}
+                  placeholder={t("admin.search.placeholder")}
+                  aria-label={t("admin.search.placeholder")}
+                  className="h-11 pl-11 pr-11 text-sm"
+                />
+                {cari && (
+                  <button
+                    onClick={() => setCari("")}
+                    aria-label={t("admin.search.clear")}
+                    className="absolute right-3 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-pill text-ink-faint hover:text-ink"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+
+              <TombolEkspor status={filter === "all" ? null : filter} kunci={cariAktif} />
+            </div>
+
+            {!memuat && terpotong && (
+              <p className="text-xs text-ink-faint">
+                {t("admin.search.truncated", { n: dipindai })}
+              </p>
+            )}
+            {!memuat && lebih && (
+              <p className="text-xs text-ink-faint">
+                {t("admin.search.more", { n: users.length })}
+              </p>
+            )}
+
             <Card elevation={2}>
               <CardBody className="pt-6">
                 {memuat ? (
                   <p className="py-10 text-center text-sm text-ink-faint">
                     {t("common.loading")}
+                  </p>
+                ) : users.length === 0 && cariAktif.trim() ? (
+                  // Pesan kosong yang menyebut kata kuncinya, bukan "tidak ada
+                  // pengguna", yang terbaca seolah basis datanya yang kosong.
+                  <p className="py-10 text-center text-sm text-ink-faint">
+                    {t("admin.search.none", { q: cariAktif.trim() })}
                   </p>
                 ) : (
                   <UserTable users={users} katalogAddOn={katalogAddOn} onAction={aksi} />

@@ -32,7 +32,11 @@ export type AksiJejak =
   /** Daftar harga disimpan. */
   | "harga"
   /** Tanggal lahir seorang pengguna diperbaiki admin. */
-  | "lahir";
+  | "lahir"
+  /** Daftar pengguna diunduh sebagai berkas. Tidak mengubah apa pun, tetap dicatat. */
+  | "ekspor"
+  /** Akun pengguna dihapus, Auth dan dokumennya sekaligus. */
+  | "hapus";
 
 export interface Jejak {
   aksi: AksiJejak;

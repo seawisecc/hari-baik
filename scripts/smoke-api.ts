@@ -45,6 +45,18 @@ const DAFTAR: Uji[] = [
     harap: [401],
     kenapa: "sama, dan route ini juga menarik mesin wariga ke sisi server",
   },
+  {
+    jalur: "/api/admin/ekspor",
+    metode: "GET",
+    harap: [401],
+    kenapa: "sama, dan route ini merakit CSV di sisi server",
+  },
+  {
+    jalur: "/api/admin/hapus",
+    metode: "POST",
+    harap: [401],
+    kenapa: "sama, dan route ini memakai Admin SDK untuk Auth sekaligus Firestore",
+  },
 ];
 
 async function tungguSiap(batasDetik = 60) {

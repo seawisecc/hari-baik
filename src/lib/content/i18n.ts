@@ -310,6 +310,28 @@ const dict = {
     "admin.loadFailed": "Gagal memuat.",
     "admin.actionFailed": "Gagal.",
     "admin.signedInAs": "Masuk sebagai",
+    "admin.search.placeholder": "Cari nama, email, atau nomor HP",
+    "admin.search.clear": "Bersihkan",
+    "admin.search.none": "Tidak ada yang cocok dengan \u201c{q}\u201d.",
+    "admin.search.more":
+      "Menampilkan {n} teratas. Persempit kata kuncinya untuk melihat sisanya.",
+    "admin.search.truncated":
+      "Pencarian memindai {n} pengguna terbaru saja. Pakai filter status untuk mempersempitnya.",
+    "admin.export": "Ekspor CSV",
+    "admin.export.running": "Menyiapkan\u2026",
+    "admin.export.done": "{n} baris terunduh.",
+    "admin.export.empty": "Tidak ada yang bisa diekspor pada tampilan ini.",
+    "admin.export.truncated": "Terpotong di {n} baris pertama.",
+    "admin.export.failed": "Gagal mengekspor.",
+    "admin.danger": "Zona berbahaya",
+    "admin.delete.hint":
+      "Akun Firebase dan dokumen profilnya dihapus sekaligus, jadi orang ini tidak bisa masuk lagi dan tidak mendapat trial baru. Salinan penuhnya tersimpan di jejak audit. Riwayat pembayarannya tetap.",
+    "admin.delete.typeEmail": "Ketik {email} untuk mengonfirmasi",
+    "admin.delete.confirmBtn": "Hapus permanen",
+    "admin.delete.no.admin": "Akun admin tidak bisa dihapus. Cabut hak adminnya lebih dulu.",
+    "admin.delete.no.menunggu":
+      "Permintaan aktivasinya masih menunggu. Setujui atau tolak dulu.",
+    "admin.delete.no.aktif": "Aksesnya masih berjalan. Nonaktifkan dulu, baru bisa dihapus.",
     "journey.uripBirth": "Urip lahir",
     "journey.ageNow": "Usia sekarang",
     "journey.years": "tahun",
@@ -544,10 +566,8 @@ const dict = {
     "fengshui.suggest.wordDesc":
       "Menambahkan kata ini di depan atau di belakang memindahkan namanya ke angka yang mendukung.",
     "fengshui.suggest.letter": "Sesuaikan satu huruf",
-    "fengshui.suggest.letterDesc":
-      "Menambah satu huruf bernilai {n} sudah cukup: {huruf}.",
-    "fengshui.suggest.none":
-      "Angka ini sudah mendukung, jadi tidak ada yang perlu diubah.",
+    "fengshui.suggest.letterDesc": "Menambah satu huruf bernilai {n} sudah cukup: {huruf}.",
+    "fengshui.suggest.none": "Angka ini sudah mendukung, jadi tidak ada yang perlu diubah.",
     "fengshui.method": "Cara menghitungnya",
     "fengshui.methodDesc":
       "Setiap huruf diberi nilai 1 sampai 9 secara berulang (A sampai I bernilai 1 sampai 9, lalu J kembali ke 1). Nilainya dijumlahkan, lalu dikurangi 80 sampai masuk rentang 1 sampai 81, dan angka itu dibaca di tabel 81 angka. Digit terakhirnya menentukan unsurnya.",
@@ -854,6 +874,27 @@ const dict = {
     "admin.loadFailed": "Could not load.",
     "admin.actionFailed": "Failed.",
     "admin.signedInAs": "Signed in as",
+    "admin.search.placeholder": "Search name, email, or phone",
+    "admin.search.clear": "Clear",
+    "admin.search.none": "Nothing matches \u201c{q}\u201d.",
+    "admin.search.more": "Showing the top {n}. Narrow the keywords to see the rest.",
+    "admin.search.truncated":
+      "Search scanned only the {n} newest users. Use the status filter to narrow it down.",
+    "admin.export": "Export CSV",
+    "admin.export.running": "Preparing\u2026",
+    "admin.export.done": "{n} rows downloaded.",
+    "admin.export.empty": "Nothing to export in this view.",
+    "admin.export.truncated": "Truncated at the first {n} rows.",
+    "admin.export.failed": "Export failed.",
+    "admin.danger": "Danger zone",
+    "admin.delete.hint":
+      "The Firebase account and the profile document are removed together, so this person cannot sign in again and gets no fresh trial. A full copy is kept in the audit trail. Their payment history stays.",
+    "admin.delete.typeEmail": "Type {email} to confirm",
+    "admin.delete.confirmBtn": "Delete permanently",
+    "admin.delete.no.admin": "Admin accounts cannot be deleted. Revoke the admin role first.",
+    "admin.delete.no.menunggu":
+      "Their activation request is still waiting. Approve or reject it first.",
+    "admin.delete.no.aktif": "Their access is still running. Deactivate it first.",
     "journey.uripBirth": "Birth urip",
     "journey.ageNow": "Current age",
     "journey.years": "years",

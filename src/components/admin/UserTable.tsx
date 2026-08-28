@@ -6,6 +6,7 @@ import type { AksiPengguna } from "./aksi";
 import { AturAddOn } from "./AturAddOn";
 import { AturLangganan } from "./AturLangganan";
 import { AturTanggalLahir } from "./AturTanggalLahir";
+import { HapusPengguna } from "./HapusPengguna";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 import { useLang, useT } from "@/lib/content/LangProvider";
@@ -283,10 +284,14 @@ function Baris({ label, children }: { label: string; children: React.ReactNode }
 }
 
 /**
- * Tiga pengatur untuk satu pengguna.
+ * Semua pengatur untuk satu pengguna.
  *
  * Dipakai kartu ponsel maupun baris tabel, jadi keduanya tidak bisa berbeda
  * isi: menambah pengatur di satu tempat otomatis muncul di keduanya.
+ *
+ * Penghapusan ditaruh paling bawah dan melebar penuh, terpisah dari tiga
+ * pengatur harian di atasnya. Bukan supaya terlihat penting, melainkan supaya
+ * tidak pernah bersebelahan dengan tombol yang sering ditekan.
  */
 function PanelKelola({
   u,
@@ -324,6 +329,13 @@ function PanelKelola({
         busy={busy}
         onSimpan={(tanggalLahir) => onAksi({ action: "lahir", tanggalLahir })}
       />
+      <div className="lg:col-span-2">
+        <HapusPengguna
+          u={u}
+          busy={busy}
+          onHapus={(email) => onAksi({ action: "hapus", email })}
+        />
+      </div>
     </div>
   );
 }

@@ -20,4 +20,17 @@ export interface AksiLahir {
   tanggalLahir: string;
 }
 
-export type AksiPengguna = AksiLangganan | AksiLahir;
+/**
+ * Penghapusan akun.
+ *
+ * `email` adalah yang diketik admin sebagai konfirmasi, dan ikut dikirim ke
+ * server untuk dicocokkan ulang di sana. Konfirmasi yang hanya diperiksa di
+ * browser bukan konfirmasi: siapa pun yang bisa memanggil route ini bisa
+ * melewatinya.
+ */
+export interface AksiHapus {
+  action: "hapus";
+  email: string;
+}
+
+export type AksiPengguna = AksiLangganan | AksiLahir | AksiHapus;
