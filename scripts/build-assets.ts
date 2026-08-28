@@ -100,12 +100,91 @@ async function ikonMaskable(ukuran: number, tujuan: string) {
   await ikonKotak(ukuran, tujuan, 0.28);
 }
 
+/**
+ * Favicon .ico berisi empat ukuran.
+ *
+ * Peramban modern memakai `icon.svg`, tapi WhatsApp, Slack, dan pembaca RSS
+ * masih menjemput `/favicon.ico` mentah-mentah dan menempelkannya di pratinjau
+ * tautan. Selama berkas ini bawaan create-next-app, setiap tautan yang dibagikan
+ * pelanggan memajang lambang Vercel, bukan lambang Hari Baik.
+ *
+ * Bentuk berkasnya menyalin yang sudah terbukti dipakai Next.js: 16, 32, dan 48
+ * sebagai BMP mentah (dibaca semua pengurai, setua apa pun), 256 sebagai PNG
+ * supaya ukuran berkasnya tidak meledak.
+ */
+async function faviconIco(tujuan: string) {
+  const ukuran = [16, 32, 48, 256];
+
+  /** Satu gambar BMP dalam bentuk yang dipahami .ico: tanpa kepala berkas, tinggi dua kali lipat. */
+  async function bmp(u: number) {
+    const { data } = await sharp(logo).resize(u, u).ensureAlpha().raw().toBuffer({
+      resolveWithObject: true,
+    });
+
+    const kepala = Buffer.alloc(40);
+    kepala.writeUInt32LE(40, 0);
+    kepala.writeInt32LE(u, 4);
+    // Tinggi ditulis dua kali lipat karena BMP di dalam .ico menyimpan gambar
+    // dan topeng transparansinya sebagai satu bidang bertumpuk.
+    kepala.writeInt32LE(u * 2, 8);
+    kepala.writeUInt16LE(1, 12);
+    kepala.writeUInt16LE(32, 14);
+
+    // BMP menyimpan baris dari bawah ke atas, dan urutan kanalnya biru dulu.
+    const piksel = Buffer.alloc(u * u * 4);
+    for (let y = 0; y < u; y++) {
+      for (let x = 0; x < u; x++) {
+        const dari = (y * u + x) * 4;
+        const ke = ((u - 1 - y) * u + x) * 4;
+        piksel[ke] = data[dari + 2];
+        piksel[ke + 1] = data[dari + 1];
+        piksel[ke + 2] = data[dari];
+        piksel[ke + 3] = data[dari + 3];
+      }
+    }
+
+    // Topeng 1 bit per piksel, tiap barisnya dibulatkan ke kelipatan 4 byte.
+    // Isinya nol semua: transparansi sudah dibawa kanal alfa di atas.
+    const topeng = Buffer.alloc(Math.ceil(u / 32) * 4 * u);
+
+    return Buffer.concat([kepala, piksel, topeng]);
+  }
+
+  const isi = await Promise.all(
+    ukuran.map((u) => (u >= 256 ? sharp(logo).resize(u, u).png().toBuffer() : bmp(u))),
+  );
+
+  const kepala = Buffer.alloc(6);
+  kepala.writeUInt16LE(1, 2);
+  kepala.writeUInt16LE(ukuran.length, 4);
+
+  const daftar = Buffer.alloc(16 * ukuran.length);
+  let offset = kepala.length + daftar.length;
+  ukuran.forEach((u, i) => {
+    const o = i * 16;
+    // Nol berarti 256: lebar dan tinggi hanya diberi satu byte.
+    daftar[o] = u % 256;
+    daftar[o + 1] = u % 256;
+    daftar.writeUInt16LE(1, o + 4);
+    daftar.writeUInt16LE(32, o + 6);
+    daftar.writeUInt32LE(isi[i].length, o + 8);
+    daftar.writeUInt32LE(offset, o + 12);
+    offset += isi[i].length;
+  });
+
+  writeFileSync(tujuan, Buffer.concat([kepala, daftar, ...isi]));
+  console.log(`  ${tujuan}  ${ukuran.join(", ")}`);
+}
+
 async function main() {
   console.log("\nMembangun aset dari", LOGO, "\n");
 
   // Favicon SVG dipakai apa adanya oleh peramban modern.
   writeFileSync("src/app/icon.svg", logo);
   console.log("  src/app/icon.svg");
+
+  // Yang lama tetap dibutuhkan aplikasi chat dan pengurai yang tidak membaca SVG.
+  await faviconIco("src/app/favicon.ico");
 
   // iOS memakai ikon ini sebagai pintasan layar utama; latarnya harus padat
   // karena iOS tidak menghormati transparansi di sini.

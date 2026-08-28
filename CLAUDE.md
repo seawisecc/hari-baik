@@ -21,7 +21,7 @@ halaman pakai `|`. Ini permintaan tegas pemilik: em dash membuat produknya
 terlihat tidak profesional. Sebelum menerbitkan dokumen panjang, periksa
 dengan grep.
 
-**`npm run verify` sebelum push.** Merangkai lint, sebelas suite tes, build,
+**`npm run verify` sebelum push.** Merangkai lint, dua belas suite tes, build,
 dan uji asap route API di build produksi asli. Perintah ini lahir dari
 kejadian nyata, lihat "Yang pernah menggigit" di bawah.
 
@@ -38,7 +38,7 @@ halamannya dan periksa DOM-nya.
 | Perintah               | Guna                                               |
 | ---------------------- | -------------------------------------------------- |
 | `npm run verify`       | Gerbang sebelum push: lint, tes, build, uji asap   |
-| `npm test`             | Sebelas suite tes                                  |
+| `npm test`             | Dua belas suite tes                                |
 | `npm run smoke`        | Tembak keenam route API di build produksi asli     |
 | `npm run deploy-rules` | Terapkan `firestore.rules`                         |
 | `npm run set-admin`    | Beri custom claim admin                            |
@@ -121,6 +121,17 @@ kurang bukan hiasan warna: itu yang dipakai `bandingkanNama()` untuk mengurutkan
 kandidat, dan yang menentukan kapan saran perbaikan muncul. Mengubah nada satu
 angka menggeser seluruh peringkat. Warnanya meminjam token kategori hari yang
 sudah dikunci suite kontras, bukan warna baru.
+
+**Favicon .ico dibangun, bukan diwarisi.** Peramban modern memakai
+`src/app/icon.svg`, jadi tab terlihat benar walau `favicon.ico` masih berkas
+bawaan create-next-app. Yang tidak terlihat: WhatsApp, Slack, dan pembaca RSS
+menjemput `/favicon.ico` mentah-mentah untuk pratinjau tautan, jadi setiap
+tautan yang dibagikan pelanggan memajang segitiga Vercel. Sekarang
+`npm run build-assets` ikut menulis .ico itu dari `src/assets/logo.svg`: 16, 32,
+dan 48 sebagai BMP mentah supaya dibaca pengurai setua apa pun, 256 sebagai PNG
+supaya berkasnya tidak meledak. Hasilnya biner yang di-commit dan tidak
+terhubung ke logonya lewat kode apa pun, jadi `ikon.test.ts` membandingkan warna
+di dalam .ico dengan warna yang tertulis di logo.svg.
 
 **Fungsi berjalan di Singapura, bukan Virginia.** `vercel.json` mematok
 `regions: ["sin1"]`. Bawaan Vercel untuk project baru adalah `iad1`
