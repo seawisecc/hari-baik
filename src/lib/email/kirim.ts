@@ -16,7 +16,19 @@ import type { IsiEmail } from "./template";
  * Kuncinya dibaca saat dipanggil, bukan saat modul dimuat, supaya build dan
  * seluruh route lain tetap hidup ketika kuncinya belum dipasang.
  */
-const DARI = "Hari Baik <noreply@seawise.id>";
+/**
+ * Alamat pengirim.
+ *
+ * Harus persis domain yang berstatus Verified di Resend, dan yang terverifikasi
+ * adalah subdomain `send.seawise.id`, bukan `seawise.id`. Resend menolak
+ * pengiriman dari domain yang tidak terdaftar dengan 403, dan pesannya cuma
+ * muncul di log server, bukan di layar siapa pun. Sudah terjadi sekali.
+ *
+ * Subdomain terpisah untuk pengiriman justru lebih baik: reputasi email
+ * transaksional dibangun sendiri, terpisah dari apa pun yang dikirim dari
+ * domain utama.
+ */
+const DARI = "Hari Baik <noreply@send.seawise.id>";
 
 export type HasilKirim =
   | { terkirim: true; id: string | null }
