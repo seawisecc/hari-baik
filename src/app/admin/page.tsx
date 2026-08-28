@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/Input";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
-import type { SubscriptionStatus, UserProfile } from "@/types";
+import type { PenggunaAdmin, SubscriptionStatus } from "@/types";
 import { ambilToken } from "@/lib/firebase/client";
 import { HARGA_BAWAAN, type AddOn, type PengaturanHarga } from "@/lib/harga";
 
@@ -32,7 +32,7 @@ const FILTER: { key: SubscriptionStatus | "all"; labelKey: string }[] = [
 export default function AdminPage() {
   const t = useT();
   const { user, profile, loading, configured } = useAuth();
-  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [users, setUsers] = useState<PenggunaAdmin[]>([]);
   const [filter, setFilter] = useState<SubscriptionStatus | "all">("pending");
   const [error, setError] = useState<string | null>(null);
   const [memuat, setMemuat] = useState(true);
@@ -133,7 +133,9 @@ export default function AdminPage() {
           ? "/api/admin/profil"
           : perintah.action === "hapus"
             ? "/api/admin/hapus"
-            : "/api/admin/subscription";
+            : perintah.action === "verifikasi"
+              ? "/api/admin/verifikasi"
+              : "/api/admin/subscription";
       const res = await fetch(jalur, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },

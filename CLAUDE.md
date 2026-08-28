@@ -39,7 +39,7 @@ halamannya dan periksa DOM-nya.
 | ---------------------- | -------------------------------------------------- |
 | `npm run verify`       | Gerbang sebelum push: lint, tes, build, uji asap   |
 | `npm test`             | Tiga belas suite tes                               |
-| `npm run smoke`        | Tembak kedelapan route API di build produksi asli  |
+| `npm run smoke`        | Tembak kesembilan route API di build produksi asli |
 | `npm run deploy-rules` | Terapkan `firestore.rules`                         |
 | `npm run set-admin`    | Beri custom claim admin                            |
 | `npm run protection`   | Nyalakan atau matikan Vercel Deployment Protection |
@@ -194,6 +194,30 @@ masuk seperti sebelumnya. Tombol Google ada di halaman masuk DAN halaman
 daftar: menaruhnya hanya di halaman daftar membuat orang yang pertama kali
 masuk lewat Google tidak punya jalan masuk sama sekali, karena dia tidak punya
 kata sandi untuk diketik di halaman satunya.
+
+**Template email tidak bisa diubah, lewat Console maupun API.** Console
+mengunci kolom Message pada email verifikasi. Identity Toolkit Admin API juga
+tidak bisa: `PATCH` pada subjek dijawab `EMAIL_TEMPLATE_UPDATE_NOT_ALLOWED`,
+dan `PATCH` pada isinya dijawab **200 tapi tidak mengubah apa pun**. Yang
+kedua itu jebakan, karena berhenti di kode balasannya akan membuat orang yakin
+templatenya sudah terpasang. Diuji 28 Agustus 2026 dengan service account
+project ini, dan seluruh konfigurasi sebelum dan sesudahnya dibandingkan baris
+per baris untuk memastikan tidak ada yang tergeser. Lihat `docs/email/README.md`.
+
+**Action URL tidak boleh dipindah ke domain sendiri sebelum halamannya ada.**
+Firebase Hosting melayani `/__/auth/action` sendiri; Vercel tidak, dan aplikasi
+ini di Vercel. Memindahkan `callbackUri` sekarang membuat setiap tautan
+verifikasi dan reset kata sandi berujung 404, termasuk yang sudah terkirim.
+Halamannya harus dibuat lebih dulu.
+
+**Status verifikasi email tidak disalin ke Firestore.** Ia milik Firebase Auth,
+dan panel admin menempelkannya saat membaca daftar lewat `getUsers()`, bukan
+menyimpannya di dokumen. Salinan kedua dari nilai yang bisa berubah di tempat
+lain pasti akan basi, lalu suatu hari dipercaya. Route `/api/admin/verifikasi`
+mengubahnya di Auth lalu mencabut refresh token: token yang sedang dipegang
+masih membawa `emailVerified` yang lama, dan `tentukanAlihan()` membacanya dari
+token itu, jadi tanpa pencabutan orangnya tetap tertahan di `/verify-email`
+dan admin mengira tombolnya tidak bekerja.
 
 **Fungsi berjalan di Singapura, bukan Virginia.** `vercel.json` mematok
 `regions: ["sin1"]`. Bawaan Vercel untuk project baru adalah `iad1`

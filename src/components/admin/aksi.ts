@@ -33,4 +33,15 @@ export interface AksiHapus {
   email: string;
 }
 
-export type AksiPengguna = AksiLangganan | AksiLahir | AksiHapus;
+/**
+ * Tandai email terverifikasi tanpa pengguna menekan tautannya.
+ *
+ * Tidak butuh muatan apa pun selain uid yang sudah dibawa pemanggil, tapi
+ * tetap ditulis sebagai bentuknya sendiri supaya tujuannya jelas di tempat
+ * pemanggilan dan tidak tersamar sebagai perubahan langganan.
+ */
+export interface AksiVerifikasi {
+  action: "verifikasi";
+}
+
+export type AksiPengguna = AksiLangganan | AksiLahir | AksiHapus | AksiVerifikasi;

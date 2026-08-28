@@ -57,6 +57,12 @@ const DAFTAR: Uji[] = [
     harap: [401],
     kenapa: "sama, dan route ini memakai Admin SDK untuk Auth sekaligus Firestore",
   },
+  {
+    jalur: "/api/admin/verifikasi",
+    metode: "POST",
+    harap: [401],
+    kenapa: "sama",
+  },
 ];
 
 async function tungguSiap(batasDetik = 60) {

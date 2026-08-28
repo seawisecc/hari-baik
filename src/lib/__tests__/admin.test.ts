@@ -226,6 +226,22 @@ function buat(ubah: Partial<UserProfile> = {}): UserProfile {
   eq("aturan boleh atau tidaknya dipakai bersama", true, hapus.includes("alasanTolak("));
   eq("salinan profil masuk jejak", true, /detail:\s*\{[^}]*profil/.test(hapus));
 
+  const verif = readFileSync("src/app/api/admin/verifikasi/route.ts", "utf8");
+
+  // Token yang sedang dipegang pengguna masih membawa emailVerified yang lama,
+  // dan tentukanAlihan() membacanya dari token itu. Tanpa pencabutan, orangnya
+  // tetap tertahan di /verify-email sesudah ditandai, dan admin akan mengira
+  // tombolnya tidak bekerja.
+  eq("token lama dicabut setelah ditandai", true, verif.includes("revokeRefreshTokens(uid)"));
+
+  // Verifikasi email milik Firebase Auth. Menyalinnya ke dokumen Firestore
+  // membuat nilai kedua yang pasti akan basi lalu suatu hari dipercaya.
+  eq("status verifikasi tidak disalin ke Firestore", false, verif.includes(".update("));
+
+  const daftar = readFileSync("src/app/api/admin/users/route.ts", "utf8");
+  eq("daftar pengguna menempelkan status verifikasi", true, daftar.includes("getUsers("));
+  eq("dan tidak menyimpannya", false, daftar.includes(".set(") || daftar.includes(".update("));
+
   const ekspor = readFileSync("src/app/api/admin/ekspor/route.ts", "utf8");
   // Ekspor tidak mengubah apa pun, jadi tidak tertangkap pemeriksa jejak di
   // lahir.test.ts yang hanya melihat POST, PUT, PATCH, dan DELETE.

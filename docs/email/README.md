@@ -39,7 +39,7 @@ Yang masih bisa dilakukan tanpa membangun apa pun:
 
 Keduanya sudah cukup mengubah kesan pertama di daftar inbox, walaupun isi emailnya tetap teks bawaan Firebase.
 
-Catatan: waktu diperiksa, Sender name masih `not provided` dan Subject masih bawaan. Perubahan yang belum ditekan **Save** tidak tersimpan.
+Catatan: pada 28 Agustus 2026 konfigurasi dibaca lewat API, dan **Sender name sudah terisi `Hari Baik`** untuk template verifikasi maupun reset. Yang masih bawaan adalah Subject-nya, keduanya masih kalimat Inggris `Verify your email for %APP_NAME%` dan `Reset your password for %APP_NAME%`.
 
 ## Kalau email verifikasi harus bertema
 
@@ -94,6 +94,43 @@ Sisanya, untuk yang tetap mendaftar dengan kata sandi:
 
 - **Gratis, di Console, tanpa kode.** Isi Sender name dan Subject, lalu arahkan **Customize action URL** ke `haribaik.seawise.id`. Nomor 2 dan 3 di atas hilang. Nomor 1 tetap.
 - **Perbaikan penuhnya** ada di bagian "Kalau email verifikasi harus bertema" di atas: kirim sendiri lewat `generateEmailVerificationLink()` dari domain `seawise.id` yang di-DKIM. `seawise.id` perlu record SPF lebih dulu, karena sekarang belum punya.
+
+## API pun tidak bisa mengubah template
+
+Console mengunci kolom Message pada email verifikasi. Pertanyaan yang wajar berikutnya: apakah Identity Toolkit Admin API bisa melewatinya? Sudah dicoba pada 28 Agustus 2026 memakai service account Admin SDK project ini, dan jawabannya tidak. Hasilnya dicatat di sini supaya tidak ada yang mencobanya lagi.
+
+`GET admin/v2/projects/{project}/config` **berhasil**, 200, dan mengembalikan seluruh setelan termasuk isi ketiga template.
+
+`PATCH` pada template **gagal, dengan dua cara yang berbeda**:
+
+| Yang diubah                                            | Hasil                                                       |
+| ------------------------------------------------------ | ----------------------------------------------------------- |
+| `notification.sendEmail.verifyEmailTemplate.subject`   | 400 `INVALID_ARGUMENT`, `EMAIL_TEMPLATE_UPDATE_NOT_ALLOWED` |
+| `notification.sendEmail.resetPasswordTemplate.subject` | 400 `INVALID_ARGUMENT`, `EMAIL_TEMPLATE_UPDATE_NOT_ALLOWED` |
+| `notification.sendEmail.verifyEmailTemplate.body`      | **200 OK, tapi tidak mengubah apa pun**                     |
+
+Yang ketiga itu jebakannya. Permintaannya dijawab berhasil, dan kalau berhenti di situ orang akan yakin templatenya sudah terpasang. Dibaca ulang, isinya masih 236 karakter teks bawaan Firebase, bukan 4687 karakter template kita. Seluruh konfigurasi sebelum dan sesudah percobaan sudah dibandingkan baris per baris: tidak ada satu pun yang berubah.
+
+Kesimpulan: 200 dari API ini bukan bukti bahwa sesuatu tersimpan. Satu-satunya cara mengubah isi email verifikasi tetap berhenti memakai `sendEmailVerification()`.
+
+## Jangan arahkan action URL ke haribaik.seawise.id begitu saja
+
+Bagian "Dua batas lain" di atas menyebut Customize action URL sebagai perbaikan gratis yang layak dikerjakan. Itu benar untuk project yang memakai Firebase Hosting, dan **project ini tidak**: aplikasinya berjalan di Vercel.
+
+Firebase Hosting melayani `/__/auth/action` secara otomatis. Vercel tidak, dan tidak ada halaman itu di aplikasi ini. Mengarahkan action URL ke `https://haribaik.seawise.id/__/auth/action` sekarang juga akan membuat **setiap tautan verifikasi dan reset kata sandi berujung 404**, termasuk milik pengguna yang emailnya sudah terkirim sebelumnya.
+
+Supaya bisa dipindah, halamannya harus dibuat dulu di aplikasi ini: satu route yang membaca `mode` dan `oobCode` dari query lalu memanggil `applyActionCode()` atau `confirmPasswordReset()`. Sesudah itu barulah `callbackUri` diarahkan ke sana. Belum dikerjakan.
+
+## Kalau satu pengguna tidak menerima emailnya
+
+Urutan yang dipakai, dari yang paling cepat:
+
+1. **Suruh pakai "Lanjutkan dengan Google".** Kalau emailnya Gmail, ini selesai dalam sepuluh detik dan tidak ada email yang perlu sampai ke mana pun. Akun Google sudah terverifikasi emailnya sejak awal.
+2. **Minta cek folder Spam dan tab Promosi**, cari `noreply` atau `hari-baik-7e56c`.
+3. **Kirim ulang** dari halaman `/verify-email` di perangkat orangnya.
+4. **Tandai manual dari panel admin.** Pengguna yang belum terverifikasi diberi penanda di daftar, dan di panel Atur ada tombol "Tandai terverifikasi". Ini mengubah keadaan di Firebase Auth lalu mencabut token lamanya, dan tercatat di jejak audit. Pakai setelah kamu yakin orangnya siapa: sesudah ini pemegang kata sandinya bisa masuk tanpa pernah membuktikan alamat emailnya.
+
+Sebelum ada nomor 4, satu-satunya jalan adalah menjalankan skrip Admin SDK dari laptop. Konsol Firebase sendiri tidak menyediakan tombol untuk menandai email terverifikasi.
 
 ## Setelah dipasang
 

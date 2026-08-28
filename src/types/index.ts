@@ -65,6 +65,22 @@ export interface UserProfile {
   uripPetemonLahir: number | null;
 }
 
+/**
+ * Pengguna sebagaimana dilihat panel admin.
+ *
+ * `emailTerverifikasi` tidak ada di dokumen Firestore dan tidak pernah
+ * disimpan di sana: sumbernya akun Firebase Auth, dan satu-satunya yang boleh
+ * mengubahnya adalah Auth sendiri. Menyalinnya ke dokumen berarti membuat
+ * salinan kedua yang pasti akan basi, lalu suatu hari dipercaya. Jadi ia
+ * ditempelkan di route daftar pengguna saat dibaca, dan hilang lagi sesudahnya.
+ *
+ * Bernilai null bila akun Auth-nya tidak ditemukan, yaitu dokumen yatim yang
+ * tertinggal setelah akunnya dihapus lewat konsol Firebase.
+ */
+export interface PenggunaAdmin extends UserProfile {
+  emailTerverifikasi: boolean | null;
+}
+
 /** Hasil evaluasi akses: dipakai untuk mengunci fitur Pro. */
 export interface AccessState {
   /** Boleh melihat kalender sama sekali. */

@@ -1,8 +1,8 @@
 import type { NextRequest } from "next/server";
 import { cariPengguna } from "@/lib/admin-cari";
-import { adminDb } from "@/lib/firebase/admin";
+import { adminAuth, adminDb } from "@/lib/firebase/admin";
 import { handleAdminError, requireAdmin } from "@/lib/firebase/requireAdmin";
-import type { UserProfile } from "@/types";
+import type { PenggunaAdmin, UserProfile } from "@/types";
 
 /**
  * Berapa banyak dokumen yang boleh dipindai saat mencari.
@@ -15,6 +15,30 @@ import type { UserProfile } from "@/types";
  * menyebutkan itu, bukan berpura-pura sudah lengkap.
  */
 const BATAS_PINDAI = 1000;
+
+/**
+ * Tempelkan status verifikasi email dari Firebase Auth.
+ *
+ * Statusnya tidak ada di Firestore dan sengaja tidak disimpan di sana. Yang
+ * ditanya cuma sehalaman yang benar-benar dikirim, bukan seluruh hasil
+ * pencarian, karena getUsers menerima paling banyak seratus identifier
+ * sekali panggil dan halaman memang dibatasi seratus.
+ *
+ * Kalau panggilannya gagal, daftarnya tetap dikirim dengan nilai null.
+ * Panel admin yang tidak bisa dibuka sama sekali lebih merugikan daripada
+ * panel admin tanpa satu kolom.
+ */
+async function denganVerifikasi(users: UserProfile[]): Promise<PenggunaAdmin[]> {
+  if (users.length === 0) return [];
+  try {
+    const { users: akun } = await adminAuth().getUsers(users.map((u) => ({ uid: u.uid })));
+    const peta = new Map(akun.map((a) => [a.uid, a.emailVerified]));
+    return users.map((u) => ({ ...u, emailTerverifikasi: peta.get(u.uid) ?? null }));
+  } catch (err) {
+    console.error("[admin users] status verifikasi gagal dibaca", err);
+    return users.map((u) => ({ ...u, emailTerverifikasi: null }));
+  }
+}
 
 /** Daftar pengguna untuk panel admin. */
 export async function GET(req: NextRequest) {
@@ -43,9 +67,10 @@ export async function GET(req: NextRequest) {
 
     const semua = snap.docs.map((d) => ({ uid: d.id, ...d.data() }) as UserProfile);
     const cocok = mencari ? cariPengguna(semua, kunci) : semua;
+    const halaman = await denganVerifikasi(cocok.slice(0, limit));
 
     return Response.json({
-      users: cocok.slice(0, limit),
+      users: halaman,
       /** Ada hasil cocok yang tidak ikut terkirim karena kena batas halaman. */
       lebih: cocok.length > limit,
       /** Batas pindai kena, jadi mungkin ada yang cocok tapi tidak sempat dilihat. */

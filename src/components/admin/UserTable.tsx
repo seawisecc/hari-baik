@@ -7,11 +7,12 @@ import { AturAddOn } from "./AturAddOn";
 import { AturLangganan } from "./AturLangganan";
 import { AturTanggalLahir } from "./AturTanggalLahir";
 import { HapusPengguna } from "./HapusPengguna";
+import { TandaiVerifikasi } from "./TandaiVerifikasi";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 import { useLang, useT } from "@/lib/content/LangProvider";
 import { teks, type AddOn } from "@/lib/harga";
-import type { SubscriptionStatus, UserProfile } from "@/types";
+import type { PenggunaAdmin, SubscriptionStatus } from "@/types";
 
 const STATUS_STYLE: Record<SubscriptionStatus, string> = {
   lifetime: "bg-accent text-accent-ink",
@@ -48,7 +49,7 @@ export function UserTable({
   katalogAddOn,
   onAction,
 }: {
-  users: UserProfile[];
+  users: PenggunaAdmin[];
   /** Daftar add-on yang ada, untuk pengatur per pengguna. */
   katalogAddOn: AddOn[];
   onAction: (uid: string, aksi: AksiPengguna) => Promise<void>;
@@ -126,7 +127,10 @@ export function UserTable({
                     </td>
 
                     <td className="px-3 py-3">
-                      <Status status={u.subscriptionStatus} />
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <Status status={u.subscriptionStatus} />
+                        <BelumVerifikasi terverifikasi={u.emailTerverifikasi} />
+                      </div>
                     </td>
 
                     <td className="px-3 py-3 text-ink-soft">
@@ -195,7 +199,7 @@ function KartuPengguna({
   onBuka,
   onAksi,
 }: {
-  u: UserProfile;
+  u: PenggunaAdmin;
   katalogAddOn: AddOn[];
   busy: boolean;
   dibuka: boolean;
@@ -211,7 +215,10 @@ function KartuPengguna({
           <p className="truncate font-medium text-ink">{u.nama || t("profile.noName")}</p>
           <p className="truncate text-xs text-ink-faint">{u.email}</p>
         </div>
-        <Status status={u.subscriptionStatus} />
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          <Status status={u.subscriptionStatus} />
+          <BelumVerifikasi terverifikasi={u.emailTerverifikasi} />
+        </div>
       </div>
 
       {u.phoneNumber && (
@@ -300,7 +307,7 @@ function PanelKelola({
   onTutup,
   onAksi,
 }: {
-  u: UserProfile;
+  u: PenggunaAdmin;
   katalogAddOn: AddOn[];
   busy: boolean;
   onTutup: () => void;
@@ -329,6 +336,9 @@ function PanelKelola({
         busy={busy}
         onSimpan={(tanggalLahir) => onAksi({ action: "lahir", tanggalLahir })}
       />
+      {u.emailTerverifikasi === false && (
+        <TandaiVerifikasi busy={busy} onTandai={() => onAksi({ action: "verifikasi" })} />
+      )}
       <div className="lg:col-span-2">
         <HapusPengguna
           u={u}
@@ -350,6 +360,27 @@ function Status({ status }: { status: SubscriptionStatus }) {
       )}
     >
       {t(STATUS_KEY[status])}
+    </span>
+  );
+}
+
+/**
+ * Penanda email yang belum terverifikasi.
+ *
+ * Ini yang membuat keluhan "saya tidak bisa masuk" bisa dijawab dalam sekali
+ * lihat, tanpa membuka konsol Firebase. Yang null dibiarkan tanpa penanda:
+ * artinya statusnya gagal dibaca, dan penanda yang salah lebih buruk daripada
+ * tidak ada penanda.
+ */
+function BelumVerifikasi({ terverifikasi }: { terverifikasi: boolean | null }) {
+  const t = useT();
+  if (terverifikasi !== false) return null;
+  return (
+    <span
+      title={t("admin.unverified.hint")}
+      className="shrink-0 rounded-pill bg-lara/20 px-2 py-0.5 text-[10px] font-medium text-lara-teks"
+    >
+      {t("admin.unverified")}
     </span>
   );
 }

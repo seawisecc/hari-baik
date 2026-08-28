@@ -36,7 +36,9 @@ export type AksiJejak =
   /** Daftar pengguna diunduh sebagai berkas. Tidak mengubah apa pun, tetap dicatat. */
   | "ekspor"
   /** Akun pengguna dihapus, Auth dan dokumennya sekaligus. */
-  | "hapus";
+  | "hapus"
+  /** Email ditandai terverifikasi oleh admin, tanpa pengguna menekan tautannya. */
+  | "verifikasi";
 
 export interface Jejak {
   aksi: AksiJejak;

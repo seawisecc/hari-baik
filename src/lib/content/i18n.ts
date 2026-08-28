@@ -326,6 +326,13 @@ const dict = {
     "admin.export.truncated": "Terpotong di {n} baris pertama.",
     "admin.export.failed": "Gagal mengekspor.",
     "admin.danger": "Zona berbahaya",
+    "admin.unverified": "belum verifikasi",
+    "admin.unverified.hint":
+      "Email konfirmasinya belum pernah ditekan, jadi orang ini tertahan di layar verifikasi.",
+    "admin.verify.title": "Email belum terverifikasi",
+    "admin.verify.hint":
+      "Pakai ini kalau email konfirmasinya tidak pernah sampai dan kamu sudah yakin orangnya siapa. Sesudah ini, pemegang kata sandinya bisa masuk tanpa membuktikan alamat emailnya. Tercatat di jejak audit.",
+    "admin.verify.btn": "Tandai terverifikasi",
     "admin.delete.hint":
       "Akun Firebase dan dokumen profilnya dihapus sekaligus, jadi orang ini tidak bisa masuk lagi dan tidak mendapat trial baru. Salinan penuhnya tersimpan di jejak audit. Riwayat pembayarannya tetap.",
     "admin.delete.typeEmail": "Ketik {email} untuk mengonfirmasi",
@@ -891,6 +898,13 @@ const dict = {
     "admin.export.truncated": "Truncated at the first {n} rows.",
     "admin.export.failed": "Export failed.",
     "admin.danger": "Danger zone",
+    "admin.unverified": "unverified",
+    "admin.unverified.hint":
+      "The confirmation link was never opened, so this person is stuck on the verification screen.",
+    "admin.verify.title": "Email not verified",
+    "admin.verify.hint":
+      "Use this when the confirmation email never arrived and you are sure who this person is. Afterwards, whoever holds their password can sign in without proving the address. Recorded in the audit trail.",
+    "admin.verify.btn": "Mark as verified",
     "admin.delete.hint":
       "The Firebase account and the profile document are removed together, so this person cannot sign in again and gets no fresh trial. A full copy is kept in the audit trail. Their payment history stays.",
     "admin.delete.typeEmail": "Type {email} to confirm",
