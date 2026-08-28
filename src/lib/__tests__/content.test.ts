@@ -3,6 +3,7 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { getPancasuda, getPangarasan } from "../content/kepribadian";
 import { translate } from "../content/i18n";
+import { TESTIMONI } from "../content/testimoni";
 import { hitungMaknaNama } from "../content/nama";
 import { petaPerjalananHidup } from "../content/nasib";
 import { getPanduan } from "../content/panduan";
@@ -173,6 +174,50 @@ eq(
 {
   const landing = readFileSync("src/app/LandingClient.tsx", "utf8");
   eq("bagian testimoni dirender bersyarat", true, landing.includes("TESTIMONI.length > 0 &&"));
+}
+
+/*
+ * Testimoni harus lengkap dua bahasa.
+ *
+ * Situsnya dwibahasa. Kutipan yang tidak punya padanan EN akan jatuh ke teks
+ * Indonesia lewat teks(), dan pengunjung yang memilih EN menemui satu blok
+ * bahasa asing di tengah halaman tanpa penjelasan. Itu tidak akan menggagalkan
+ * build, tidak akan terlihat di tangkapan layar bahasa Indonesia, dan baru
+ * ketahuan kalau ada yang kebetulan menekan toggle EN.
+ */
+{
+  eq("ada testimoni", true, TESTIMONI.length > 0);
+  const timpang = TESTIMONI.filter(
+    (x) => !x.kutipan.en?.trim() || !x.peran.en?.trim() || !x.nama.trim() || !x.asal.trim(),
+  ).map((x) => x.nama);
+  eq("setiap testimoni lengkap dua bahasa", "", timpang.join(", "));
+}
+
+/*
+ * Deret testimoni: dua kerapuhan yang sudah terbukti pernah membuatnya diam.
+ *
+ * Yang pertama, timernya sempat dipasang ulang setiap kali kartunya berganti,
+ * karena `aktif` ada di daftar dependensi. Hitungan mundurnya ikut mulai dari
+ * nol tiap kali, dan deretnya bisa tidak pernah sampai ke geseran berikutnya.
+ *
+ * Yang kedua, sentuhan menghentikannya tanpa ada pasangan yang menyalakannya
+ * lagi. Di ponsel itu berarti sekali digeser dengan jari, diam untuk seterusnya.
+ */
+{
+  const slider = readFileSync("src/components/TestimoniSlider.tsx", "utf8");
+  eq(
+    "timer tidak dipasang ulang tiap kartu berganti",
+    true,
+    slider.includes("}, [berhenti, keKartu]);"),
+  );
+  eq("posisi dibaca dari ref", true, slider.includes("posisi.current"));
+  eq("sentuhan punya pasangan yang menyalakan lagi", true, slider.includes("onTouchEnd="));
+  eq(
+    "gerakan dihormati saat diminta dikurangi",
+    true,
+    slider.includes("prefers-reduced-motion"),
+  );
+  eq("tab tersembunyi tidak digeser", true, slider.includes("document.visibilityState"));
 }
 
 console.log(fail === 0 ? "✓ konten: semua lolos" : `✗ konten: ${fail} gagal`);

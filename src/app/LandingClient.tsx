@@ -2,6 +2,7 @@
 
 import {
   ArrowRight,
+  BookOpen,
   Calculator,
   CalendarDays,
   CalendarSearch,
@@ -9,10 +10,10 @@ import {
   FileText,
   Fingerprint,
   Heart,
-  Quote,
   Route,
   ShieldCheck,
   Sparkles,
+  Store,
   Sun,
   User,
   UserPlus,
@@ -27,6 +28,7 @@ import { Logo, Wordmark } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { WhatsAppCard } from "@/components/WhatsAppCard";
 import { useLang, useT } from "@/lib/content/LangProvider";
+import { TestimoniSlider } from "@/components/TestimoniSlider";
 import { TESTIMONI } from "@/lib/content/testimoni";
 import { hemat, perTahun, rupiah, teks, type PengaturanHarga } from "@/lib/harga";
 import { HARI_TRIAL } from "@/lib/subscription";
@@ -92,6 +94,17 @@ const FAQ = [1, 2, 3, 4, 5, 6] as const;
  * lebih dulu, baru produknya diperkenalkan sebagai jawabannya.
  */
 const MASALAH = [1, 2, 3] as const;
+
+/**
+ * Tiga tradisi yang benar-benar dipakai di dalam aplikasi, bukan sekadar
+ * disebut. Kalau suatu hari salah satunya dibuang dari produk, kartunya harus
+ * ikut dibuang dari sini.
+ */
+const WARISAN = [
+  { icon: Sun, kunci: "bali" },
+  { icon: BookOpen, kunci: "jawa" },
+  { icon: Store, kunci: "fengshui" },
+] as const;
 
 /** Tiga alasan kenapa ini perhitungan, bukan ramalan. */
 const ALASAN = [
@@ -195,6 +208,7 @@ export function LandingClient({
         <div className="mt-10 flex flex-col items-center gap-4">
           <TombolDaftar />
           <p className="text-xs italic text-ink-faint">{t("landing.cta.noCard")}</p>
+          <p className="text-sm font-medium text-ink-soft">{t("landing.hero.proof")}</p>
         </div>
       </section>
 
@@ -239,6 +253,34 @@ export function LandingClient({
                 </h3>
                 <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
                   {t(`landing.why.${a.kunci}.desc`)}
+                </p>
+              </Card>
+            ))}
+          </div>
+        </Section>
+
+        {/*
+         * Tiga sumbernya disebutkan terang-terangan.
+         *
+         * Halaman ini dulu hanya menyebut Bali, dan itu membuat sebagian
+         * pembaca menyimpulkan aplikasinya bukan untuk mereka sebelum sempat
+         * melihat isinya. Ketiganya memang sudah ada di dalam aplikasi sejak
+         * awal: pawukon dan wewaran dari wariga, weton dan pangarasan dan
+         * pancasuda dari primbon, dan sistem 81 angka untuk nama usaha. Yang
+         * kurang cuma menyebutkannya.
+         */}
+        <Section title={t("landing.roots.title")} lead={t("landing.roots.lead")}>
+          <div className="grid gap-5 sm:grid-cols-3">
+            {WARISAN.map((w) => (
+              <Card key={w.kunci} className="p-6">
+                <span className="mb-4 grid h-11 w-11 place-items-center rounded-pill bg-accent-wash hb-raise-1">
+                  <w.icon className="h-5 w-5 text-accent-deep" aria-hidden />
+                </span>
+                <h3 className="font-heading text-lg font-semibold text-ink">
+                  {t(`landing.roots.${w.kunci}.title`)}
+                </h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
+                  {t(`landing.roots.${w.kunci}.desc`)}
                 </p>
               </Card>
             ))}
@@ -324,22 +366,17 @@ export function LandingClient({
          * orang berhenti menimbang apa yang didapat dan mulai menimbang
          * apakah ini layak dibayar.
          */}
+        {/*
+         * Kata pelanggan, hanya kalau memang ada.
+         *
+         * Bagian ini hilang seluruhnya ketika daftarnya kosong, bukan tampil
+         * sebagai deret kosong. Letaknya sesudah daftar fitur dan sebelum
+         * harga, karena di situlah orang berhenti menimbang apa yang didapat
+         * dan mulai menimbang apakah ini layak dibayar.
+         */}
         {TESTIMONI.length > 0 && (
           <Section title={t("landing.voices.title")} lead={t("landing.voices.lead")}>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {TESTIMONI.map((x) => (
-                <Card key={`${x.nama}-${x.kutipan.slice(0, 16)}`} className="flex flex-col p-6">
-                  <Quote className="h-5 w-5 shrink-0 text-accent-deep" aria-hidden />
-                  <blockquote className="mt-3 flex-1 text-[15px] leading-relaxed text-ink-soft">
-                    &ldquo;{x.kutipan}&rdquo;
-                  </blockquote>
-                  <figcaption className="mt-4 border-t border-border-soft pt-3">
-                    <p className="text-sm font-semibold text-ink">{x.nama}</p>
-                    {x.peran && <p className="text-xs text-ink-faint">{x.peran}</p>}
-                  </figcaption>
-                </Card>
-              ))}
-            </div>
+            <TestimoniSlider />
           </Section>
         )}
 

@@ -422,8 +422,8 @@ const dict = {
     "admin.sub.requests": "Setujui setelah pembayaran kamu terima.",
     "admin.sub.pricing": "Perubahan langsung berlaku di halaman langganan.",
     "landing.hero.lead":
-      "Kalender Siklus Personal yang dihitung dari tanggal lahirmu, memadukan Wariga dan kalender Bali dengan kalender Masehi.",
-    "landing.hero.eyebrow": "Kalender siklus personal Bali",
+      "Kalender siklus personal yang dihitung dari tanggal lahirmu, memadukan wariga Bali, primbon Jawa, dan fengshui ke dalam kalender Masehi.",
+    "landing.hero.eyebrow": "Warisan leluhur Nusantara, dihitung untuk hari ini",
     "landing.hero.hook": "Sudah kerja keras, tapi kenapa hasilnya sering meleset?",
     "landing.hero.sub":
       "Bukan cuma soal seberapa keras kamu berusaha, tapi seberapa tepat kapan kamu memulai.",
@@ -441,7 +441,7 @@ const dict = {
       "Ada hari yang semuanya mengalir tanpa bisa dijelaskan, dan ada hari yang semuanya berat padahal tidak ada yang berbeda.",
     "landing.why.title": "Waktu yang tepat bukan keberuntungan",
     "landing.why.body":
-      "Leluhur di Bali sudah menghitungnya jauh sebelum ada aplikasi. Wariga bukan kepercayaan yang harus kamu anut, melainkan sistem perhitungan: urip hari lahirmu bertemu urip hari yang sedang berjalan, dan dari pertemuan itu lahir kategori harinya.",
+      "Leluhur di Nusantara sudah menghitungnya jauh sebelum ada aplikasi, dan hitungannya sampai ke kita utuh. Ini bukan kepercayaan yang harus kamu anut, melainkan sistem perhitungan: urip hari lahirmu bertemu urip hari yang sedang berjalan, dan dari pertemuan itu lahir kategori harinya. Siapa pun sukumu, siapa pun yang kamu sembah, angkanya sama.",
     "landing.why.point1.title": "Angkanya tetap",
     "landing.why.point1.desc":
       "Tanggal yang sama selalu memberi hasil yang sama, dan siapa pun bisa menghitung ulang.",
@@ -453,7 +453,7 @@ const dict = {
       "Kalender Bali berlaku sama untuk semua orang. Ini dihitung dari tanggal lahirmu, jadi harimu bukan hari orang lain.",
     "landing.faq.5.q": "Saya bukan orang Bali dan bukan Hindu. Tetap bisa dipakai?",
     "landing.faq.5.a":
-      "Bisa. Yang dipakai sistem perhitungannya, bukan ritualnya. Kamu cuma perlu tanggal lahir Masehi, dan yang keluar adalah keterangan tentang hari, bukan tuntunan ibadah.",
+      "Bisa, dan memang begitu maksudnya. Yang dipakai sistem perhitungannya, bukan ritualnya. Kamu cuma perlu tanggal lahir Masehi, dan yang keluar keterangan tentang hari, bukan tuntunan ibadah. Pengguna kami datang dari berbagai suku, agama, dan juga dari luar negeri.",
     "landing.faq.6.q": "Apakah ini memakai AI?",
     "landing.faq.6.a":
       "Tidak. Tidak ada model yang mengarang jawaban di sini. Semuanya rumus tetap, dijalankan apa adanya, dan diuji terhadap 210 hari siklus pawukon penuh serta 41 tanggal acuan.",
@@ -502,6 +502,23 @@ const dict = {
     "landing.f.journey.desc": "Peta siklus rejeki dan kesehatan dari lahir sampai usia senja.",
     "landing.price.title": "Harga",
     "landing.voices.title": "Kata mereka",
+    "landing.hero.proof":
+      "Sudah dipakai lebih dari 500 orang, dari berbagai daerah dan mancanegara.",
+    "landing.roots.title": "Tiga warisan, satu perhitungan",
+    "landing.roots.lead":
+      "Bukan salinan satu tradisi, melainkan tiga sistem yang sudah lama dipakai orang untuk membaca waktu, dihitung ulang dari tanggal lahirmu.",
+    "landing.roots.bali.title": "Wariga Bali",
+    "landing.roots.bali.desc":
+      "Siklus pawukon 210 hari, wewaran, sasih, dan purnama tilem. Dari sinilah kategori harianmu dihitung.",
+    "landing.roots.jawa.title": "Primbon Jawa",
+    "landing.roots.jawa.desc":
+      "Weton, pangarasan, dan pancasuda dari hari lahirmu, dibaca sebagai watak dan kecenderungan, bukan nasib yang sudah tertutup.",
+    "landing.roots.fengshui.title": "Fengshui 81 angka",
+    "landing.roots.fengshui.desc":
+      "Untuk menimbang nama usaha dan nama produk: tiap huruf diberi nilai, jumlahnya dibaca di tabel yang sama tuanya.",
+    "landing.voices.prev": "Sebelumnya",
+    "landing.voices.next": "Berikutnya",
+    "landing.voices.goTo": "Ke testimoni {n}",
     "landing.voices.lead":
       "Dari orang yang sudah memakainya untuk menentukan waktu, bukan sekadar membacanya.",
     "landing.price.lead":
@@ -1041,8 +1058,8 @@ const dict = {
     "admin.sub.requests": "Approve once you have received the payment.",
     "admin.sub.pricing": "Changes take effect immediately on the subscription page.",
     "landing.hero.lead":
-      "A personal cycle calendar calculated from your birth date, weaving Wariga and the Balinese calendar into the Gregorian one.",
-    "landing.hero.eyebrow": "Balinese personal cycle calendar",
+      "A personal cycle calendar reckoned from your birth date, weaving Balinese wariga, Javanese primbon, and fengshui into the Gregorian one.",
+    "landing.hero.eyebrow": "Ancestral knowledge of the archipelago, reckoned for today",
     "landing.hero.hook": "Working this hard, so why does it so often fall flat?",
     "landing.hero.sub":
       "It is not only how hard you push, but how well you pick the moment you start.",
@@ -1060,7 +1077,7 @@ const dict = {
       "Some days everything flows and nobody can say why, and some days everything drags though nothing has changed.",
     "landing.why.title": "Good timing is not luck",
     "landing.why.body":
-      "People in Bali were calculating this long before there were apps. Wariga is not a belief you have to hold; it is a system of reckoning. The urip of your birth day meets the urip of the day at hand, and their meeting is what gives the day its category.",
+      "People across the archipelago were calculating this long before there were apps, and the reckoning reached us intact. It is not a belief you have to hold; it is a system of arithmetic. The urip of your birth day meets the urip of the day at hand, and their meeting is what gives the day its category. Whatever your background, whatever you worship, the numbers come out the same.",
     "landing.why.point1.title": "The numbers hold still",
     "landing.why.point1.desc":
       "The same date always gives the same answer, and anyone can work it out again.",
@@ -1072,7 +1089,7 @@ const dict = {
       "A Balinese calendar reads the same for everybody. This is worked out from your birth date, so your day is not someone else's day.",
     "landing.faq.5.q": "I am not Balinese and not Hindu. Can I still use it?",
     "landing.faq.5.a":
-      "Yes. What you are using is the reckoning, not the ritual. All it needs is your Gregorian birth date, and what comes back is a reading of the day, not religious instruction.",
+      "Yes, and that is the point. What you are using is the reckoning, not the ritual. All it needs is your Gregorian birth date, and what comes back is a reading of the day, not religious instruction. Our users come from many backgrounds and faiths, and from outside Indonesia too.",
     "landing.faq.6.q": "Does this use AI?",
     "landing.faq.6.a":
       "No. Nothing here invents an answer. It is fixed arithmetic, run as written, and checked against all 210 days of the pawukon cycle plus 41 reference dates.",
@@ -1121,6 +1138,22 @@ const dict = {
     "landing.f.journey.desc": "A map of fortune and health cycles from birth into later years.",
     "landing.price.title": "Pricing",
     "landing.voices.title": "In their words",
+    "landing.hero.proof": "Used by more than 500 people, across the country and beyond it.",
+    "landing.roots.title": "Three inheritances, one reckoning",
+    "landing.roots.lead":
+      "Not a copy of one tradition but three systems people have long used to read time, worked out afresh from your birth date.",
+    "landing.roots.bali.title": "Balinese wariga",
+    "landing.roots.bali.desc":
+      "The 210-day pawukon cycle, the wewaran, sasih, and the full and dark moons. This is where your daily category comes from.",
+    "landing.roots.jawa.title": "Javanese primbon",
+    "landing.roots.jawa.desc":
+      "Weton, pangarasan, and pancasuda from your birth day, read as character and leaning, not as a fate already closed.",
+    "landing.roots.fengshui.title": "The 81-number fengshui",
+    "landing.roots.fengshui.desc":
+      "For weighing a business or product name: each letter carries a value, and the total is read against a table just as old.",
+    "landing.voices.prev": "Previous",
+    "landing.voices.next": "Next",
+    "landing.voices.goTo": "Go to testimonial {n}",
     "landing.voices.lead":
       "From people who use it to pick their moments, not just to read about them.",
     "landing.price.lead": "One subscription unlocks every Pro feature. No hidden fees.",
