@@ -38,7 +38,12 @@ export async function POST(req: NextRequest) {
 
     const baru: Omit<UserProfile, "uid"> = {
       email: decoded.email ?? "",
-      nama: "",
+      // Yang masuk lewat Google membawa namanya sendiri dari sana, jadi kolom
+      // nama di onboarding sudah terisi dan tinggal dibenarkan kalau perlu.
+      // Dipotong 120 huruf mengikuti batas yang sama yang dipakai Rules, supaya
+      // dokumen buatan server tidak pernah melebihi bentuk yang boleh disunting
+      // pemiliknya sendiri nanti.
+      nama: (decoded.name ?? "").slice(0, 120),
       tanggalLahir: null,
       phoneNumber: null,
       role: "user",

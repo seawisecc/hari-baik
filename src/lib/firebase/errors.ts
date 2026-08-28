@@ -9,7 +9,20 @@ const PESAN: Record<string, string> = {
   "auth/weak-password": "Kata sandi minimal 6 karakter.",
   "auth/too-many-requests": "Terlalu banyak percobaan. Coba lagi beberapa menit lagi.",
   "auth/network-request-failed": "Koneksi bermasalah. Periksa jaringanmu.",
-  "auth/operation-not-allowed": "Metode email/password belum diaktifkan di Firebase Console.",
+  "auth/operation-not-allowed": "Metode masuk ini belum diaktifkan di Firebase Console.",
+
+  // Masuk dengan Google.
+  //
+  // account-exists-with-different-credential muncul ketika email yang sama
+  // sudah dipakai mendaftar dengan kata sandi. Firebase tidak menggabungkan
+  // keduanya sendiri, dan pesan bawaannya tidak memberi tahu jalan keluarnya,
+  // jadi orangnya akan menekan tombol yang sama berulang kali.
+  "auth/account-exists-with-different-credential":
+    "Email ini sudah terdaftar dengan kata sandi. Masuk dengan kata sandi dulu.",
+  "auth/popup-blocked": "Peramban memblokir jendela Google. Izinkan popup lalu coba lagi.",
+  "auth/popup-closed-by-user": "Jendela Google ditutup sebelum selesai.",
+  "auth/cancelled-popup-request": "Jendela Google ditutup sebelum selesai.",
+  "auth/unauthorized-domain": "Domain ini belum diizinkan di Firebase Console.",
 };
 
 export function pesanAuth(err: unknown): string {

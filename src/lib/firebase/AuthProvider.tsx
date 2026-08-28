@@ -18,6 +18,15 @@ interface AuthContextValue {
   configured: boolean;
   register: (email: string, password: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
+  /**
+   * Masuk dengan akun Google.
+   *
+   * Mengembalikan true bila urusannya selesai di halaman ini, false bila
+   * peramban dialihkan ke Google dan akan kembali lagi nanti. Pemanggil perlu
+   * membedakan keduanya: pada jalur redirect tidak ada gunanya router.push,
+   * halamannya sudah ditinggalkan.
+   */
+  loginWithGoogle: () => Promise<boolean>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   resendVerification: () => Promise<void>;
@@ -49,6 +58,22 @@ async function bootstrapProfile(user: User): Promise<void> {
     const data = await res.json().catch(() => ({}));
     throw new Error(data.error ?? "Gagal menyiapkan profil.");
   }
+}
+
+/**
+ * Aplikasi sedang berjalan sebagai aplikasi terpasang, bukan di dalam tab.
+ *
+ * Penting untuk cara masuk dengan Google. Di mode standalone iOS, jendela
+ * popup dibuka Safari sebagai konteks terpisah yang tidak bisa mengembalikan
+ * hasilnya ke aplikasi, jadi signInWithPopup menggantung tanpa pesan apa pun.
+ * Aplikasi ini memang berjalan standalone di iPhone (appleWebApp.capable),
+ * jadi jalur redirect bukan kasus langka di sini, melainkan jalur normal bagi
+ * setiap pengguna yang memasang aplikasinya.
+ */
+function modeTerpasang(): boolean {
+  if (typeof window === "undefined") return false;
+  const iosStandalone = (window.navigator as { standalone?: boolean }).standalone === true;
+  return iosStandalone || window.matchMedia?.("(display-mode: standalone)").matches === true;
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -87,6 +112,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const { auth, fn } = await firebase();
         if (batal) return;
+
+        /*
+         * Kembali dari alur redirect Google.
+         *
+         * Di jalur popup, bootstrapProfile dipanggil di loginWithGoogle. Di
+         * jalur redirect tidak bisa: halamannya sudah dibuang dan dimuat ulang,
+         * jadi tidak ada apa pun yang tersisa dari pemanggilan itu. Tanpa
+         * pemanggilan di sini, pengguna kembali dalam keadaan sudah masuk tapi
+         * tanpa dokumen profil, dan tentukanAlihan() tidak mengirimnya ke mana
+         * pun karena onboardingComplete-nya null. Layarnya diam, dan tidak ada
+         * yang salah kelihatannya.
+         */
+        void fn
+          .getRedirectResult(auth)
+          .then(async (hasil) => {
+            if (hasil?.user) await bootstrapProfile(hasil.user);
+          })
+          .catch((err) => console.error("[redirect google]", err));
+
         lepas = fn.onAuthStateChanged(auth, (u) => {
           setUser(u);
           setEmailVerified(!!u?.emailVerified);
@@ -151,6 +195,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await bootstrapProfile(cred.user);
   }, []);
 
+  const loginWithGoogle = useCallback(async () => {
+    const { auth, fn } = await firebase();
+    const provider = new fn.GoogleAuthProvider();
+    // Selalu tanyakan akun mana yang dipakai, jangan diam-diam meneruskan yang
+    // terakhir dipakai di peramban ini. Satu ponsel sering dipakai berdua.
+    provider.setCustomParameters({ prompt: "select_account" });
+
+    if (modeTerpasang()) {
+      await fn.signInWithRedirect(auth, provider);
+      return false;
+    }
+
+    try {
+      const cred = await fn.signInWithPopup(auth, provider);
+      // Sama seperti login biasa: profil dibuat server, dan memanggilnya untuk
+      // yang sudah punya profil tidak mengubah apa pun.
+      await bootstrapProfile(cred.user);
+      return true;
+    } catch (err) {
+      // Popup yang diblokir bukan alasan untuk menyerah, cuma alasan untuk
+      // memakai jalur yang satunya.
+      if ((err as { code?: string }).code === "auth/popup-blocked") {
+        await fn.signInWithRedirect(auth, provider);
+        return false;
+      }
+      throw err;
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     const { auth, fn } = await firebase();
     await fn.signOut(auth);
@@ -190,6 +263,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       configured: firebaseConfigured,
       register,
       login,
+      loginWithGoogle,
       logout,
       resetPassword,
       resendVerification,
@@ -203,6 +277,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       loading,
       register,
       login,
+      loginWithGoogle,
       logout,
       resetPassword,
       resendVerification,

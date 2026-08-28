@@ -146,6 +146,8 @@ const dict = {
     "auth.hidePassword": "Sembunyikan kata sandi",
     "auth.passwordMismatch": "Kata sandi belum sama.",
     "auth.forgot": "Lupa?",
+    "auth.google": "Lanjutkan dengan Google",
+    "auth.or": "atau",
     "auth.forgotTitle": "Lupa kata sandi",
     "auth.forgotSubtitle":
       "Masukkan emailmu, kami kirimkan tautan untuk membuat kata sandi baru.",
@@ -711,6 +713,8 @@ const dict = {
     "auth.hidePassword": "Hide password",
     "auth.passwordMismatch": "Passwords do not match yet.",
     "auth.forgot": "Forgot?",
+    "auth.google": "Continue with Google",
+    "auth.or": "or",
     "auth.forgotTitle": "Forgot password",
     "auth.forgotSubtitle": "Enter your email and we will send a link to set a new password.",
     "auth.forgotSend": "Send link",

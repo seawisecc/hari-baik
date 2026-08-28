@@ -46,6 +46,12 @@ export interface Firebase {
     signOut: typeof import("firebase/auth").signOut;
     sendEmailVerification: typeof import("firebase/auth").sendEmailVerification;
     sendPasswordResetEmail: typeof import("firebase/auth").sendPasswordResetEmail;
+    GoogleAuthProvider: typeof import("firebase/auth").GoogleAuthProvider;
+    signInWithPopup: typeof import("firebase/auth").signInWithPopup;
+    // Jalur cadangan untuk aplikasi terpasang dan peramban yang memblokir
+    // popup. Keduanya harus ada: yang satu tidak bisa menggantikan yang lain.
+    signInWithRedirect: typeof import("firebase/auth").signInWithRedirect;
+    getRedirectResult: typeof import("firebase/auth").getRedirectResult;
     doc: typeof import("firebase/firestore").doc;
     onSnapshot: typeof import("firebase/firestore").onSnapshot;
     updateDoc: typeof import("firebase/firestore").updateDoc;
@@ -117,6 +123,10 @@ export function firebase(): Promise<Firebase> {
         signOut: auth.signOut,
         sendEmailVerification: auth.sendEmailVerification,
         sendPasswordResetEmail: auth.sendPasswordResetEmail,
+        GoogleAuthProvider: auth.GoogleAuthProvider,
+        signInWithPopup: auth.signInWithPopup,
+        signInWithRedirect: auth.signInWithRedirect,
+        getRedirectResult: auth.getRedirectResult,
         doc: firestore.doc,
         onSnapshot: firestore.onSnapshot,
         updateDoc: firestore.updateDoc,

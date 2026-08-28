@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AuthShell, BelumDikonfigurasi, Bidang } from "../AuthShell";
+import { Pemisah, TombolGoogle } from "../TombolGoogle";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Input, InputSandi, Label } from "@/components/ui/Input";
@@ -35,61 +36,73 @@ export default function LoginPage() {
       {!configured ? (
         <BelumDikonfigurasi />
       ) : (
-        <form
-          className="space-y-5"
-          onSubmit={async (e) => {
-            e.preventDefault();
-            setError(null);
-            setBusy(true);
-            try {
-              await login(email, password);
-              router.push("/hari-ini");
-            } catch (err) {
-              setError(pesanAuth(err));
-            } finally {
-              setBusy(false);
-            }
-          }}
-        >
+        <div className="space-y-5">
           {error && <Alert tone="error">{error}</Alert>}
 
-          <Bidang label={<Label htmlFor="email">{t("auth.email")}</Label>}>
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </Bidang>
+          {/* Google di atas formulir, bukan di bawahnya. Yang punya akun
+              Google tidak perlu membaca dua kolom isian lebih dulu untuk
+              tahu bahwa ada jalan yang lebih pendek. */}
+          <TombolGoogle
+            disabled={busy}
+            onError={setError}
+            onSukses={() => router.push("/hari-ini")}
+          />
+          <Pemisah />
 
-          <Bidang
-            label={
-              <div className="flex items-baseline justify-between gap-3">
-                <Label htmlFor="password">{t("auth.password")}</Label>
-                <Link
-                  href="/lupa-sandi"
-                  className="text-xs text-ink-faint underline underline-offset-2 hover:text-ink-soft"
-                >
-                  {t("auth.forgot")}
-                </Link>
-              </div>
-            }
+          <form
+            className="space-y-5"
+            onSubmit={async (e) => {
+              e.preventDefault();
+              setError(null);
+              setBusy(true);
+              try {
+                await login(email, password);
+                router.push("/hari-ini");
+              } catch (err) {
+                setError(pesanAuth(err));
+              } finally {
+                setBusy(false);
+              }
+            }}
           >
-            <InputSandi
-              id="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </Bidang>
+            <Bidang label={<Label htmlFor="email">{t("auth.email")}</Label>}>
+              <Input
+                id="email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </Bidang>
 
-          <Button type="submit" block size="lg" disabled={busy || !email || !password}>
-            {busy ? t("common.processing") : t("auth.login")}
-          </Button>
-        </form>
+            <Bidang
+              label={
+                <div className="flex items-baseline justify-between gap-3">
+                  <Label htmlFor="password">{t("auth.password")}</Label>
+                  <Link
+                    href="/lupa-sandi"
+                    className="text-xs text-ink-faint underline underline-offset-2 hover:text-ink-soft"
+                  >
+                    {t("auth.forgot")}
+                  </Link>
+                </div>
+              }
+            >
+              <InputSandi
+                id="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </Bidang>
+
+            <Button type="submit" block size="lg" disabled={busy || !email || !password}>
+              {busy ? t("common.processing") : t("auth.login")}
+            </Button>
+          </form>
+        </div>
       )}
     </AuthShell>
   );

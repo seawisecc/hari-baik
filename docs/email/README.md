@@ -4,11 +4,11 @@
 
 Diperiksa langsung di console project `hari-baik-7e56c` pada 26 Agustus 2026, bukan dari dokumentasi. Kolom **Message** diperiksa sesudah masuk mode edit, dan hasilnya berbeda per template:
 
-| Template | Subject | Message |
-|---|---|---|
-| Email address verification | bisa | **dikunci** |
-| Password reset | bisa | **bisa** |
-| Email address change | bisa | **dikunci** |
+| Template                   | Subject | Message     |
+| -------------------------- | ------- | ----------- |
+| Email address verification | bisa    | **dikunci** |
+| Password reset             | bisa    | **bisa**    |
+| Email address change       | bisa    | **dikunci** |
 
 Alasannya disebut Firebase sendiri di tooltip kolom Message:
 
@@ -70,6 +70,30 @@ Email bukan halaman web. Empat hal di bawah menentukan cara template ditulis, da
 **Domain tautan konfirmasi masih `hari-baik-7e56c.firebaseapp.com`.** Bisa diganti lewat **Customize action URL** di panel yang sama. Ini gratis dan layak dikerjakan, karena tautan berdomain asing menurunkan kepercayaan orang untuk menekannya.
 
 **Isi email tidak mengikuti bahasa di dalam aplikasi.** Firebase memilih template dari `languageCode`, bukan dari toggle ID/EN. Pengaturannya ada di **Template language** di kiri bawah panel, sekarang masih English.
+
+## Kenapa emailnya masuk spam, dan apa yang mengurangi
+
+Diperiksa lewat `dig` pada 28 Agustus 2026, bukan dari dugaan:
+
+| Yang diperiksa                         | Hasil                                  |
+| -------------------------------------- | -------------------------------------- |
+| SPF `seawise.id`                       | tidak ada, hanya TXT verifikasi Google |
+| DMARC `seawise.id`                     | ada, `p=none`                          |
+| SPF `hari-baik-7e56c.firebaseapp.com`  | ada, `v=spf1 redirect=_spf.google.com` |
+| DKIM `hari-baik-7e56c.firebaseapp.com` | ada                                    |
+
+Jadi emailnya tidak gagal autentikasi. Yang membuatnya jatuh ke spam:
+
+1. Alamat pengirimnya subdomain buatan mesin yang dipakai bersama ribuan project Firebase lain. Reputasi dinilai per domain pengirim, dan domain itu bukan milikmu.
+2. Sender name masih `not provided`, jadi muncul sebagai `noreply` di daftar inbox.
+3. Tautan di dalamnya juga berdomain `firebaseapp.com`. Email yang mengaku dari Hari Baik tapi mengarah ke domain lain adalah pola yang sama persis dengan phishing.
+
+Yang sudah mengurangi masalahnya tanpa mengirim email apa pun: **masuk dengan Google**. Akun yang datang lewat Google sudah terverifikasi emailnya, jadi `sendEmailVerification()` tidak pernah dipanggil untuk mereka. Untuk pasar yang hampir semuanya Gmail, ini memotong sebagian besar kasusnya.
+
+Sisanya, untuk yang tetap mendaftar dengan kata sandi:
+
+- **Gratis, di Console, tanpa kode.** Isi Sender name dan Subject, lalu arahkan **Customize action URL** ke `haribaik.seawise.id`. Nomor 2 dan 3 di atas hilang. Nomor 1 tetap.
+- **Perbaikan penuhnya** ada di bagian "Kalau email verifikasi harus bertema" di atas: kirim sendiri lewat `generateEmailVerificationLink()` dari domain `seawise.id` yang di-DKIM. `seawise.id` perlu record SPF lebih dulu, karena sekarang belum punya.
 
 ## Setelah dipasang
 

@@ -175,6 +175,26 @@ langganan yang tanggalnya sudah lewat tapi statusnya belum sempat diperbarui
 tetap terbaca apa adanya. Trial yang belum habis termasuk yang ditolak: itu
 calon pelanggan yang mungkin baru mendaftar setengah jam lalu.
 
+**Masuk dengan Google memakai popup, kecuali di aplikasi terpasang.** Di mode
+standalone iOS, jendela popup dibuka Safari sebagai konteks terpisah yang tidak
+bisa mengembalikan hasilnya, jadi `signInWithPopup` menggantung tanpa pesan apa
+pun. Karena `appleWebApp.capable` menaruh aplikasi ini dalam mode standalone,
+jalur redirect bukan kasus langka di sini melainkan jalur normal bagi setiap
+pengguna yang memasang aplikasinya. Konsekuensinya: halaman dibuang dan dimuat
+ulang, jadi `bootstrapProfile()` yang biasanya dipanggil di `loginWithGoogle()`
+harus dipanggil ulang lewat `getRedirectResult()` saat kembali. Tanpa itu
+pengguna kembali dalam keadaan sudah masuk tapi tanpa dokumen profil, dan
+`tentukanAlihan()` tidak mengirimnya ke mana pun karena `onboardingComplete`
+masih null: layarnya diam dan tidak ada yang tampak salah. Dijaga
+`auth.test.ts`.
+
+**Email/password tidak boleh ikut hilang saat Google dinyalakan.** Keduanya
+berdampingan, dan yang tidak punya akun Google harus tetap bisa daftar dan
+masuk seperti sebelumnya. Tombol Google ada di halaman masuk DAN halaman
+daftar: menaruhnya hanya di halaman daftar membuat orang yang pertama kali
+masuk lewat Google tidak punya jalan masuk sama sekali, karena dia tidak punya
+kata sandi untuk diketik di halaman satunya.
+
 **Fungsi berjalan di Singapura, bukan Virginia.** `vercel.json` mematok
 `regions: ["sin1"]`. Bawaan Vercel untuk project baru adalah `iad1`
 (Washington DC), sementara Firestore project ini ada di `asia-southeast2`
@@ -245,6 +265,17 @@ yang pasti, bukan setelah "impor terakhir".
 - **Libur nasional 2028 ke atas** masih manual, menunggu SKB pemerintah.
 - **Email verifikasi tidak bisa bertema.** Firebase mengunci isinya untuk
   mencegah spam. Hanya reset kata sandi yang bisa. Lihat `docs/email/README.md`.
+  Sejak masuk dengan Google ada, sebagian pengguna tidak pernah menerima email
+  ini sama sekali, jadi masalahnya mengecil tapi belum hilang.
+- **Email verifikasi sering masuk spam.** Bukan karena gagal autentikasi: SPF
+  dan DKIM domain pengirim Firebase ada dan sah (diperiksa lewat dig, 28
+  Agustus 2026). Penyebabnya alamat pengirimnya `hari-baik-7e56c.firebaseapp.com`,
+  subdomain buatan mesin yang dipakai bersama ribuan project lain dan tidak
+  berhubungan dengan `haribaik.seawise.id`, ditambah tautan di dalamnya yang
+  juga berdomain lain. `seawise.id` sendiri belum punya record SPF; DMARC-nya
+  sudah ada di `p=none`. Perbaikan penuhnya berarti mengirim emailnya sendiri
+  lewat `generateEmailVerificationLink()`, yang sekalian menyelesaikan butir di
+  atas.
 - **Pengingat WhatsApp dibuang** dari katalog, butuh layanan pengirim pesan
   dan penjadwal di luar aplikasi ini.
 

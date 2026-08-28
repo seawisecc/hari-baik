@@ -101,5 +101,69 @@ for (const f of [
   );
 }
 
+// ── Masuk dengan Google ───────────────────────────────────────────────────
+//
+// Alur ini punya dua jalur yang tidak bisa saling menggantikan, dan yang satu
+// hanya terpakai di keadaan yang tidak pernah terlihat saat menguji di laptop:
+// aplikasi yang sudah dipasang di layar utama iPhone berjalan standalone, dan
+// di sana signInWithPopup menggantung tanpa pesan apa pun. Jalur redirect-nya
+// punya konsekuensi lanjutan, karena halaman dibuang dan dimuat ulang, jadi
+// pembuatan profil harus dikerjakan ulang saat kembali.
+{
+  const klien = readFileSync("src/lib/firebase/client.ts", "utf8");
+  for (const f of [
+    "GoogleAuthProvider",
+    "signInWithPopup",
+    "signInWithRedirect",
+    "getRedirectResult",
+  ]) {
+    eq(`client menyediakan ${f}`, true, klien.includes(f));
+  }
+
+  // Popup saja tidak cukup, dan redirect tanpa pembacaan hasilnya membuat
+  // pengguna kembali dalam keadaan masuk tapi tanpa dokumen profil. Layarnya
+  // diam di tempat, dan tidak ada apa pun yang terlihat salah.
+  eq("jalur redirect disiapkan", true, provider.includes("signInWithRedirect"));
+  // Dicocokkan berikut argumennya, bukan namanya saja: nama yang kebetulan
+  // memuat potongan itu, atau tipe yang diimpor tanpa pernah dipanggil, sudah
+  // cukup membuat pemeriksaan nama telanjang lolos.
+  eq("hasil redirect dibaca saat kembali", true, provider.includes("getRedirectResult(auth)"));
+  eq(
+    "profil dibuat setelah kembali dari redirect",
+    true,
+    /getRedirectResult[\s\S]{0,400}bootstrapProfile/.test(provider),
+  );
+  eq("mode terpasang dikenali", true, provider.includes("display-mode: standalone"));
+
+  // Popup yang diblokir peramban bukan alasan untuk menyerah.
+  eq("popup terblokir jatuh ke redirect", true, provider.includes("auth/popup-blocked"));
+
+  // Email yang sudah punya sandi lalu ditekan tombol Google akan ditolak
+  // Firebase dengan kode ini. Tanpa pesan yang menyebut jalan keluarnya,
+  // orangnya menekan tombol yang sama berulang kali.
+  const galat = readFileSync("src/lib/firebase/errors.ts", "utf8");
+  eq(
+    "bentrok akun punya pesannya sendiri",
+    true,
+    galat.includes("auth/account-exists-with-different-credential"),
+  );
+
+  // Tombolnya harus ada di kedua halaman. Menaruhnya hanya di halaman daftar
+  // membuat orang yang sudah pernah masuk lewat Google tidak punya jalan
+  // masuk sama sekali, karena dia tidak punya kata sandi.
+  for (const f of ["src/app/(auth)/login/page.tsx", "src/app/(auth)/register/page.tsx"]) {
+    eq(`${f} menawarkan Google`, true, readFileSync(f, "utf8").includes("<TombolGoogle"));
+  }
+
+  // Email/password tidak boleh ikut hilang: yang tidak punya akun Google
+  // harus tetap bisa masuk seperti sebelumnya.
+  eq("masuk dengan sandi tetap ada", true, provider.includes("signInWithEmailAndPassword"));
+  eq(
+    "daftar dengan sandi tetap ada",
+    true,
+    provider.includes("createUserWithEmailAndPassword"),
+  );
+}
+
 console.log(fail === 0 ? "✓ auth: semua lolos" : `✗ auth: ${fail} gagal`);
 if (fail) process.exit(1);
