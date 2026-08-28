@@ -134,6 +134,39 @@ export function ambilKegagalanGoogle(): string | null {
   }
 }
 
+/**
+ * Kirim email konfirmasi lewat pengirim sendiri, dengan jalur cadangan.
+ *
+ * Pengirim sendiri dipakai supaya emailnya datang dari noreply@seawise.id, dan
+ * supaya isinya bisa bertema. Kalau route-nya belum siap atau gagal, jalur
+ * Firebase dipakai kembali. Itu bukan kemewahan: yang mendaftar tetap harus
+ * menerima emailnya, walaupun dari alamat lama yang lebih sering masuk spam.
+ * Tidak ada email sama sekali berarti akunnya mati sebelum dipakai.
+ */
+async function kirimVerifikasi(user: User, cadangan: (u: User) => Promise<void>) {
+  try {
+    const token = await user.getIdToken();
+    const res = await fetch("/api/auth/verifikasi", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = (await res.json().catch(() => ({}))) as {
+      terkirim?: boolean;
+      alasan?: string;
+    };
+
+    if (res.ok && data.terkirim) return;
+    // Sudah terverifikasi di perangkat lain: tidak ada yang perlu dikirim,
+    // dan jalur cadangan justru akan mengirim email yang membingungkan.
+    if (data.alasan === "sudah-terverifikasi") return;
+
+    console.warn("[verifikasi] memakai pengirim Firebase:", data.alasan ?? res.status);
+  } catch (err) {
+    console.warn("[verifikasi] memakai pengirim Firebase:", err);
+  }
+  await cadangan(user);
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   // Status verifikasi disimpan terpisah dari objek User. `reload()` mengubah
@@ -257,8 +290,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = useCallback(async (email: string, password: string) => {
     const { auth, fn } = await firebase();
     const cred = await fn.createUserWithEmailAndPassword(auth, email, password);
-    await fn.sendEmailVerification(cred.user);
+    // Profil dibuat lebih dulu: route pengirim memverifikasi token dan membaca
+    // akunnya, dan tidak ada gunanya mengirim email untuk akun yang
+    // pembuatannya gagal di langkah berikutnya.
     await bootstrapProfile(cred.user);
+    await kirimVerifikasi(cred.user, (u) => fn.sendEmailVerification(u));
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
@@ -330,7 +366,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const resendVerification = useCallback(async () => {
     const { auth, fn } = await firebase();
     const current = auth.currentUser;
-    if (current) await fn.sendEmailVerification(current);
+    if (current) await kirimVerifikasi(current, (u) => fn.sendEmailVerification(u));
   }, []);
 
   const refreshUser = useCallback(async () => {

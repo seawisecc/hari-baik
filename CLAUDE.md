@@ -21,7 +21,7 @@ halaman pakai `|`. Ini permintaan tegas pemilik: em dash membuat produknya
 terlihat tidak profesional. Sebelum menerbitkan dokumen panjang, periksa
 dengan grep.
 
-**`npm run verify` sebelum push.** Merangkai lint, tiga belas suite tes, build,
+**`npm run verify` sebelum push.** Merangkai lint, empat belas suite tes, build,
 dan uji asap route API di build produksi asli. Perintah ini lahir dari
 kejadian nyata, lihat "Yang pernah menggigit" di bawah.
 
@@ -38,8 +38,8 @@ halamannya dan periksa DOM-nya.
 | Perintah               | Guna                                               |
 | ---------------------- | -------------------------------------------------- |
 | `npm run verify`       | Gerbang sebelum push: lint, tes, build, uji asap   |
-| `npm test`             | Tiga belas suite tes                               |
-| `npm run smoke`        | Tembak kesembilan route API di build produksi asli |
+| `npm test`             | Empat belas suite tes                              |
+| `npm run smoke`        | Tembak kesepuluh route API di build produksi asli  |
 | `npm run deploy-rules` | Terapkan `firestore.rules`                         |
 | `npm run set-admin`    | Beri custom claim admin                            |
 | `npm run protection`   | Nyalakan atau matikan Vercel Deployment Protection |
@@ -304,6 +304,27 @@ DAN tambahkan `https://haribaik.seawise.id/__/auth/handler` ke Authorized
 redirect URIs di Google Cloud Console. Ketiganya harus sekaligus: dua yang
 pertama tanpa yang ketiga membuat Google menolak dengan redirect_uri_mismatch,
 dan masuk dengan Google mati total, bukan cuma rapuh.
+
+**Email konfirmasi dikirim sendiri, bukan lewat Firebase.** Alasannya bukan
+gaya: Firebase mengirimnya dari `noreply@hari-baik-7e56c.firebaseapp.com`,
+subdomain buatan mesin yang dipakai bersama ribuan project lain. SPF dan DKIM-nya
+sah (diukur lewat dig), jadi yang menjatuhkannya ke spam adalah reputasi domain
+pengirim, dan itu tidak bisa diperbaiki dari sisi kita. Isinya juga terkunci:
+Console dan Identity Toolkit API sama-sama menolak dengan
+`EMAIL_TEMPLATE_UPDATE_NOT_ALLOWED`.
+
+**Tautan dari `generateEmailVerificationLink()` dirakit ulang ke `/aksi`.**
+Tautannya selalu menunjuk ke `callbackUri` project, yang juga terkunci. Tapi
+yang bernilai di dalamnya cuma `oobCode`, dan itu ikut terbawa di query, jadi
+`tautanAksi()` mengambilnya lalu menyusun URL baru ke domain sendiri. `apiKey`
+sengaja tidak ikut: halaman `/aksi` memakai config miliknya sendiri, dan apa
+pun yang tidak dibutuhkan lebih baik tidak berkeliaran di kotak masuk orang.
+
+**Jalur cadangan ke pengirim Firebase tidak boleh dibuang.** Kalau
+`RESEND_API_KEY` belum ada atau pengirimannya gagal, `kirimVerifikasi()`
+kembali memakai `sendEmailVerification()`. Email dari alamat lama yang sering
+masuk spam masih jauh lebih baik daripada tidak ada email sama sekali, yang
+berarti akunnya mati sebelum sempat dipakai.
 
 **Fungsi berjalan di Singapura, bukan Virginia.** `vercel.json` mematok
 `regions: ["sin1"]`. Bawaan Vercel untuk project baru adalah `iad1`

@@ -63,6 +63,12 @@ const DAFTAR: Uji[] = [
     harap: [401],
     kenapa: "sama",
   },
+  {
+    jalur: "/api/auth/verifikasi",
+    metode: "POST",
+    harap: [401],
+    kenapa: "sama, dan route ini menarik SDK Resend ke sisi server",
+  },
 ];
 
 async function tungguSiap(batasDetik = 60) {
