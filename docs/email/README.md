@@ -119,7 +119,14 @@ Bagian "Dua batas lain" di atas menyebut Customize action URL sebagai perbaikan 
 
 Firebase Hosting melayani `/__/auth/action` secara otomatis. Vercel tidak, dan tidak ada halaman itu di aplikasi ini. Mengarahkan action URL ke `https://haribaik.seawise.id/__/auth/action` sekarang juga akan membuat **setiap tautan verifikasi dan reset kata sandi berujung 404**, termasuk milik pengguna yang emailnya sudah terkirim sebelumnya.
 
-Supaya bisa dipindah, halamannya harus dibuat dulu di aplikasi ini: satu route yang membaca `mode` dan `oobCode` dari query lalu memanggil `applyActionCode()` atau `confirmPasswordReset()`. Sesudah itu barulah `callbackUri` diarahkan ke sana. Belum dikerjakan.
+Halamannya sekarang **sudah ada**, di `src/app/aksi/page.tsx`. Ia menangani `verifyEmail`, `resetPassword`, dan `recoverEmail`, dan sudah diuji dengan oobCode asli yang dibangkitkan `generateEmailVerificationLink()`: akun ujinya benar-benar berubah jadi terverifikasi, bukan hanya lolos tes.
+
+Jadi urutannya sekarang:
+
+1. Pastikan `https://haribaik.seawise.id/aksi` sudah hidup di produksi.
+2. Baru arahkan **Customize action URL** ke situ.
+
+Jangan dibalik. Selama halamannya belum ter-deploy, memindahkan action URL membuat setiap tautan berujung 404, termasuk milik orang yang emailnya sudah terkirim kemarin.
 
 ## Kalau satu pengguna tidak menerima emailnya
 

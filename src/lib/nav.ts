@@ -135,6 +135,10 @@ export const RUTE_TELANJANG = [
   "/login",
   "/register",
   "/lupa-sandi",
+  // Tujuan tautan di email Firebase. Yang membukanya datang dari kotak
+  // masuknya, bukan dari dalam aplikasi, dan pada kasus reset kata sandi
+  // biasanya belum bisa masuk sama sekali.
+  "/aksi",
   "/verify-email",
   "/onboarding",
   // Terkunci berarti terkunci: jangan tampilkan menu yang tidak bisa dibuka.

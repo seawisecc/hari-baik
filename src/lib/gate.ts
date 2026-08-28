@@ -1,5 +1,12 @@
 /** Rute yang boleh diakses tanpa melewati pemeriksaan apa pun. */
-export const RUTE_PUBLIK = new Set(["/", "/login", "/register", "/lupa-sandi"]);
+/**
+ * Rute yang boleh dibuka siapa pun.
+ *
+ * "/aksi" adalah tujuan tautan di email Firebase: konfirmasi email dan atur
+ * ulang kata sandi. Ia wajib publik justru karena yang membukanya belum tentu
+ * sudah masuk, dan pada kasus reset kata sandi hampir pasti belum bisa masuk.
+ */
+export const RUTE_PUBLIK = new Set(["/", "/login", "/register", "/lupa-sandi", "/aksi"]);
 
 /**
  * Rute yang menjadi TUJUAN salah satu pemeriksaan. Halaman ini harus bisa

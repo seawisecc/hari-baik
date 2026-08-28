@@ -1,6 +1,7 @@
 /** Keputusan pengalihan rute: siapa boleh melihat apa. */
 import {
   RUTE_PRO,
+  RUTE_PUBLIK,
   perluLayarTunggu,
   tanggalKalender,
   tentukanAlihan,
@@ -13,6 +14,7 @@ import {
   NAV_MOBILE_LAINNYA,
   NAV_PRO,
   NAV_UTAMA,
+  RUTE_TELANJANG,
 } from "../nav";
 
 let fail = 0;
@@ -195,5 +197,19 @@ for (const href of Object.keys(RUTE_PRO)) {
   eq("masa coba: hari ini sendiri diterima", hariIni, tanggalKalender(hariIni, hariIni, false));
 }
 
+// ── Rute publik harus ikut tanpa kerangka aplikasi ───────────────────────
+//
+// Dua daftar di berkas berbeda yang tidak saling menyebut: RUTE_PUBLIK di
+// gate.ts memutuskan siapa boleh membuka, RUTE_TELANJANG di nav.ts memutuskan
+// apakah bilah samping ikut tampil. Halaman yang boleh dibuka tanpa masuk tapi
+// lupa didaftarkan di daftar kedua akan tampil dengan menu lengkap berisi
+// tautan yang semuanya menolak pengunjungnya. Sudah terjadi sekali, pada
+// halaman /aksi yang menangani tautan dari email.
+{
+  const bocor = [...RUTE_PUBLIK].filter((r) => !RUTE_TELANJANG.includes(r));
+  eq("setiap rute publik juga tanpa kerangka", "", bocor.join(", "));
+}
+
 console.log(fail === 0 ? "✓ gate: semua lolos" : `✗ gate: ${fail} gagal`);
 if (fail) process.exit(1);
+

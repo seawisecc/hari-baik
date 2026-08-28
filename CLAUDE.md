@@ -204,11 +204,23 @@ templatenya sudah terpasang. Diuji 28 Agustus 2026 dengan service account
 project ini, dan seluruh konfigurasi sebelum dan sesudahnya dibandingkan baris
 per baris untuk memastikan tidak ada yang tergeser. Lihat `docs/email/README.md`.
 
-**Action URL tidak boleh dipindah ke domain sendiri sebelum halamannya ada.**
+**Action URL boleh dipindah setelah `/aksi` hidup, bukan sebelumnya.**
 Firebase Hosting melayani `/__/auth/action` sendiri; Vercel tidak, dan aplikasi
-ini di Vercel. Memindahkan `callbackUri` sekarang membuat setiap tautan
-verifikasi dan reset kata sandi berujung 404, termasuk yang sudah terkirim.
-Halamannya harus dibuat lebih dulu.
+ini di Vercel. Memindahkan `callbackUri` tanpa halaman penangannya membuat
+setiap tautan verifikasi dan reset kata sandi berujung 404, termasuk yang sudah
+terkirim ke orang. Halamannya sekarang ada di `src/app/aksi/page.tsx`, menangani
+`verifyEmail`, `resetPassword`, dan `recoverEmail`, dan sudah diuji dengan
+oobCode asli dari `generateEmailVerificationLink()`, bukan hanya dengan tes.
+Setelah `applyActionCode`, `currentUser` harus di-reload dan tokennya ditarik
+ulang: `emailVerified` ikut token, jadi tanpa itu orangnya menekan tombol lalu
+dikembalikan ke layar verifikasi yang sama.
+
+**Rute publik wajib ada di dua daftar.** `RUTE_PUBLIK` di `gate.ts` menentukan
+siapa boleh membuka, `RUTE_TELANJANG` di `nav.ts` menentukan apakah bilah
+samping ikut tampil. Keduanya di berkas berbeda dan tidak saling menyebut.
+Halaman `/aksi` sempat tampil dengan menu lengkap berisi tautan yang semuanya
+menolak pengunjungnya, karena terdaftar di yang pertama saja. `gate.test.ts`
+sekarang menahannya.
 
 **Status verifikasi email tidak disalin ke Firestore.** Ia milik Firebase Auth,
 dan panel admin menempelkannya saat membaca daftar lewat `getUsers()`, bukan

@@ -23,6 +23,15 @@ const PESAN: Record<string, string> = {
   "auth/popup-closed-by-user": "Jendela Google ditutup sebelum selesai.",
   "auth/cancelled-popup-request": "Jendela Google ditutup sebelum selesai.",
   "auth/unauthorized-domain": "Domain ini belum diizinkan di Firebase Console.",
+
+  // Tautan dari email. Ketiganya berarti hal yang sama bagi yang membukanya:
+  // tautannya tidak berlaku lagi, dan yang perlu dia tahu adalah cara
+  // mendapatkan yang baru, bukan istilah teknisnya.
+  "auth/expired-action-code":
+    "Tautannya sudah kedaluwarsa. Minta email baru lalu buka yang terbaru.",
+  "auth/invalid-action-code":
+    "Tautannya tidak berlaku. Biasanya karena sudah pernah dipakai, atau ada email yang lebih baru.",
+  "auth/missing-action-code": "Tautannya tidak lengkap. Buka lagi langsung dari emailnya.",
 };
 
 export function pesanAuth(err: unknown): string {

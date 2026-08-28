@@ -52,6 +52,12 @@ export interface Firebase {
     // popup. Keduanya harus ada: yang satu tidak bisa menggantikan yang lain.
     signInWithRedirect: typeof import("firebase/auth").signInWithRedirect;
     getRedirectResult: typeof import("firebase/auth").getRedirectResult;
+    // Penangan tautan email: dipakai halaman /aksi, satu-satunya tempat
+    // oobCode dari email Firebase ditukar jadi perubahan yang sesungguhnya.
+    applyActionCode: typeof import("firebase/auth").applyActionCode;
+    checkActionCode: typeof import("firebase/auth").checkActionCode;
+    verifyPasswordResetCode: typeof import("firebase/auth").verifyPasswordResetCode;
+    confirmPasswordReset: typeof import("firebase/auth").confirmPasswordReset;
     doc: typeof import("firebase/firestore").doc;
     onSnapshot: typeof import("firebase/firestore").onSnapshot;
     updateDoc: typeof import("firebase/firestore").updateDoc;
@@ -127,6 +133,10 @@ export function firebase(): Promise<Firebase> {
         signInWithPopup: auth.signInWithPopup,
         signInWithRedirect: auth.signInWithRedirect,
         getRedirectResult: auth.getRedirectResult,
+        applyActionCode: auth.applyActionCode,
+        checkActionCode: auth.checkActionCode,
+        verifyPasswordResetCode: auth.verifyPasswordResetCode,
+        confirmPasswordReset: auth.confirmPasswordReset,
         doc: firestore.doc,
         onSnapshot: firestore.onSnapshot,
         updateDoc: firestore.updateDoc,
