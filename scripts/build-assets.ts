@@ -57,22 +57,37 @@ async function pratinjauTautan(tujuan: string) {
   // pada hasil render SVG ini.
   const logoRedup = Buffer.from(logo.toString().replace("<g fill=", '<g opacity="0.14" fill='));
   const latar = await sharp(logoRedup).resize(560, 560).png().toBuffer();
-  const lambang = await sharp(logo).resize(104, 104).png().toBuffer();
+  const lambang = await sharp(logo).resize(52, 52).png().toBuffer();
 
+  /*
+   * Teksnya dipecah baris di sini, bukan dibiarkan membungkus sendiri.
+   * <text> pada SVG tidak mengenal pembungkusan baris sama sekali: kalimat
+   * yang kepanjangan akan terus memanjang keluar kanvas tanpa peringatan.
+   *
+   * Lebar amannya 1008 piksel (1200 dikurangi tepi 96 di kiri dan kanan).
+   * Setiap kali kalimatnya diubah, gambarnya harus dilihat lagi, bukan
+   * dipercaya begitu saja.
+   */
   const teks = Buffer.from(`
 <svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">
   <style>
-    .judul { font-family: Georgia, 'Times New Roman', serif; font-style: italic;
-             font-weight: 700; font-size: 86px; fill: ${TINTA}; }
-    .slogan { font-family: Georgia, serif; font-weight: 700; font-size: 33px; fill: ${TINTA}; }
-    .isi { font-family: Helvetica, Arial, sans-serif; font-size: 26px; fill: ${REDUP}; }
+    .merek { font-family: Georgia, 'Times New Roman', serif; font-style: italic;
+             font-weight: 700; font-size: 34px; fill: ${TINTA}; }
+    .kail { font-family: Georgia, 'Times New Roman', serif; font-weight: 700;
+            font-size: 58px; fill: ${TINTA}; }
+    .isi { font-family: Helvetica, Arial, sans-serif; font-size: 27px; fill: ${REDUP}; }
+    .akar { font-family: Helvetica, Arial, sans-serif; font-size: 22px; fill: ${REDUP};
+            letter-spacing: 1px; }
     .kaki { font-family: Helvetica, Arial, sans-serif; font-size: 22px; fill: ${REDUP};
             letter-spacing: 2px; }
   </style>
-  <text class="judul" x="234" y="278">Hari Baik</text>
-  <text class="slogan" x="96" y="372">&#8220;Setiap orang punya waktunya masing-masing&#8221;</text>
-  <text class="isi" x="96" y="424">Kalender siklus personal, dihitung dari tanggal lahirmu.</text>
-  <text class="kaki" x="96" y="536">HARIBAIK.SEAWISE.ID</text>
+  <text class="merek" x="158" y="107">Hari Baik</text>
+  <text class="kail" x="96" y="248">Sudah kerja keras, tapi kenapa</text>
+  <text class="kail" x="96" y="318">hasilnya sering meleset?</text>
+  <text class="isi" x="96" y="382">Bukan cuma soal seberapa keras kamu berusaha,</text>
+  <text class="isi" x="96" y="420">tapi seberapa tepat kapan kamu memulai.</text>
+  <text class="akar" x="96" y="484">Wariga Bali &#183; Primbon Jawa &#183; Fengshui</text>
+  <text class="kaki" x="96" y="546">HARIBAIK.SEAWISE.ID</text>
 </svg>`);
 
   await sharp({
@@ -81,7 +96,7 @@ async function pratinjauTautan(tujuan: string) {
     .composite([
       // Latar dulu supaya teks selalu berada di atasnya.
       { input: latar, top: 35, left: 830 },
-      { input: lambang, top: 176, left: 96 },
+      { input: lambang, top: 62, left: 96 },
       { input: teks, top: 0, left: 0 },
     ])
     .png()

@@ -12,7 +12,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Hari Baik | Kalender Siklus Personal",
     short_name: "Hari Baik",
     description:
-      "Kalender siklus personal yang dihitung dari tanggal lahirmu, memadukan Wariga dan kalender Bali dengan kalender Masehi.",
+      "Kalender siklus personal yang dihitung dari tanggal lahirmu, memadukan wariga Bali, primbon Jawa, dan fengshui ke dalam kalender Masehi.",
     id: "/",
     // Aplikasi terpasang langsung membuka halaman harian, bukan halaman
     // pemasaran: yang memasang sudah tidak perlu diyakinkan lagi.

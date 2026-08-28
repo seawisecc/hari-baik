@@ -29,8 +29,18 @@ const body = Inter({
 const SITUS = "https://haribaik.seawise.id";
 const STUDIO = "Seawise Studio";
 const JUDUL = "Hari Baik | Kalender Siklus Personal";
+/*
+ * Ringkasan membawa kailnya, bukan cuma keterangan kategorinya.
+ *
+ * Ini teks yang benar-benar dibaca orang di pratinjau WhatsApp, dan di sana
+ * ia berdiri sendiri tanpa halaman di sekelilingnya untuk menjelaskan. Kalimat
+ * yang cuma menyebutkan apa produknya menyerahkan seluruh pekerjaan menarik
+ * perhatian kepada judul dan gambar. Ketiga tradisinya ikut disebut, karena
+ * pratinjau yang hanya menyebut Bali membuat sebagian orang menyimpulkan
+ * aplikasinya bukan untuk mereka sebelum sempat menekan tautannya.
+ */
 const RINGKASAN =
-  "Kalender siklus personal yang dihitung dari tanggal lahirmu, memadukan Wariga dan kalender Bali dengan kalender Masehi.";
+  "Sudah kerja keras, tapi kenapa hasilnya sering meleset? Kalender siklus personal yang dihitung dari tanggal lahirmu, memadukan wariga Bali, primbon Jawa, dan fengshui.";
 
 export const metadata: Metadata = {
   // metadataBase membuat URL gambar jadi absolut. Tanpa ini WhatsApp dan

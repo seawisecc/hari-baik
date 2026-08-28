@@ -220,5 +220,32 @@ eq(
   eq("tab tersembunyi tidak digeser", true, slider.includes("document.visibilityState"));
 }
 
+/*
+ * Kail di halaman depan, di gambar OG, dan di ringkasan metadata harus sama.
+ *
+ * Ketiganya ada di berkas yang berbeda dan tidak saling menyebut: kalimatnya
+ * di kamus i18n, salinannya digambar ulang sebagai teks SVG di
+ * scripts/build-assets.ts, dan ringkasannya ditulis lagi di layout.tsx.
+ * Mengganti kail di halaman tanpa menyentuh dua yang lain tidak menggagalkan
+ * apa pun, tidak terlihat di layar mana pun, dan baru ketahuan ketika seseorang
+ * membagikan tautannya di WhatsApp lalu melihat kalimat yang sudah tidak
+ * dipakai lagi. Itu justru tempat paling banyak orang membacanya pertama kali.
+ *
+ * Tes ini tidak bisa memeriksa PNG-nya, cuma teks yang menghasilkannya. Jadi
+ * kalau tes ini merah, yang kurang bukan hanya menyunting skripnya melainkan
+ * juga menjalankan `npm run build-assets`.
+ */
+{
+  const kail = translate("id", "landing.hero.hook");
+  const skrip = readFileSync("scripts/build-assets.ts", "utf8");
+  const barisGambar = [...skrip.matchAll(/class="kail"[^>]*>([^<]+)</g)]
+    .map((m) => m[1].trim())
+    .join(" ");
+  eq("kail di gambar OG sama dengan di halaman", kail, barisGambar);
+
+  const layout = readFileSync("src/app/layout.tsx", "utf8");
+  eq("ringkasan metadata membawa kailnya", true, layout.includes(kail));
+}
+
 console.log(fail === 0 ? "✓ konten: semua lolos" : `✗ konten: ${fail} gagal`);
 if (fail) process.exit(1);
