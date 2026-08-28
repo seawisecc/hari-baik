@@ -65,21 +65,33 @@ export async function POST(req: NextRequest) {
       throw new AdminError(400, "Email konfirmasi tidak cocok dengan pengguna ini.");
     }
 
-    const tolak = alasanTolak(profil as unknown as DapatDihapus);
+    /*
+     * Status verifikasi harus ikut ditanyakan sebelum memutuskan.
+     *
+     * Yang emailnya belum terbukti tidak pernah bisa masuk walau trialnya
+     * secara hitungan masih berjalan, dan akun seperti itulah yang paling
+     * banyak menumpuk: mendaftar, lalu berhenti di layar verifikasi.
+     *
+     * Akun Auth yang sudah tidak ada diperlakukan sama, yaitu tidak bisa
+     * masuk. Yang tersisa dari akun seperti itu memang cuma dokumen yatim.
+     */
+    let akun;
+    try {
+      akun = await adminAuth().getUser(uid);
+    } catch (err) {
+      if ((err as { code?: string }).code !== "auth/user-not-found") throw err;
+    }
+
+    const tolak = alasanTolak({
+      ...(profil as unknown as DapatDihapus),
+      emailTerverifikasi: akun ? akun.emailVerified : false,
+    });
     if (tolak) throw new AdminError(409, PESAN_TOLAK[tolak]);
 
-    // Akun Auth boleh saja sudah tidak ada, misalnya karena dihapus lewat
-    // konsol Firebase. Itu bukan kegagalan: yang tersisa justru dokumen
-    // yatim yang memang sedang dibersihkan.
-    let authTerhapus = true;
-    try {
+    let authTerhapus = false;
+    if (akun) {
       await adminAuth().deleteUser(uid);
-    } catch (err) {
-      if ((err as { code?: string }).code === "auth/user-not-found") {
-        authTerhapus = false;
-      } else {
-        throw err;
-      }
+      authTerhapus = true;
     }
 
     await ref.delete();

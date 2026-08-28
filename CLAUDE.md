@@ -219,6 +219,23 @@ masih membawa `emailVerified` yang lama, dan `tentukanAlihan()` membacanya dari
 token itu, jadi tanpa pencabutan orangnya tetap tertahan di `/verify-email`
 dan admin mengira tombolnya tidak bekerja.
 
+**Akun yang belum verifikasi boleh dihapus walau trialnya masih berjalan.**
+`evaluateAccess()` bilang aksesnya hidup, tapi `tentukanAlihan()` menahannya di
+`/verify-email`, jadi di layar dia tidak bisa membuka apa pun. Akun seperti
+itulah yang paling banyak menumpuk (mendaftar lalu berhenti), dan penjaga
+trial justru membuatnya satu-satunya yang tidak bisa dibersihkan. Pengecualian
+ini hanya melewati penjaga trial, bukan penjaga admin maupun yang menunggu.
+Status tidak diketahui (null, Auth gagal dibaca) tetap ditolak: menebak ke arah
+menghapus adalah arah tebakan yang salah.
+
+**Tabel admin punya lima kolom, bukan enam.** Masa berlaku digabung ke dalam
+kolom status. Dengan enam kolom, tabelnya lebih lebar daripada ruang di sebelah
+bilah samping pada laptop biasa: kolom aksi terpotong di tepi kanan, dan kolom
+tanggal yang terhimpit membungkus jadi dua baris sehingga tiap baris jadi
+setinggi dua baris. Diukur di jendela 950 piksel, bukan ditebak. Untuk baris
+trial yang dibaca `trialEndsAt`, bukan `subscriptionExpiresAt` yang memang
+selalu kosong bagi mereka.
+
 **Fungsi berjalan di Singapura, bukan Virginia.** `vercel.json` mematok
 `regions: ["sin1"]`. Bawaan Vercel untuk project baru adalah `iad1`
 (Washington DC), sementara Firestore project ini ada di `asia-southeast2`

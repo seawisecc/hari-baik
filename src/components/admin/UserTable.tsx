@@ -97,18 +97,33 @@ export function UserTable({
         ))}
       </div>
 
-      {/* Layar lebar: tabel, karena membandingkan banyak orang sekaligus
-          lebih mudah kalau angkanya sebaris. */}
+      {/*
+       * Layar lebar: tabel, karena membandingkan banyak orang sekaligus lebih
+       * mudah kalau angkanya sebaris.
+       *
+       * Masa berlaku digabung ke dalam kolom status, bukan berdiri sendiri.
+       * Dengan enam kolom, tabelnya lebih lebar daripada ruang yang tersisa di
+       * sebelah bilah samping pada laptop biasa: kolom aksi terpotong di tepi
+       * kanan, dan kolom tanggal yang terhimpit membungkus jadi dua baris
+       * sehingga tiap baris jadi setinggi dua baris. Digabung, keduanya justru
+       * lebih mudah dibaca, karena status dan sampai kapan status itu berlaku
+       * memang satu keterangan.
+       */}
       <div className="hidden overflow-x-auto md:block">
-        <table className="w-full min-w-[820px] text-sm">
+        <table className="w-full min-w-[600px] text-sm">
           <thead>
             <tr className="text-left text-[11px] uppercase tracking-wider text-ink-faint">
               <th className="px-3 py-2 font-semibold">{t("admin.col.user")}</th>
-              <th className="px-3 py-2 font-semibold">{t("admin.col.status")}</th>
-              <th className="px-3 py-2 font-semibold">{t("admin.col.validUntil")}</th>
-              <th className="px-3 py-2 font-semibold">{t("admin.col.birth")}</th>
+              <th className="whitespace-nowrap px-3 py-2 font-semibold">
+                {t("admin.col.status")}
+              </th>
+              <th className="whitespace-nowrap px-3 py-2 font-semibold">
+                {t("admin.col.birth")}
+              </th>
               <th className="px-3 py-2 font-semibold">{t("admin.col.addon")}</th>
-              <th className="px-3 py-2 text-right font-semibold">{t("admin.col.action")}</th>
+              <th className="whitespace-nowrap px-3 py-2 text-right font-semibold">
+                {t("admin.col.action")}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -120,28 +135,28 @@ export function UserTable({
                 // yang sama, sel colSpan menghimpit kolom-kolom lainnya.
                 <Fragment key={u.uid}>
                   <tr className="border-t border-border-soft align-middle">
-                    <td className="px-3 py-3">
-                      <p className="font-medium text-ink">{u.nama || t("profile.noName")}</p>
-                      <p className="text-xs text-ink-faint">{u.email}</p>
+                    {/* Email panjang dipotong, bukan dibiarkan melebarkan
+                        seluruh tabel sampai kolom lain kehabisan ruang.
+                        Lengkapnya tetap bisa dibaca lewat title. */}
+                    <td className="max-w-[220px] px-3 py-3">
+                      <p className="truncate font-medium text-ink">
+                        {u.nama || t("profile.noName")}
+                      </p>
+                      <p className="truncate text-xs text-ink-faint" title={u.email}>
+                        {u.email}
+                      </p>
                       {u.phoneNumber && <TautanWa phone={u.phoneNumber} />}
                     </td>
 
-                    <td className="px-3 py-3">
-                      <div className="flex flex-wrap items-center gap-1.5">
+                    <td className="whitespace-nowrap px-3 py-3">
+                      <div className="flex items-center gap-1.5">
                         <Status status={u.subscriptionStatus} />
                         <BelumVerifikasi terverifikasi={u.emailTerverifikasi} />
                       </div>
+                      <Sampai u={u} />
                     </td>
 
-                    <td className="px-3 py-3 text-ink-soft">
-                      {u.subscriptionStatus === "lifetime" ? (
-                        <span className="text-ink">{t("admin.noExpiry")}</span>
-                      ) : (
-                        tanggal(u.subscriptionExpiresAt)
-                      )}
-                    </td>
-
-                    <td className="px-3 py-3 text-ink-soft">
+                    <td className="whitespace-nowrap px-3 py-3 text-ink-soft">
                       {u.tanggalLahir ?? "-"}
                       {u.uripLahir !== null && (
                         <span className="block text-xs text-ink-faint">urip {u.uripLahir}</span>
@@ -152,7 +167,7 @@ export function UserTable({
                       <SelAddOn dimiliki={u.addOn ?? []} katalog={katalogAddOn} />
                     </td>
 
-                    <td className="px-3 py-3">
+                    <td className="whitespace-nowrap px-3 py-3">
                       <div className="flex justify-end">
                         <Button
                           size="sm"
@@ -169,7 +184,7 @@ export function UserTable({
 
                   {dibuka && (
                     <tr>
-                      <td colSpan={6} className="px-3 pb-4">
+                      <td colSpan={5} className="px-3 pb-4">
                         <PanelKelola
                           u={u}
                           katalogAddOn={katalogAddOn}
@@ -234,6 +249,8 @@ function KartuPengguna({
         <Baris label={t("admin.col.validUntil")}>
           {u.subscriptionStatus === "lifetime" ? (
             <span className="text-ink">{t("admin.noExpiry")}</span>
+          ) : u.subscriptionStatus === "trial" && u.trialEndsAt ? (
+            tanggal(u.trialEndsAt)
           ) : (
             tanggal(u.subscriptionExpiresAt)
           )}
@@ -360,6 +377,35 @@ function Status({ status }: { status: SubscriptionStatus }) {
       )}
     >
       {t(STATUS_KEY[status])}
+    </span>
+  );
+}
+
+/**
+ * Sampai kapan status ini berlaku, di bawah lencananya.
+ *
+ * Untuk trial yang dibaca bukan tanggal habis langganan melainkan akhir masa
+ * coba: yang berstatus trial belum pernah punya tanggal habis, jadi kolomnya
+ * dulu selalu kosong padahal justru merekalah yang paling perlu dipantau,
+ * karena tinggal beberapa hari lagi.
+ *
+ * Kalau tidak ada tanggal yang bisa disebut, barisnya tidak ditampilkan sama
+ * sekali. Sebelumnya tertulis "s/d -", yang terbaca seperti kesalahan.
+ */
+function Sampai({ u }: { u: PenggunaAdmin }) {
+  const t = useT();
+
+  if (u.subscriptionStatus === "lifetime") {
+    return <span className="mt-1 block text-xs text-ink-faint">{t("admin.noExpiry")}</span>;
+  }
+
+  const iso =
+    u.subscriptionStatus === "trial" ? u.trialEndsAt : (u.subscriptionExpiresAt ?? null);
+  if (!iso) return null;
+
+  return (
+    <span className="mt-1 block text-xs text-ink-faint">
+      {t("admin.until", { tanggal: tanggal(iso) })}
     </span>
   );
 }

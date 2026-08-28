@@ -4,6 +4,7 @@ import { csvPengguna, namaBerkas } from "@/lib/admin-ekspor";
 import { catatJejak } from "@/lib/audit";
 import { adminDb } from "@/lib/firebase/admin";
 import { handleAdminError, requireAdmin } from "@/lib/firebase/requireAdmin";
+import { denganVerifikasi } from "@/lib/status-verifikasi";
 import type { UserProfile } from "@/types";
 
 /**
@@ -36,6 +37,7 @@ export async function GET(req: NextRequest) {
 
     const status = req.nextUrl.searchParams.get("status");
     const kunci = req.nextUrl.searchParams.get("q") ?? "";
+    const belumVerifikasi = req.nextUrl.searchParams.get("verifikasi") === "belum";
 
     const dasar = adminDb().collection("users");
     const snap = await (status ? dasar.where("subscriptionStatus", "==", status) : dasar)
@@ -44,11 +46,15 @@ export async function GET(req: NextRequest) {
       .get();
 
     const semua = snap.docs.map((d) => ({ uid: d.id, ...d.data() }) as UserProfile);
-    const users = kunci.trim() ? cariPengguna(semua, kunci) : semua;
+    const dicari = kunci.trim() ? cariPengguna(semua, kunci) : semua;
+    const lengkap = await denganVerifikasi(dicari);
+    const users = belumVerifikasi
+      ? lengkap.filter((u) => u.emailTerverifikasi === false)
+      : lengkap;
     const terpotong = snap.size === BATAS;
 
     const sekarang = new Date();
-    const berkas = namaBerkas(status, kunci, sekarang);
+    const berkas = namaBerkas(status, kunci, sekarang, belumVerifikasi);
 
     await catatJejak(
       {
@@ -60,6 +66,7 @@ export async function GET(req: NextRequest) {
         detail: {
           status: status ?? "semua",
           kunci: kunci.trim() || null,
+          belumVerifikasi,
           jumlah: users.length,
           terpotong,
         },

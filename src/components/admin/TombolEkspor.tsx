@@ -23,7 +23,15 @@ function namaDariHeader(header: string | null): string {
  * memori tab selama tab itu terbuka, dan ini berkas berisi seluruh daftar
  * pelanggan.
  */
-export function TombolEkspor({ status, kunci }: { status: string | null; kunci: string }) {
+export function TombolEkspor({
+  status,
+  kunci,
+  belumVerifikasi = false,
+}: {
+  status: string | null;
+  kunci: string;
+  belumVerifikasi?: boolean;
+}) {
   const t = useT();
   const [sibuk, setSibuk] = useState(false);
   const [catatan, setCatatan] = useState<string | null>(null);
@@ -37,6 +45,7 @@ export function TombolEkspor({ status, kunci }: { status: string | null; kunci: 
       const token = await ambilToken();
       const q = new URLSearchParams();
       if (status) q.set("status", status);
+      if (belumVerifikasi) q.set("verifikasi", "belum");
       if (kunci.trim()) q.set("q", kunci.trim());
 
       const res = await fetch(`/api/admin/ekspor?${q}`, {

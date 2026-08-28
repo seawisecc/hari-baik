@@ -20,20 +20,31 @@ import type { PenggunaAdmin, SubscriptionStatus } from "@/types";
 import { ambilToken } from "@/lib/firebase/client";
 import { HARGA_BAWAAN, type AddOn, type PengaturanHarga } from "@/lib/harga";
 
-const FILTER: { key: SubscriptionStatus | "all"; labelKey: string }[] = [
+/**
+ * Saringan daftar pengguna.
+ *
+ * "belum-verifikasi" bukan status langganan dan tidak ada di Firestore:
+ * sumbernya Firebase Auth, jadi ia dikirim sebagai parameter tersendiri dan
+ * disaring di server. Ditaruh sebaris dengan yang lain karena bagi yang
+ * memakainya memang satu jenis pertanyaan: tunjukkan yang mana.
+ */
+type Saringan = SubscriptionStatus | "all" | "belum-verifikasi";
+
+const FILTER: { key: Saringan; labelKey: string }[] = [
   { key: "all", labelKey: "admin.filter.all" },
   { key: "pending", labelKey: "admin.filter.pending" },
   { key: "active", labelKey: "admin.filter.active" },
   { key: "lifetime", labelKey: "admin.filter.lifetime" },
   { key: "trial", labelKey: "admin.filter.trial" },
   { key: "expired", labelKey: "admin.filter.expired" },
+  { key: "belum-verifikasi", labelKey: "admin.filter.unverified" },
 ];
 
 export default function AdminPage() {
   const t = useT();
   const { user, profile, loading, configured } = useAuth();
   const [users, setUsers] = useState<PenggunaAdmin[]>([]);
-  const [filter, setFilter] = useState<SubscriptionStatus | "all">("pending");
+  const [filter, setFilter] = useState<Saringan>("pending");
   const [error, setError] = useState<string | null>(null);
   const [memuat, setMemuat] = useState(true);
   /** Dinaikkan untuk memaksa muat ulang setelah sebuah aksi berhasil. */
@@ -95,7 +106,8 @@ export default function AdminPage() {
         const token = await ambilToken();
         if (batal) return;
         const q = new URLSearchParams();
-        if (filter !== "all") q.set("status", filter);
+        if (filter === "belum-verifikasi") q.set("verifikasi", "belum");
+        else if (filter !== "all") q.set("status", filter);
         if (cariAktif.trim()) q.set("q", cariAktif.trim());
         const res = await fetch(`/api/admin/users?${q}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -272,7 +284,13 @@ export default function AdminPage() {
                 )}
               </div>
 
-              <TombolEkspor status={filter === "all" ? null : filter} kunci={cariAktif} />
+              {/* Ekspor mengikuti saringan yang sedang tampil, jadi yang
+                  terekspor selalu yang terlihat. */}
+              <TombolEkspor
+                status={filter === "all" || filter === "belum-verifikasi" ? null : filter}
+                belumVerifikasi={filter === "belum-verifikasi"}
+                kunci={cariAktif}
+              />
             </div>
 
             {!memuat && terpotong && (

@@ -1,4 +1,4 @@
-import type { SubscriptionStatus, UserProfile } from "@/types";
+import type { PenggunaAdmin, SubscriptionStatus } from "@/types";
 
 /**
  * Ekspor daftar pengguna sebagai CSV.
@@ -17,6 +17,7 @@ export const KOLOM: string[] = [
   "email",
   "nomor hp",
   "status",
+  "email terverifikasi",
   "berlaku sampai",
   "add-on",
   "peran",
@@ -73,13 +74,20 @@ export function nilaiCsv(nilai: string): string {
 }
 
 /** Satu pengguna jadi satu baris nilai, urutannya mengikuti KOLOM. */
-export function barisPengguna(u: UserProfile): string[] {
+export function barisPengguna(u: PenggunaAdmin): string[] {
   return [
     u.uid,
     u.nama ?? "",
     u.email ?? "",
     u.phoneNumber ?? "",
     LABEL_STATUS[u.subscriptionStatus] ?? u.subscriptionStatus,
+    // Kosong berarti tidak diketahui, bukan belum. Sel kosong lebih jujur
+    // daripada menebak ke salah satu arah.
+    u.emailTerverifikasi === null || u.emailTerverifikasi === undefined
+      ? ""
+      : u.emailTerverifikasi
+        ? "ya"
+        : "belum",
     u.subscriptionStatus === "lifetime" ? "tanpa batas" : tanggalSaja(u.subscriptionExpiresAt),
     (u.addOn ?? []).join("; "),
     u.role ?? "user",
@@ -107,16 +115,22 @@ export function barisPengguna(u: UserProfile): string[] {
 export const BOM = "﻿";
 
 /** Seluruh daftar jadi satu berkas CSV, siap dikirim apa adanya. */
-export function csvPengguna(users: UserProfile[]): string {
+export function csvPengguna(users: PenggunaAdmin[]): string {
   const baris = [KOLOM, ...users.map(barisPengguna)].map((b) => b.map(nilaiCsv).join(","));
   // CRLF sesuai RFC 4180. Excel lama memerlukannya, yang lain menerima keduanya.
   return BOM + baris.join("\r\n") + "\r\n";
 }
 
 /** Nama berkas yang menyebut isinya, supaya unduhan berulang tidak tertukar. */
-export function namaBerkas(status: string | null, kunci: string, sekarang: Date): string {
+export function namaBerkas(
+  status: string | null,
+  kunci: string,
+  sekarang: Date,
+  belumVerifikasi = false,
+): string {
   const bagian = ["hari-baik-pengguna"];
   if (status) bagian.push(status);
+  if (belumVerifikasi) bagian.push("belum-verifikasi");
   if (kunci.trim()) bagian.push("cari");
   bagian.push(sekarang.toISOString().slice(0, 10));
   return `${bagian.join("-")}.csv`;

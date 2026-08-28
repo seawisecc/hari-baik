@@ -11,7 +11,7 @@ import { readFileSync } from "node:fs";
 import { cariPengguna, cocokCari, angkaNomor, normalkan } from "../admin-cari";
 import { barisPengguna, csvPengguna, nilaiCsv, namaBerkas, KOLOM } from "../admin-ekspor";
 import { alasanTolak, bolehDihapus, emailCocok } from "../admin-hapus";
-import type { UserProfile } from "../../types";
+import type { PenggunaAdmin } from "../../types";
 
 let fail = 0;
 const eq = (label: string, expected: unknown, actual: unknown) => {
@@ -23,7 +23,7 @@ const eq = (label: string, expected: unknown, actual: unknown) => {
 
 const KINI = new Date("2026-08-28T04:00:00.000Z");
 
-function buat(ubah: Partial<UserProfile> = {}): UserProfile {
+function buat(ubah: Partial<PenggunaAdmin> = {}): PenggunaAdmin {
   return {
     uid: "u1",
     email: "budi@gmail.com",
@@ -43,6 +43,7 @@ function buat(ubah: Partial<UserProfile> = {}): UserProfile {
     wukuLahir: "Sinta",
     uripLahir: 13,
     uripPetemonLahir: 21,
+    emailTerverifikasi: true,
     ...ubah,
   };
 }
@@ -113,6 +114,20 @@ function buat(ubah: Partial<UserProfile> = {}): UserProfile {
   eq("tanggal habis tidak bergeser", "2027-03-01", aktif[KOLOM.indexOf("berlaku sampai")]);
   eq("tanggal daftar dipotong", "2025-12-29", aktif[KOLOM.indexOf("tanggal daftar")]);
   eq("status berlabel Indonesia", "Aktif", aktif[KOLOM.indexOf("status")]);
+
+  const kolomVerif = KOLOM.indexOf("email terverifikasi");
+  eq("verifikasi ya", "ya", barisPengguna(buat({ emailTerverifikasi: true }))[kolomVerif]);
+  eq(
+    "verifikasi belum",
+    "belum",
+    barisPengguna(buat({ emailTerverifikasi: false }))[kolomVerif],
+  );
+  // Kosong berarti tidak diketahui, bukan belum.
+  eq(
+    "verifikasi tak diketahui",
+    "",
+    barisPengguna(buat({ emailTerverifikasi: null }))[kolomVerif],
+  );
 
   const kosong = barisPengguna(buat({ tanggalLahir: null, uripLahir: null }));
   eq("lahir kosong jadi sel kosong", "", kosong[KOLOM.indexOf("tanggal lahir")]);
@@ -196,6 +211,47 @@ function buat(ubah: Partial<UserProfile> = {}): UserProfile {
     ),
   );
 
+  /*
+   * Yang mendaftar lalu berhenti di layar verifikasi.
+   *
+   * Trialnya secara hitungan masih berjalan, jadi evaluateAccess() bilang
+   * aksesnya hidup, padahal di layar dia tidak bisa membuka apa pun. Akun
+   * seperti inilah yang paling banyak menumpuk, dan penjaga trial justru
+   * membuatnya jadi satu-satunya yang tidak bisa dibersihkan.
+   */
+  const belumVerifikasi = {
+    subscriptionStatus: "trial" as const,
+    trialEndsAt: "2026-09-01T00:00:00.000Z",
+  };
+  eq(
+    "trial berjalan yang belum verifikasi boleh dihapus",
+    null,
+    alasanTolak(buat({ ...belumVerifikasi, emailTerverifikasi: false }), KINI),
+  );
+  eq(
+    "trial berjalan yang sudah verifikasi tetap ditolak",
+    "aktif",
+    alasanTolak(buat({ ...belumVerifikasi, emailTerverifikasi: true }), KINI),
+  );
+  // Tidak diketahui bukan alasan untuk menghapus. Menebak ke arah menghapus
+  // adalah arah tebakan yang salah.
+  eq(
+    "status verifikasi tidak diketahui tetap ditolak",
+    "aktif",
+    alasanTolak(buat({ ...belumVerifikasi, emailTerverifikasi: null }), KINI),
+  );
+  // Pengecualiannya hanya melewati penjaga trial, bukan penjaga yang lain.
+  eq(
+    "admin yang belum verifikasi tetap ditolak",
+    "admin",
+    alasanTolak(buat({ role: "admin", emailTerverifikasi: false }), KINI),
+  );
+  eq(
+    "yang menunggu dan belum verifikasi tetap ditolak",
+    "menunggu",
+    alasanTolak(buat({ subscriptionStatus: "pending", emailTerverifikasi: false }), KINI),
+  );
+
   eq("email cocok apa adanya", true, emailCocok("budi@gmail.com", "budi@gmail.com"));
   eq("besar kecil huruf diabaikan", true, emailCocok("BUDI@Gmail.com ", "budi@gmail.com"));
   eq("email lain ditolak", false, emailCocok("budi@gmail.co", "budi@gmail.com"));
@@ -239,10 +295,22 @@ function buat(ubah: Partial<UserProfile> = {}): UserProfile {
   eq("status verifikasi tidak disalin ke Firestore", false, verif.includes(".update("));
 
   const daftar = readFileSync("src/app/api/admin/users/route.ts", "utf8");
-  eq("daftar pengguna menempelkan status verifikasi", true, daftar.includes("getUsers("));
-  eq("dan tidak menyimpannya", false, daftar.includes(".set(") || daftar.includes(".update("));
-
   const ekspor = readFileSync("src/app/api/admin/ekspor/route.ts", "utf8");
+  const status = readFileSync("src/lib/status-verifikasi.ts", "utf8");
+
+  eq("status verifikasi dibaca dari Auth", true, status.includes("getUsers("));
+  // Dicocokkan ke bentuk tulisan Firestore, bukan ke nama methodnya saja: Map
+  // juga punya .set(), dan modul ini memang memakainya untuk mengingat status
+  // yang baru dibaca.
+  eq("dan tidak disimpan ke Firestore", false, /\.doc\([^)]*\)\.(set|update)\(/.test(status));
+
+  // Keduanya wajib memakai modul yang sama. Kalau ekspor punya salinan
+  // aturannya sendiri, cepat atau lambat berkas CSV dan layar akan berselisih
+  // tentang orang yang sama, dan yang dipercaya orang adalah yang terakhir
+  // dilihatnya.
+  eq("daftar memakai modul bersama", true, daftar.includes("denganVerifikasi("));
+  eq("ekspor memakai modul bersama", true, ekspor.includes("denganVerifikasi("));
+
   // Ekspor tidak mengubah apa pun, jadi tidak tertangkap pemeriksa jejak di
   // lahir.test.ts yang hanya melihat POST, PUT, PATCH, dan DELETE.
   eq("ekspor tetap menulis jejak", true, ekspor.includes("catatJejak("));

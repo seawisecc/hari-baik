@@ -24,6 +24,17 @@ import type { UserProfile } from "@/types";
  *
  * Keputusan "aksesnya masih hidup" tidak dihitung ulang di sini, melainkan
  * ditanyakan ke evaluateAccess(), satu-satunya tempat aturan akses diputuskan.
+ *
+ * Dengan satu pengecualian, yang datang dari kasus nyata. Orang yang mendaftar
+ * lalu tidak pernah menekan tautan verifikasinya punya trial yang secara
+ * hitungan masih berjalan, jadi evaluateAccess() bilang aksesnya hidup. Di
+ * layar dia tidak bisa membuka apa pun: tentukanAlihan() menahannya di
+ * /verify-email selama emailnya belum terbukti. Jadi "aksesnya masih hidup"
+ * tidak benar untuknya, dan akun seperti itulah yang justru paling banyak
+ * menumpuk. Selama emailnya diketahui belum terverifikasi, penjaga trial
+ * dilewati. Kalau statusnya tidak diketahui (null, karena akun Auth-nya gagal
+ * dibaca), penjaganya tetap berlaku: menebak ke arah menghapus adalah arah
+ * tebakan yang salah.
  */
 export type TolakHapus = "admin" | "menunggu" | "aktif";
 
@@ -31,11 +42,20 @@ export type TolakHapus = "admin" | "menunggu" | "aktif";
 export type DapatDihapus = Pick<
   UserProfile,
   "role" | "subscriptionStatus" | "subscriptionExpiresAt" | "trialEndsAt"
->;
+> & {
+  /**
+   * Dari Firebase Auth, bukan dari dokumen Firestore. null berarti tidak
+   * diketahui, dan diperlakukan seperti sudah terverifikasi.
+   */
+  emailTerverifikasi?: boolean | null;
+};
 
 export function alasanTolak(u: DapatDihapus, sekarang: Date = new Date()): TolakHapus | null {
   if (u.role === "admin") return "admin";
   if (u.subscriptionStatus === "pending") return "menunggu";
+  // Yang emailnya belum terbukti tidak pernah bisa masuk, berapa pun sisa
+  // trialnya, jadi tidak ada akses hidup yang perlu dilindungi.
+  if (u.emailTerverifikasi === false) return null;
   if (evaluateAccess(u, sekarang).canView) return "aktif";
   return null;
 }

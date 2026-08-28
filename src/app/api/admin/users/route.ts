@@ -1,44 +1,23 @@
 import type { NextRequest } from "next/server";
 import { cariPengguna } from "@/lib/admin-cari";
-import { adminAuth, adminDb } from "@/lib/firebase/admin";
+import { adminDb } from "@/lib/firebase/admin";
 import { handleAdminError, requireAdmin } from "@/lib/firebase/requireAdmin";
-import type { PenggunaAdmin, UserProfile } from "@/types";
+import { denganVerifikasi } from "@/lib/status-verifikasi";
+import type { UserProfile } from "@/types";
 
 /**
- * Berapa banyak dokumen yang boleh dipindai saat mencari.
+ * Berapa banyak dokumen yang boleh dipindai saat mencari atau menyaring yang
+ * belum terverifikasi.
  *
- * Pencarian substring tidak bisa dikerjakan Firestore, jadi dokumennya dibaca
- * lalu dicocokkan di sini. Satu pencarian berarti sebanyak ini pembacaan, dan
- * itu ditagih. Batasnya ditaruh di angka yang masih jauh di atas jumlah
- * pelanggan sekarang tapi tidak membiarkan biayanya tumbuh diam-diam kalau
- * suatu hari daftarnya jadi puluhan ribu. Kalau batas ini kena, jawabannya
- * menyebutkan itu, bukan berpura-pura sudah lengkap.
+ * Keduanya tidak bisa dikerjakan Firestore. Pencarian substring bukan
+ * pekerjaannya, dan status verifikasi bahkan tidak ada di sana: ia milik
+ * Firebase Auth. Jadi dokumennya dibaca lalu disaring di sini, dan satu
+ * permintaan berarti sebanyak ini pembacaan. Batasnya ditaruh di angka yang
+ * masih jauh di atas jumlah pelanggan sekarang tapi tidak membiarkan biayanya
+ * tumbuh diam-diam kalau suatu hari daftarnya jadi puluhan ribu. Kalau batas
+ * ini kena, jawabannya menyebutkan itu, bukan berpura-pura sudah lengkap.
  */
 const BATAS_PINDAI = 1000;
-
-/**
- * Tempelkan status verifikasi email dari Firebase Auth.
- *
- * Statusnya tidak ada di Firestore dan sengaja tidak disimpan di sana. Yang
- * ditanya cuma sehalaman yang benar-benar dikirim, bukan seluruh hasil
- * pencarian, karena getUsers menerima paling banyak seratus identifier
- * sekali panggil dan halaman memang dibatasi seratus.
- *
- * Kalau panggilannya gagal, daftarnya tetap dikirim dengan nilai null.
- * Panel admin yang tidak bisa dibuka sama sekali lebih merugikan daripada
- * panel admin tanpa satu kolom.
- */
-async function denganVerifikasi(users: UserProfile[]): Promise<PenggunaAdmin[]> {
-  if (users.length === 0) return [];
-  try {
-    const { users: akun } = await adminAuth().getUsers(users.map((u) => ({ uid: u.uid })));
-    const peta = new Map(akun.map((a) => [a.uid, a.emailVerified]));
-    return users.map((u) => ({ ...u, emailTerverifikasi: peta.get(u.uid) ?? null }));
-  } catch (err) {
-    console.error("[admin users] status verifikasi gagal dibaca", err);
-    return users.map((u) => ({ ...u, emailTerverifikasi: null }));
-  }
-}
 
 /** Daftar pengguna untuk panel admin. */
 export async function GET(req: NextRequest) {
@@ -47,6 +26,7 @@ export async function GET(req: NextRequest) {
 
     const status = req.nextUrl.searchParams.get("status");
     const kunci = req.nextUrl.searchParams.get("q") ?? "";
+    const belumVerifikasi = req.nextUrl.searchParams.get("verifikasi") === "belum";
     const limit = Math.min(Number(req.nextUrl.searchParams.get("limit") ?? 100), 500);
 
     // Filter dulu, baru urutkan dan batasi, mengikuti urutan yang dipakai
@@ -55,26 +35,34 @@ export async function GET(req: NextRequest) {
     const dasar = adminDb().collection("users");
     const disaring = status ? dasar.where("subscriptionStatus", "==", status) : dasar;
 
-    // Saat mencari, yang diambil bukan sehalaman melainkan sebanyak yang
-    // diizinkan dipindai: pencarian yang hanya melihat 100 baris teratas akan
-    // menjawab "tidak ada" untuk pelanggan yang sebenarnya ada, dan jawaban
-    // salah lebih berbahaya daripada tidak ada pencarian sama sekali.
-    const mencari = kunci.trim() !== "";
+    // Saat menyaring di memori, yang diambil bukan sehalaman melainkan
+    // sebanyak yang diizinkan dipindai: penyaringan yang hanya melihat 100
+    // baris teratas akan menjawab "tidak ada" untuk pengguna yang sebenarnya
+    // ada, dan jawaban salah lebih berbahaya daripada tidak ada fiturnya.
+    const memindai = kunci.trim() !== "" || belumVerifikasi;
     const snap = await disaring
       .orderBy("createdAt", "desc")
-      .limit(mencari ? BATAS_PINDAI : limit)
+      .limit(memindai ? BATAS_PINDAI : limit)
       .get();
 
     const semua = snap.docs.map((d) => ({ uid: d.id, ...d.data() }) as UserProfile);
-    const cocok = mencari ? cariPengguna(semua, kunci) : semua;
-    const halaman = await denganVerifikasi(cocok.slice(0, limit));
+    const dicari = kunci.trim() ? cariPengguna(semua, kunci) : semua;
+
+    // Saat menyaring yang belum terverifikasi, statusnya harus ditanyakan
+    // untuk semua calon lebih dulu, bukan hanya untuk sehalaman yang akan
+    // dikirim. Itu sebabnya penyaringan ini lebih mahal daripada yang lain,
+    // dan itu wajar: ia dipakai sesekali untuk membersihkan, bukan tiap hari.
+    const lengkap = await denganVerifikasi(belumVerifikasi ? dicari : dicari.slice(0, limit));
+    const cocok = belumVerifikasi
+      ? lengkap.filter((u) => u.emailTerverifikasi === false)
+      : lengkap;
 
     return Response.json({
-      users: halaman,
+      users: cocok.slice(0, limit),
       /** Ada hasil cocok yang tidak ikut terkirim karena kena batas halaman. */
       lebih: cocok.length > limit,
       /** Batas pindai kena, jadi mungkin ada yang cocok tapi tidak sempat dilihat. */
-      terpotong: mencari && snap.size === BATAS_PINDAI,
+      terpotong: memindai && snap.size === BATAS_PINDAI,
       /** Berapa dokumen yang benar-benar dilihat, supaya tampilan bisa mengatakannya. */
       dipindai: snap.size,
     });
