@@ -163,5 +163,17 @@ eq(
     .join(", "),
 );
 
+/*
+ * Bagian "Kata mereka" harus hilang seluruhnya saat daftarnya kosong.
+ *
+ * Kartu kosong atau tulisan "belum ada testimoni" lebih melemahkan daripada
+ * tidak menyinggungnya sama sekali. Ini gampang putus tanpa ketahuan, karena
+ * yang menulis ulang halaman depan tidak selalu tahu daftarnya boleh kosong.
+ */
+{
+  const landing = readFileSync("src/app/LandingClient.tsx", "utf8");
+  eq("bagian testimoni dirender bersyarat", true, landing.includes("TESTIMONI.length > 0 &&"));
+}
+
 console.log(fail === 0 ? "✓ konten: semua lolos" : `✗ konten: ${fail} gagal`);
 if (fail) process.exit(1);

@@ -9,6 +9,7 @@ import {
   FileText,
   Fingerprint,
   Heart,
+  Quote,
   Route,
   ShieldCheck,
   Sparkles,
@@ -26,6 +27,7 @@ import { Logo, Wordmark } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { WhatsAppCard } from "@/components/WhatsAppCard";
 import { useLang, useT } from "@/lib/content/LangProvider";
+import { TESTIMONI } from "@/lib/content/testimoni";
 import { hemat, perTahun, rupiah, teks, type PengaturanHarga } from "@/lib/harga";
 import { HARI_TRIAL } from "@/lib/subscription";
 
@@ -309,6 +311,37 @@ export function LandingClient({
             ))}
           </div>
         </Section>
+
+        {/*
+         * Kata pelanggan, hanya kalau memang ada.
+         *
+         * Bagian ini hilang seluruhnya ketika daftarnya kosong, bukan tampil
+         * sebagai kartu kosong atau tulisan "belum ada testimoni". Halaman
+         * yang mengakui dirinya belum punya pelanggan lebih melemahkan
+         * daripada halaman yang memang tidak menyinggungnya.
+         *
+         * Letaknya sesudah daftar fitur dan sebelum harga, karena di situlah
+         * orang berhenti menimbang apa yang didapat dan mulai menimbang
+         * apakah ini layak dibayar.
+         */}
+        {TESTIMONI.length > 0 && (
+          <Section title={t("landing.voices.title")} lead={t("landing.voices.lead")}>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {TESTIMONI.map((x) => (
+                <Card key={`${x.nama}-${x.kutipan.slice(0, 16)}`} className="flex flex-col p-6">
+                  <Quote className="h-5 w-5 shrink-0 text-accent-deep" aria-hidden />
+                  <blockquote className="mt-3 flex-1 text-[15px] leading-relaxed text-ink-soft">
+                    &ldquo;{x.kutipan}&rdquo;
+                  </blockquote>
+                  <figcaption className="mt-4 border-t border-border-soft pt-3">
+                    <p className="text-sm font-semibold text-ink">{x.nama}</p>
+                    {x.peran && <p className="text-xs text-ink-faint">{x.peran}</p>}
+                  </figcaption>
+                </Card>
+              ))}
+            </div>
+          </Section>
+        )}
 
         <Section title={t("landing.price.title")} lead={t("landing.price.lead")}>
           <div className="grid gap-5 sm:grid-cols-3">

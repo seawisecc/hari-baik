@@ -501,6 +501,9 @@ const dict = {
     "landing.f.journey.title": "Perjalanan hidup",
     "landing.f.journey.desc": "Peta siklus rejeki dan kesehatan dari lahir sampai usia senja.",
     "landing.price.title": "Harga",
+    "landing.voices.title": "Kata mereka",
+    "landing.voices.lead":
+      "Dari orang yang sudah memakainya untuk menentukan waktu, bukan sekadar membacanya.",
     "landing.price.lead":
       "Satu langganan membuka seluruh fitur Pro. Tidak ada biaya tersembunyi.",
     "landing.price.perMonth": "≈ {v} per bulan",
@@ -1117,6 +1120,9 @@ const dict = {
     "landing.f.journey.title": "Life journey",
     "landing.f.journey.desc": "A map of fortune and health cycles from birth into later years.",
     "landing.price.title": "Pricing",
+    "landing.voices.title": "In their words",
+    "landing.voices.lead":
+      "From people who use it to pick their moments, not just to read about them.",
     "landing.price.lead": "One subscription unlocks every Pro feature. No hidden fees.",
     "landing.price.perMonth": "≈ {v} per month",
     "landing.price.trialNote": "Every account starts with {n} days free.",
