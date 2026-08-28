@@ -76,6 +76,64 @@ function modeTerpasang(): boolean {
   return iosStandalone || window.matchMedia?.("(display-mode: standalone)").matches === true;
 }
 
+/*
+ * Penanda bahwa alur redirect Google sedang berjalan.
+ *
+ * Disimpan di sessionStorage milik domain aplikasi sendiri, bukan milik
+ * authDomain, jadi ia tidak ikut terkena pemisahan penyimpanan lintas situs
+ * yang justru sering merusak alurnya. Umurnya satu tab, dan itu memang
+ * secukupnya: kalau tabnya ditutup di tengah jalan, tidak ada yang perlu
+ * dilaporkan kepada siapa pun.
+ *
+ * Semua pembacaan dibungkus try: mode penyamaran dan pengaturan privasi yang
+ * ketat bisa membuat sessionStorage melempar, bukan sekadar kosong, dan
+ * penanda yang gagal dibaca tidak boleh menggagalkan proses masuk.
+ */
+const PENANDA = "hb-google-redirect";
+const KEGAGALAN = "hb-google-gagal";
+
+function tandaiRedirect() {
+  try {
+    sessionStorage.setItem(PENANDA, "1");
+  } catch {}
+}
+
+function ambilPenandaRedirect(): boolean {
+  try {
+    return sessionStorage.getItem(PENANDA) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function lupakanRedirect() {
+  try {
+    sessionStorage.removeItem(PENANDA);
+  } catch {}
+}
+
+function simpanKegagalanGoogle(kode: string) {
+  try {
+    sessionStorage.setItem(KEGAGALAN, kode);
+  } catch {}
+}
+
+/**
+ * Ambil sekali lalu buang: kegagalan alur redirect yang perlu ditampilkan.
+ *
+ * Dibaca tombol Google saat halamannya kembali dimuat. Dibuang begitu dibaca,
+ * supaya tidak muncul lagi pada kunjungan berikutnya di tab yang sama.
+ */
+export function ambilKegagalanGoogle(): string | null {
+  try {
+    const kode = sessionStorage.getItem(KEGAGALAN);
+    if (kode !== null) sessionStorage.removeItem(KEGAGALAN);
+    return kode;
+  } catch {
+    return null;
+  }
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   // Status verifikasi disimpan terpisah dari objek User. `reload()` mengubah
@@ -127,9 +185,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         void fn
           .getRedirectResult(auth)
           .then(async (hasil) => {
-            if (hasil?.user) await bootstrapProfile(hasil.user);
+            if (hasil?.user) {
+              await bootstrapProfile(hasil.user);
+              lupakanRedirect();
+              return;
+            }
+            // Kembali dari redirect tanpa membawa siapa pun. Firebase tidak
+            // melempar apa pun di sini, ia hanya mengembalikan null, jadi
+            // tanpa penanda ini halamannya diam saja dan orangnya tidak tahu
+            // apakah dia sudah masuk atau belum.
+            if (ambilPenandaRedirect()) {
+              lupakanRedirect();
+              simpanKegagalanGoogle("auth/redirect-tanpa-hasil");
+            }
           })
-          .catch((err) => console.error("[redirect google]", err));
+          .catch((err) => {
+            lupakanRedirect();
+            simpanKegagalanGoogle((err as { code?: string }).code ?? "");
+            console.error("[redirect google]", err);
+          });
 
         lepas = fn.onAuthStateChanged(auth, (u) => {
           setUser(u);
@@ -217,25 +291,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const kode = (err as { code?: string }).code ?? "";
 
       /*
-       * Popup gagal? Coba jalur redirect, kecuali kalau orangnya memang
-       * menutup jendelanya sendiri.
+       * Jatuh ke redirect hanya untuk kegagalan yang memang khas popup.
        *
-       * Dulu hanya auth/popup-blocked yang jatuh ke redirect. Ternyata popup
-       * bisa gagal dengan beberapa kode berbeda, dan yang paling sering di
-       * Safari adalah auth/missing-initial-state: Safari memisahkan
-       * penyimpanan milik domain pihak ketiga, sementara alur popup Firebase
-       * menaruh keadaan awalnya di sessionStorage milik authDomain.
+       * Sempat dibuat sebaliknya, yaitu semua kegagalan dicoba ulang lewat
+       * redirect kecuali pembatalan. Itu keliru, dan keliru ke arah yang
+       * berbahaya. Kegagalan tersering di Safari, auth/missing-initial-state,
+       * berasal dari pemisahan penyimpanan lintas situs, dan itu menimpa
+       * redirect persis sama seperti popup. Mencobanya ulang bukan pemulihan:
+       * halamannya ditinggalkan, orangnya kembali dalam keadaan tetap belum
+       * masuk, dan kali ini tanpa pesan apa pun. Kegagalan senyap lebih buruk
+       * daripada kegagalan yang berkata.
        *
-       * Daftar putih per kode berarti setiap kode baru harus ditemukan lebih
-       * dulu lewat seorang pengguna sungguhan yang gagal masuk. Jadi yang
-       * didaftar sekarang kebalikannya: hanya pembatalan yang tidak dicoba
-       * ulang, sisanya dicoba lewat jalur satunya.
+       * Yang benar-benar tertolong redirect cuma dua: popup yang diblokir, dan
+       * lingkungan yang memang tidak mengenal popup sama sekali.
        */
-      const dibatalkan =
-        kode === "auth/popup-closed-by-user" || kode === "auth/cancelled-popup-request";
-      if (dibatalkan) throw err;
+      const popupSaja =
+        kode === "auth/popup-blocked" ||
+        kode === "auth/operation-not-supported-in-this-environment";
+      if (!popupSaja) throw err;
 
-      console.warn("[google] popup gagal, beralih ke redirect:", kode || err);
+      console.warn("[google] popup tidak tersedia, beralih ke redirect:", kode);
+      tandaiRedirect();
       await fn.signInWithRedirect(auth, provider);
       return false;
     }

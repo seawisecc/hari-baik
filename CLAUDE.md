@@ -248,6 +248,32 @@ setinggi dua baris. Diukur di jendela 950 piksel, bukan ditebak. Untuk baris
 trial yang dibaca `trialEndsAt`, bukan `subscriptionExpiresAt` yang memang
 selalu kosong bagi mereka.
 
+**Kegagalan popup Google jangan dijatuhkan ke redirect begitu saja.** Hanya
+`auth/popup-blocked` dan `auth/operation-not-supported-in-this-environment`
+yang benar-benar tertolong. Kegagalan tersering di Safari,
+`auth/missing-initial-state`, berasal dari pemisahan penyimpanan lintas situs
+dan menimpa redirect persis sama seperti popup: mencobanya ulang cuma mengubah
+kegagalan yang berkata jadi kegagalan yang senyap. Pernah ditulis terbalik
+selama satu commit. Dan karena `getRedirectResult()` tidak melempar apa pun
+ketika kembali tanpa hasil, penanda di `sessionStorage` domain sendiri yang
+membuat kepulangan kosong tetap bisa dilaporkan.
+
+**Kode error yang belum dikenali ikut ditampilkan.** `pesanAuth()` dulu
+mengubah setiap kode asing jadi "Terjadi kesalahan. Coba lagi." Itu terbaca
+sopan tapi menelan satu-satunya keterangan yang berguna: yang melihatnya tidak
+bisa berbuat apa-apa dan yang dilapori tidak bisa mencari apa-apa. Satu putaran
+penuh terbuang hanya untuk mengetahui kode yang sudah ada di tangan
+penggunanya sejak awal.
+
+**`authDomain` masih `hari-baik-7e56c.firebaseapp.com`.** Artinya penangan
+OAuth berjalan di domain pihak ketiga, dan itulah sumber kerapuhan masuk dengan
+Google di Safari. Perbaikannya membuatnya satu domain dengan aplikasi: proxy
+`/__/auth/*` ke firebaseapp.com, ganti env `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`,
+DAN tambahkan `https://haribaik.seawise.id/__/auth/handler` ke Authorized
+redirect URIs di Google Cloud Console. Ketiganya harus sekaligus: dua yang
+pertama tanpa yang ketiga membuat Google menolak dengan redirect_uri_mismatch,
+dan masuk dengan Google mati total, bukan cuma rapuh.
+
 **Fungsi berjalan di Singapura, bukan Virginia.** `vercel.json` mematok
 `regions: ["sin1"]`. Bawaan Vercel untuk project baru adalah `iad1`
 (Washington DC), sementara Firestore project ini ada di `asia-southeast2`

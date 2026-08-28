@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { useT } from "@/lib/content/LangProvider";
-import { useAuth } from "@/lib/firebase/AuthProvider";
+import { ambilKegagalanGoogle, useAuth } from "@/lib/firebase/AuthProvider";
 import { pesanAuth } from "@/lib/firebase/errors";
 
 /**
@@ -57,6 +57,22 @@ export function TombolGoogle({
   const t = useT();
   const { loginWithGoogle } = useAuth();
   const [busy, setBusy] = useState(false);
+
+  /*
+   * Kegagalan yang terjadi di seberang redirect.
+   *
+   * Halaman ini dibuang dan dimuat ulang di tengah alur, jadi tidak ada state
+   * React yang selamat untuk membawa pesannya. Tanpa pembacaan ini, orang yang
+   * gagal masuk lewat jalur redirect kembali ke halaman daftar yang tampak
+   * baik-baik saja, dan tidak ada yang memberi tahu bahwa dia belum masuk.
+   */
+  useEffect(() => {
+    const kode = ambilKegagalanGoogle();
+    if (kode !== null) onError(pesanAuth({ code: kode }));
+    // Sengaja hanya sekali saat dipasang: yang dibaca adalah sisa dari
+    // kunjungan sebelum redirect, bukan sesuatu yang bisa berubah di sini.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Button

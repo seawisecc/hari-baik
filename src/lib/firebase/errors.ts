@@ -30,6 +30,11 @@ const PESAN: Record<string, string> = {
   "auth/timeout": "Terlalu lama menunggu jawaban. Coba lagi.",
   "auth/user-cancelled": "Izin ke Google dibatalkan.",
   "auth/internal-error": "Google menolak permintaannya. Coba lagi sebentar lagi.",
+  // Bukan kode Firebase, melainkan kode kita sendiri: alur redirect kembali
+  // tanpa membawa siapa pun. Firebase tidak melempar apa pun untuk keadaan
+  // ini, ia hanya mengembalikan null.
+  "auth/redirect-tanpa-hasil":
+    "Masuk lewat Google tidak selesai. Kalau peramban ini memblokir cookie lintas situs, coba pakai email dan kata sandi.",
   "auth/popup-closed-by-user": "Jendela Google ditutup sebelum selesai.",
   "auth/cancelled-popup-request": "Jendela Google ditutup sebelum selesai.",
   "auth/unauthorized-domain": "Domain ini belum diizinkan di Firebase Console.",

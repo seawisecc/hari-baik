@@ -137,24 +137,40 @@ for (const f of [
   eq("mode terpasang dikenali", true, provider.includes("display-mode: standalone"));
 
   /*
-   * Popup yang gagal harus jatuh ke redirect, dan daftarnya harus daftar
-   * pengecualian, bukan daftar putih.
+   * Redirect hanya untuk kegagalan yang memang khas popup.
    *
-   * Sebelumnya hanya auth/popup-blocked yang dicoba ulang. Artinya setiap
-   * kode kegagalan baru harus ditemukan lebih dulu lewat seorang pengguna
-   * sungguhan yang gagal masuk, dan itu memang terjadi di Safari. Yang boleh
-   * TIDAK dicoba ulang cuma pembatalan oleh orangnya sendiri.
+   * Sempat dibuat sebaliknya: semua kegagalan dicoba ulang lewat redirect
+   * kecuali pembatalan. Itu keliru ke arah yang berbahaya. Kegagalan tersering
+   * di Safari, auth/missing-initial-state, berasal dari pemisahan penyimpanan
+   * lintas situs dan menimpa redirect persis sama seperti popup, jadi
+   * mencobanya ulang cuma mengubah kegagalan yang berkata jadi kegagalan yang
+   * senyap. Tes ini menahan keduanya: daftarnya harus sempit, dan yang di luar
+   * daftar harus dilempar supaya sampai ke layar.
    */
+  eq("daftar jatuh-ke-redirect tetap sempit", true, provider.includes("const popupSaja ="));
+  eq("popup yang diblokir masih ditolong", true, provider.includes("auth/popup-blocked"));
+  eq("selain itu dilempar ke pemanggil", true, provider.includes("if (!popupSaja) throw err;"));
+
+  /*
+   * Redirect yang kembali tanpa membawa siapa pun harus tetap berkata.
+   *
+   * Firebase tidak melempar apa pun untuk keadaan itu, ia hanya mengembalikan
+   * null. Tanpa penanda, orangnya kembali ke halaman daftar yang tampak
+   * baik-baik saja dan tidak ada yang memberi tahu bahwa dia belum masuk.
+   */
+  // Dicocokkan ke pemakaiannya, bukan ke namanya: definisi fungsinya sendiri
+  // sudah cukup membuat pencocokan nama telanjang lolos walau tidak pernah
+  // dipanggil di mana pun.
+  eq("kepulangan kosong ditandai", true, provider.includes("if (ambilPenandaRedirect()) {"));
   eq(
-    "hanya pembatalan yang tidak dicoba ulang",
+    "dan pesannya bisa diambil halaman",
     true,
-    /const dibatalkan =[\s\S]{0,200}if \(dibatalkan\) throw err;/.test(provider),
+    provider.includes("export function ambilKegagalanGoogle"),
   );
   eq(
-    "sisanya jatuh ke redirect",
+    "tombol Google membacanya saat dimuat",
     true,
-    provider.indexOf("if (dibatalkan) throw err;") <
-      provider.lastIndexOf("signInWithRedirect(auth, provider)"),
+    readFileSync("src/app/(auth)/TombolGoogle.tsx", "utf8").includes("ambilKegagalanGoogle()"),
   );
 
   /*
