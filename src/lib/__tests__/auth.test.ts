@@ -111,6 +111,7 @@ for (const f of [
 // pembuatan profil harus dikerjakan ulang saat kembali.
 {
   const klien = readFileSync("src/lib/firebase/client.ts", "utf8");
+  const galatSumber = readFileSync("src/lib/firebase/errors.ts", "utf8");
   for (const f of [
     "GoogleAuthProvider",
     "signInWithPopup",
@@ -135,17 +136,45 @@ for (const f of [
   );
   eq("mode terpasang dikenali", true, provider.includes("display-mode: standalone"));
 
-  // Popup yang diblokir peramban bukan alasan untuk menyerah.
-  eq("popup terblokir jatuh ke redirect", true, provider.includes("auth/popup-blocked"));
+  /*
+   * Popup yang gagal harus jatuh ke redirect, dan daftarnya harus daftar
+   * pengecualian, bukan daftar putih.
+   *
+   * Sebelumnya hanya auth/popup-blocked yang dicoba ulang. Artinya setiap
+   * kode kegagalan baru harus ditemukan lebih dulu lewat seorang pengguna
+   * sungguhan yang gagal masuk, dan itu memang terjadi di Safari. Yang boleh
+   * TIDAK dicoba ulang cuma pembatalan oleh orangnya sendiri.
+   */
+  eq(
+    "hanya pembatalan yang tidak dicoba ulang",
+    true,
+    /const dibatalkan =[\s\S]{0,200}if \(dibatalkan\) throw err;/.test(provider),
+  );
+  eq(
+    "sisanya jatuh ke redirect",
+    true,
+    provider.indexOf("if (dibatalkan) throw err;") <
+      provider.lastIndexOf("signInWithRedirect(auth, provider)"),
+  );
+
+  /*
+   * Kode yang belum dikenali tidak boleh ditelan.
+   *
+   * "Terjadi kesalahan. Coba lagi." terbaca sopan tapi tidak menunjuk apa
+   * pun: yang melihatnya tidak bisa berbuat apa-apa, dan yang dilapori tidak
+   * bisa mencari apa-apa. Satu putaran penuh terbuang hanya untuk mengetahui
+   * kode yang sebenarnya sudah ada di tangan pengguna sejak awal.
+   */
+  eq("kode yang belum dikenali ikut ditampilkan", true, galatSumber.includes("(${code})"));
+  eq("dan dicatat utuh ke console", true, galatSumber.includes("console.error"));
 
   // Email yang sudah punya sandi lalu ditekan tombol Google akan ditolak
   // Firebase dengan kode ini. Tanpa pesan yang menyebut jalan keluarnya,
   // orangnya menekan tombol yang sama berulang kali.
-  const galat = readFileSync("src/lib/firebase/errors.ts", "utf8");
   eq(
     "bentrok akun punya pesannya sendiri",
     true,
-    galat.includes("auth/account-exists-with-different-credential"),
+    galatSumber.includes("auth/account-exists-with-different-credential"),
   );
 
   // Tombolnya harus ada di kedua halaman. Menaruhnya hanya di halaman daftar

@@ -20,6 +20,16 @@ const PESAN: Record<string, string> = {
   "auth/account-exists-with-different-credential":
     "Email ini sudah terdaftar dengan kata sandi. Masuk dengan kata sandi dulu.",
   "auth/popup-blocked": "Peramban memblokir jendela Google. Izinkan popup lalu coba lagi.",
+  // Safari memisahkan penyimpanan milik domain pihak ketiga, dan alur popup
+  // Firebase menaruh keadaan awalnya di sessionStorage domain authDomain.
+  // Kalau pemisahan itu memutusnya, inilah kode yang keluar.
+  "auth/missing-initial-state":
+    "Peramban memblokir penyimpanan yang dibutuhkan Google. Matikan mode penyamaran atau pemblokiran cookie lintas situs, lalu coba lagi.",
+  "auth/web-storage-unsupported":
+    "Peramban ini memblokir penyimpanan lokal, yang dibutuhkan untuk masuk.",
+  "auth/timeout": "Terlalu lama menunggu jawaban. Coba lagi.",
+  "auth/user-cancelled": "Izin ke Google dibatalkan.",
+  "auth/internal-error": "Google menolak permintaannya. Coba lagi sebentar lagi.",
   "auth/popup-closed-by-user": "Jendela Google ditutup sebelum selesai.",
   "auth/cancelled-popup-request": "Jendela Google ditutup sebelum selesai.",
   "auth/unauthorized-domain": "Domain ini belum diizinkan di Firebase Console.",
@@ -34,10 +44,28 @@ const PESAN: Record<string, string> = {
   "auth/missing-action-code": "Tautannya tidak lengkap. Buka lagi langsung dari emailnya.",
 };
 
+/**
+ * Kalimat untuk pengguna, dan kode aslinya kalau kalimatnya belum ada.
+ *
+ * Sebelumnya setiap kode yang tidak terdaftar berubah jadi "Terjadi kesalahan.
+ * Coba lagi." Itu terbaca sopan tapi menelan satu-satunya keterangan yang
+ * berguna: yang melihatnya tidak bisa berbuat apa-apa, dan yang dilapori
+ * tidak bisa mencari apa-apa. Sudah terjadi pada alur masuk dengan Google di
+ * Safari, dan butuh satu putaran penuh hanya untuk mengetahui kodenya.
+ *
+ * Jadi kode yang belum dikenali ikut ditampilkan dalam kurung, dan errornya
+ * dicatat utuh ke console. Kode mentah memang bukan bahasa pengguna, tapi
+ * satu potong teks yang bisa disalin dan dikirimkan jauh lebih berguna
+ * daripada kalimat yang tidak menunjuk apa pun.
+ */
 export function pesanAuth(err: unknown): string {
   const code =
     typeof err === "object" && err !== null && "code" in err
       ? String((err as { code: unknown }).code)
       : "";
-  return PESAN[code] ?? "Terjadi kesalahan. Coba lagi.";
+
+  if (PESAN[code]) return PESAN[code];
+
+  console.error("[auth] kode belum dikenali:", code || "(tanpa kode)", err);
+  return code ? `Terjadi kesalahan. Coba lagi. (${code})` : "Terjadi kesalahan. Coba lagi.";
 }

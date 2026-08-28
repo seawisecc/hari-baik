@@ -214,13 +214,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await bootstrapProfile(cred.user);
       return true;
     } catch (err) {
-      // Popup yang diblokir bukan alasan untuk menyerah, cuma alasan untuk
-      // memakai jalur yang satunya.
-      if ((err as { code?: string }).code === "auth/popup-blocked") {
-        await fn.signInWithRedirect(auth, provider);
-        return false;
-      }
-      throw err;
+      const kode = (err as { code?: string }).code ?? "";
+
+      /*
+       * Popup gagal? Coba jalur redirect, kecuali kalau orangnya memang
+       * menutup jendelanya sendiri.
+       *
+       * Dulu hanya auth/popup-blocked yang jatuh ke redirect. Ternyata popup
+       * bisa gagal dengan beberapa kode berbeda, dan yang paling sering di
+       * Safari adalah auth/missing-initial-state: Safari memisahkan
+       * penyimpanan milik domain pihak ketiga, sementara alur popup Firebase
+       * menaruh keadaan awalnya di sessionStorage milik authDomain.
+       *
+       * Daftar putih per kode berarti setiap kode baru harus ditemukan lebih
+       * dulu lewat seorang pengguna sungguhan yang gagal masuk. Jadi yang
+       * didaftar sekarang kebalikannya: hanya pembatalan yang tidak dicoba
+       * ulang, sisanya dicoba lewat jalur satunya.
+       */
+      const dibatalkan =
+        kode === "auth/popup-closed-by-user" || kode === "auth/cancelled-popup-request";
+      if (dibatalkan) throw err;
+
+      console.warn("[google] popup gagal, beralih ke redirect:", kode || err);
+      await fn.signInWithRedirect(auth, provider);
+      return false;
     }
   }, []);
 
