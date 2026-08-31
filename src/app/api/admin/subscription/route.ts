@@ -4,7 +4,7 @@ import { catatJejak } from "@/lib/audit";
 import { adminDb } from "@/lib/firebase/admin";
 import { AdminError, handleAdminError, requireAdmin } from "@/lib/firebase/requireAdmin";
 import { HARGA_BAWAAN } from "@/lib/harga";
-import { extendYears } from "@/lib/subscription";
+import { extendYears, trialDiakhiri } from "@/lib/subscription";
 import type { SubscriptionStatus } from "@/types";
 
 type Action = "extend" | "set" | "lifetime" | "deactivate" | "addon";
@@ -89,16 +89,28 @@ export async function POST(req: NextRequest) {
       return Response.json({ ok: true, addOn: bersih });
     }
 
-    const current = snap.data() as { subscriptionExpiresAt?: string | null };
+    const current = snap.data() as {
+      subscriptionExpiresAt?: string | null;
+      trialEndsAt?: string | null;
+    };
     const now = new Date();
 
     let update: {
       subscriptionStatus: SubscriptionStatus;
       subscriptionExpiresAt: string | null;
+      trialEndsAt?: string | null;
     };
 
     if (action === "deactivate") {
-      update = { subscriptionStatus: "expired", subscriptionExpiresAt: null };
+      // Masa cobanya ikut diakhiri, kalau tidak aksi ini tidak menonaktifkan
+      // siapa pun yang trialnya masih berjalan: evaluateAccess() membaca
+      // trialEndsAt tanpa peduli status, jadi orangnya tetap bisa membuka
+      // seluruh aplikasi dan yang berubah cuma lencana di panel admin.
+      update = {
+        subscriptionStatus: "expired",
+        subscriptionExpiresAt: null,
+        trialEndsAt: trialDiakhiri(current.trialEndsAt ?? null, now),
+      };
     } else if (action === "lifetime") {
       update = { subscriptionStatus: "lifetime", subscriptionExpiresAt: null };
     } else if (action === "extend") {
@@ -156,6 +168,9 @@ export async function POST(req: NextRequest) {
           sebelum: {
             status: (snap.data() as { subscriptionStatus?: string }).subscriptionStatus ?? null,
             expiresAt: current.subscriptionExpiresAt ?? null,
+            // Ikut dicatat supaya masa coba yang terpotong karena salah pencet
+            // masih bisa dikembalikan ke tanggal aslinya.
+            trialEndsAt: current.trialEndsAt ?? null,
           },
           sesudah: update,
         },

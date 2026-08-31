@@ -1,12 +1,12 @@
 "use client";
 
 import { Trash2, TriangleAlert } from "lucide-react";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
 import { alasanTolak, emailCocok } from "@/lib/admin-hapus";
 import { useT } from "@/lib/content/LangProvider";
-import type { UserProfile } from "@/types";
+import type { PenggunaAdmin } from "@/types";
 
 /**
  * Zona berbahaya: penghapusan akun.
@@ -19,17 +19,40 @@ import type { UserProfile } from "@/types";
  * Konfirmasinya mengetik email, bukan menekan "ya". Daftar pengguna adalah
  * baris-baris yang mirip satu sama lain, dan tombol hapus di baris yang salah
  * tidak terasa berbeda dari tombol hapus di baris yang benar.
+ *
+ * Yang diterima PenggunaAdmin, bukan UserProfile: alasanTolak() membaca
+ * `emailTerverifikasi`, dan field itu tidak ada di UserProfile. Dengan tipe
+ * yang terlalu sempit, TypeScript membacanya undefined lalu menyimpulkan
+ * penjaga trial masih berlaku, sementara server memakai nilai yang sebenarnya
+ * dan membolehkan. Layar dan server jadi berbeda pendapat, persis hal yang
+ * paling ingin dihindari fungsi bersama ini.
+ */
+/*
+ * Id kolom isian datang dari useId(), bukan ditulis sendiri.
+ *
+ * UserTable merender DUA pohon sekaligus: kartu ponsel dan tabel layar lebar.
+ * Yang menyembunyikan salah satunya cuma CSS, jadi keduanya tetap ada di DOM,
+ * dan panel kelola yang sedang terbuka muncul dua kali. Id yang ditulis
+ * sendiri jadi kembar, dan label mana pun yang ditekan akan menunjuk elemen
+ * PERTAMA yang ber-id itu, yaitu milik kartu ponsel yang display-nya none.
+ * Elemen ber-display none tidak bisa menerima fokus, jadi di layar lebar
+ * menekan labelnya tidak memfokuskan apa pun dan yang diketik tidak masuk ke
+ * mana-mana. Terukur di peramban pada lebar 1680: fokus mendarat di BODY.
+ *
+ * useId() memberi id yang berbeda untuk tiap instance, jadi kedua salinan
+ * punya id sendiri dan labelnya masing-masing menunjuk ke tetangganya.
  */
 export function HapusPengguna({
   u,
   busy,
   onHapus,
 }: {
-  u: UserProfile;
+  u: PenggunaAdmin;
   busy: boolean;
   onHapus: (email: string) => void;
 }) {
   const t = useT();
+  const idEmail = useId();
   const [buka, setBuka] = useState(false);
   const [ketik, setKetik] = useState("");
 
@@ -71,11 +94,11 @@ export function HapusPengguna({
           <p className="text-xs text-ink-soft">{t("admin.delete.confirm")}</p>
 
           <div className="space-y-2">
-            <Label htmlFor={`hapus-${u.uid}`} className="text-xs">
+            <Label htmlFor={idEmail} className="text-xs">
               {t("admin.delete.typeEmail", { email: u.email })}
             </Label>
             <Input
-              id={`hapus-${u.uid}`}
+              id={idEmail}
               type="email"
               autoComplete="off"
               spellCheck={false}

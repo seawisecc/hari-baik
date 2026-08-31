@@ -98,6 +98,34 @@ export function extendYears(
   return next.toISOString();
 }
 
+/**
+ * Akhiri masa coba yang masih berjalan, sekarang juga.
+ *
+ * Dipakai aksi "nonaktifkan" di panel admin. Sebelum ini aksi itu hanya
+ * menyetel `subscriptionStatus` ke "expired" dan mengosongkan tanggal habis
+ * langganan, sementara `trialEndsAt` dibiarkan apa adanya. Akibatnya, untuk
+ * siapa pun yang masa cobanya belum habis, tombol Nonaktifkan tidak
+ * menonaktifkan apa pun: `evaluateAccess()` membaca `trialEndsAt` tanpa peduli
+ * status, jadi orangnya tetap bisa membuka seluruh aplikasi. Yang berubah cuma
+ * lencana di panel admin.
+ *
+ * Gejala yang membuatnya ketahuan justru di tempat lain: tombol hapus menolak
+ * bekerja dengan alasan "aksesnya masih berjalan" pada akun yang jelas-jelas
+ * tertulis Expired, dan menekan Nonaktifkan sekali lagi tidak mengubah apa pun.
+ * Buntu, dan tidak ada di layar yang menjelaskan kenapa.
+ *
+ * Yang sudah lewat tidak disentuh. Memajukannya ke waktu sekarang akan menulis
+ * ulang riwayat yang benar dengan riwayat yang salah, dan tanggal itu masih
+ * dipakai panel admin untuk menampilkan kapan masa coba seseorang berakhir.
+ */
+export function trialDiakhiri(
+  trialEndsAt: string | null,
+  now: Date = new Date(),
+): string | null {
+  if (!trialEndsAt) return trialEndsAt;
+  return new Date(trialEndsAt) > now ? now.toISOString() : trialEndsAt;
+}
+
 /** Bentuk minimal yang dibutuhkan untuk menilai keadaan langganan seseorang. */
 type Langganan = Pick<UserProfile, "subscriptionStatus" | "subscriptionExpiresAt">;
 
