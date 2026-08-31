@@ -11,7 +11,7 @@ import type { NextConfig } from "next";
  * dan halaman ini juga punya satu, yaitu penyetel tema yang harus jalan
  * sebelum cat pertama supaya layar tidak berkedip putih. Yang tetap dijaga
  * ketat adalah ASAL: tidak ada skrip, gaya, gambar, atau koneksi dari domain
- * lain kecuali endpoint Firebase yang memang dipakai.
+ * lain kecuali endpoint Firebase dan Midtrans yang memang dipakai.
  *
  * connect-src memakai *.googleapis.com karena Firebase Auth, Firestore, dan
  * penyegaran token berada di subdomain yang berbeda-beda, dan daftarnya bisa
@@ -24,7 +24,8 @@ const CSP = [
   "object-src 'none'",
   "frame-ancestors 'none'",
   "form-action 'self'",
-  "img-src 'self' data: blob:",
+  // Snap menampilkan logo bank dan e-wallet dari CDN Midtrans.
+  "img-src 'self' data: blob: https://app.midtrans.com https://app.sandbox.midtrans.com",
   "font-src 'self' data:",
   "style-src 'self' 'unsafe-inline'",
   // apis.google.com dibutuhkan alur masuk dengan Google, dan ia tidak tercakup
@@ -36,13 +37,22 @@ const CSP = [
   // pun, karena memang tidak ada server yang sempat menjawab. Sempat dikira
   // masalah Safari selama beberapa putaran; sebenarnya berlaku di semua
   // peramban.
-  "script-src 'self' 'unsafe-inline' https://apis.google.com",
+  //
+  // Midtrans Snap memuat snap.js dari app.midtrans.com (atau
+  // app.sandbox.midtrans.com), dan skrip itu sendiri menarik pustaka
+  // pendukungnya dari beberapa host Midtrans lain saat berjalan. Tanpa izin
+  // ini jendela pembayaran tidak pernah terbuka dan yang terlihat pengguna
+  // cuma tombol yang berputar lalu berhenti.
+  "script-src 'self' 'unsafe-inline' https://apis.google.com https://app.midtrans.com https://app.sandbox.midtrans.com https://api.midtrans.com https://api.sandbox.midtrans.com",
   "worker-src 'self'",
   "manifest-src 'self'",
   // Jembatan gapi hidup di dalam iframe apis.google.com, dan pemilih akun
   // Google bisa muncul dari accounts.google.com.
-  "frame-src 'self' https://*.firebaseapp.com https://apis.google.com https://accounts.google.com",
-  "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://apis.google.com https://accounts.google.com",
+  // Jendela pembayaran Snap hidup di dalam iframe milik Midtrans, dan
+  // sebagian metode (kartu dengan 3DS, e-wallet) membuka iframe bank atau
+  // penyedia dompetnya sendiri dari dalam sana.
+  "frame-src 'self' https://*.firebaseapp.com https://apis.google.com https://accounts.google.com https://app.midtrans.com https://app.sandbox.midtrans.com https://api.midtrans.com https://api.sandbox.midtrans.com https://*.veritrans.co.id",
+  "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://apis.google.com https://accounts.google.com https://app.midtrans.com https://app.sandbox.midtrans.com https://api.midtrans.com https://api.sandbox.midtrans.com",
   "upgrade-insecure-requests",
 ].join("; ");
 
@@ -53,10 +63,14 @@ const HEADER_KEAMANAN = [
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  // Tidak ada fitur perangkat yang dipakai aplikasi ini.
+  // Tidak ada fitur perangkat yang dipakai aplikasi ini, kecuali Payment
+  // Request API yang dipakai Snap untuk kartu tersimpan di peramban. Izinnya
+  // diberikan kepada halaman sendiri dan kepada iframe Midtrans, bukan kepada
+  // siapa pun.
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+    value:
+      'camera=(), microphone=(), geolocation=(), usb=(), payment=(self "https://app.midtrans.com" "https://app.sandbox.midtrans.com")',
   },
   // Untuk browser lama yang belum mengenal frame-ancestors.
   { key: "X-Frame-Options", value: "DENY" },

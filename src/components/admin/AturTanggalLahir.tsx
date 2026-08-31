@@ -1,7 +1,7 @@
 "use client";
 
 import { CalendarCheck } from "lucide-react";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
 import { useT } from "@/lib/content/LangProvider";
@@ -25,6 +25,12 @@ export function AturTanggalLahir({
   onSimpan: (tanggalLahir: string) => void;
 }) {
   const t = useT();
+  // Id dari useId(), bukan untaian tetap: UserTable merender kartu ponsel dan
+  // tabel layar lebar sekaligus, jadi panel ini muncul dua kali di DOM. Id yang
+  // kembar membuat label menunjuk salinan yang sedang disembunyikan CSS, dan
+  // elemen ber-display none tidak bisa difokuskan. Lihat catatan lengkapnya di
+  // HapusPengguna.tsx.
+  const idTanggal = useId();
   const [nilai, setNilai] = useState(sekarang ?? "");
   const berubah = nilai.length === 10 && nilai !== sekarang;
 
@@ -35,11 +41,11 @@ export function AturTanggalLahir({
       </p>
 
       <div className="space-y-2">
-        <Label htmlFor="lahir-admin" className="text-xs">
+        <Label htmlFor={idTanggal} className="text-xs">
           {t("admin.birth.current", { tanggal: sekarang ?? "-" })}
         </Label>
         <Input
-          id="lahir-admin"
+          id={idTanggal}
           type="date"
           value={nilai}
           onChange={(e) => setNilai(e.target.value)}

@@ -1,7 +1,7 @@
 "use client";
 
 import { CalendarDays, Infinity as InfinityIcon, Plus, X } from "lucide-react";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
 import { useT } from "@/lib/content/LangProvider";
@@ -27,6 +27,12 @@ export function AturLangganan({
   busy: boolean;
 }) {
   const t = useT();
+  // Id dari useId(), bukan untaian tetap: UserTable merender kartu ponsel dan
+  // tabel layar lebar sekaligus, jadi panel ini muncul dua kali di DOM. Id yang
+  // kembar membuat label menunjuk salinan yang sedang disembunyikan CSS, dan
+  // elemen ber-display none tidak bisa difokuskan. Lihat catatan lengkapnya di
+  // HapusPengguna.tsx.
+  const idHabis = useId();
   const [tanggal, setTanggal] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -76,12 +82,12 @@ export function AturLangganan({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="habis" className="text-xs">
+        <Label htmlFor={idHabis} className="text-xs">
           {t("admin.orSetDate")}
         </Label>
         <div className="flex flex-wrap gap-2">
           <Input
-            id="habis"
+            id={idHabis}
             type="date"
             value={tanggal}
             onChange={(e) => setTanggal(e.target.value)}

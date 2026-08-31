@@ -2,12 +2,14 @@
  * Tes aturan akses. Dijalankan dengan: npm run test
  * Sengaja tanpa framework: logikanya kecil dan hanya butuh perbandingan nilai.
  */
+import { readFileSync } from "node:fs";
 import {
   evaluateAccess,
   extendOneYear,
   extendYears,
   punyaAksesBerbayar,
   statusSetelahDitolak,
+  trialDiakhiri,
   trialEnd,
 } from "../subscription";
 
@@ -190,6 +192,55 @@ eq(
     now,
   ),
 );
+
+/*
+ * Nonaktifkan harus benar-benar menonaktifkan.
+ *
+ * Aksi itu dulu hanya menyetel status ke "expired" dan mengosongkan tanggal
+ * habis langganan. Untuk siapa pun yang masa cobanya belum lewat, itu tidak
+ * mencabut apa pun: evaluateAccess() membaca trialEndsAt tanpa peduli status,
+ * jadi orangnya tetap bisa membuka seluruh aplikasi sementara panel admin
+ * menampilkannya sebagai Expired. Terjadi sungguhan pada satu akun, dan yang
+ * membuatnya ketahuan bukan aksesnya melainkan tombol hapus yang menolak
+ * bekerja dengan alasan "aksesnya masih berjalan".
+ */
+eq("trial yang masih hidup diakhiri sekarang", now.toISOString(), trialDiakhiri(iso("2026-09-01"), now));
+eq("trial yang sudah lewat tidak disentuh", iso("2026-08-01"), trialDiakhiri(iso("2026-08-01"), now));
+eq("tanpa trial tetap null", null, trialDiakhiri(null, now));
+
+// Inilah keadaan yang sebenarnya terjadi: status sudah expired, tapi masa coba
+// masih berjalan, jadi aksesnya tetap hidup.
+eq(
+  "expired dengan trial hidup masih bisa membuka aplikasi",
+  true,
+  evaluateAccess(
+    {
+      subscriptionStatus: "expired",
+      subscriptionExpiresAt: null,
+      trialEndsAt: iso("2026-08-27"),
+    },
+    now,
+  ).canView,
+);
+// Dan inilah keadaan sesudah nonaktifkan diperbaiki.
+eq(
+  "setelah trialnya ikut diakhiri, aksesnya mati",
+  false,
+  evaluateAccess(
+    {
+      subscriptionStatus: "expired",
+      subscriptionExpiresAt: null,
+      trialEndsAt: trialDiakhiri(iso("2026-08-27"), now),
+    },
+    now,
+  ).canView,
+);
+
+{
+  const route = readFileSync("src/app/api/admin/subscription/route.ts", "utf8");
+  const potongan = route.slice(route.indexOf('if (action === "deactivate")'), route.indexOf('} else if (action === "lifetime")'));
+  eq("nonaktifkan ikut mengakhiri masa coba", true, potongan.includes("trialDiakhiri("));
+}
 
 console.log(fail === 0 ? "✓ langganan: semua lolos" : `✗ langganan: ${fail} gagal`);
 if (fail) process.exit(1);

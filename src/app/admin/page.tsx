@@ -4,6 +4,7 @@ import { Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { AksiPengguna } from "@/components/admin/aksi";
 import { AturHarga } from "@/components/admin/AturHarga";
+import { DaftarPembayaran } from "@/components/admin/DaftarPembayaran";
 import { DaftarPermintaan } from "@/components/admin/DaftarPermintaan";
 import { TombolEkspor } from "@/components/admin/TombolEkspor";
 import { UserTable } from "@/components/admin/UserTable";
@@ -49,7 +50,9 @@ export default function AdminPage() {
   const [memuat, setMemuat] = useState(true);
   /** Dinaikkan untuk memaksa muat ulang setelah sebuah aksi berhasil. */
   const [refresh, setRefresh] = useState(0);
-  const [tab, setTab] = useState<"pengguna" | "permintaan" | "harga">("pengguna");
+  const [tab, setTab] = useState<"pengguna" | "permintaan" | "pembayaran" | "harga">(
+    "pengguna",
+  );
   /** Katalog add-on, dipakai kolom dan pengatur add-on di tabel pengguna. */
   const [katalogAddOn, setKatalogAddOn] = useState<AddOn[]>(HARGA_BAWAAN.addOn);
   /** Yang sedang diketik, dan yang sudah benar-benar dikirim ke server. */
@@ -186,32 +189,38 @@ export default function AdminPage() {
           title={t(
             tab === "permintaan"
               ? "admin.title.requests"
-              : tab === "harga"
-                ? "admin.title.pricing"
-                : "admin.title.users",
+              : tab === "pembayaran"
+                ? "admin.title.payments"
+                : tab === "harga"
+                  ? "admin.title.pricing"
+                  : "admin.title.users",
           )}
           subtitle={
             tab === "permintaan"
               ? t("admin.sub.requests")
-              : tab === "harga"
-                ? t("admin.sub.pricing")
-                : memuat
-                  ? t("common.loading")
-                  : t(filter === "all" ? "admin.count" : "admin.countFiltered", {
-                      n: users.length,
-                    })
+              : tab === "pembayaran"
+                ? t("admin.sub.payments")
+                : tab === "harga"
+                  ? t("admin.sub.pricing")
+                  : memuat
+                    ? t("common.loading")
+                    : t(filter === "all" ? "admin.count" : "admin.countFiltered", {
+                        n: users.length,
+                      })
           }
         />
 
         {error && <Alert tone="error">{error}</Alert>}
 
-        {/* Dua bagian yang jarang dipakai bersamaan: kelola pengguna
-            sehari-hari, atur harga sesekali. */}
+        {/* Empat bagian yang jarang dipakai bersamaan: kelola pengguna
+            sehari-hari, periksa permintaan transfer manual, telusuri
+            pembayaran gateway ketika ada yang menanyakannya, atur harga
+            sesekali. */}
         <div
           role="tablist"
           className="inline-flex gap-1 rounded-pill bg-surface-sunk p-1 hb-sink"
         >
-          {(["pengguna", "permintaan", "harga"] as const).map((k) => (
+          {(["pengguna", "permintaan", "pembayaran", "harga"] as const).map((k) => (
             <button
               key={k}
               role="tab"
@@ -228,7 +237,9 @@ export default function AdminPage() {
                   ? "price.tab.users"
                   : k === "permintaan"
                     ? "admin.tab.requests"
-                    : "price.tab.pricing",
+                    : k === "pembayaran"
+                      ? "admin.tab.payments"
+                      : "price.tab.pricing",
               )}
             </button>
           ))}
@@ -238,6 +249,8 @@ export default function AdminPage() {
           <AturHarga />
         ) : tab === "permintaan" ? (
           <DaftarPermintaan />
+        ) : tab === "pembayaran" ? (
+          <DaftarPembayaran />
         ) : (
           <>
             <div className="flex flex-wrap gap-2.5">

@@ -89,7 +89,7 @@ const FAQ = [1, 2, 3, 4, 5, 6] as const;
  * Tiga bentuk dari satu masalah yang sama.
  *
  * Halaman ini dulu langsung memperkenalkan produknya. Yang membuka halaman
- * depan belum tentu sedang mencari kalender Bali; sebagian besar sedang
+ * depan belum tentu sedang mencari kalender wariga; sebagian besar sedang
  * memikirkan sesuatu yang tidak berjalan. Tiga kartu ini menyebutkan hal itu
  * lebih dulu, baru produknya diperkenalkan sebagai jawabannya.
  */
@@ -99,10 +99,15 @@ const MASALAH = [1, 2, 3] as const;
  * Tiga tradisi yang benar-benar dipakai di dalam aplikasi, bukan sekadar
  * disebut. Kalau suatu hari salah satunya dibuang dari produk, kartunya harus
  * ikut dibuang dari sini.
+ *
+ * Kuncinya menyebut nama sistem perhitungannya (wariga, primbon, fengshui),
+ * bukan nama daerah asalnya. Judul yang berbunyi "Wariga Bali" dan "Primbon
+ * Jawa" membuat pembaca dari daerah lain menyimpulkan aplikasinya bukan
+ * untuk mereka, padahal hitungannya sama untuk siapa pun.
  */
 const WARISAN = [
-  { icon: Sun, kunci: "bali" },
-  { icon: BookOpen, kunci: "jawa" },
+  { icon: Sun, kunci: "wariga" },
+  { icon: BookOpen, kunci: "primbon" },
   { icon: Store, kunci: "fengshui" },
 ] as const;
 
@@ -262,12 +267,12 @@ export function LandingClient({
         {/*
          * Tiga sumbernya disebutkan terang-terangan.
          *
-         * Halaman ini dulu hanya menyebut Bali, dan itu membuat sebagian
-         * pembaca menyimpulkan aplikasinya bukan untuk mereka sebelum sempat
-         * melihat isinya. Ketiganya memang sudah ada di dalam aplikasi sejak
-         * awal: pawukon dan wewaran dari wariga, weton dan pangarasan dan
-         * pancasuda dari primbon, dan sistem 81 angka untuk nama usaha. Yang
-         * kurang cuma menyebutkannya.
+         * Halaman ini dulu hanya menyebut satu daerah, dan itu membuat
+         * sebagian pembaca menyimpulkan aplikasinya bukan untuk mereka sebelum
+         * sempat melihat isinya. Ketiganya memang sudah ada di dalam aplikasi
+         * sejak awal: pawukon dan wewaran dari wariga, weton dan pangarasan
+         * dan pancasuda dari primbon, dan sistem 81 angka untuk nama usaha.
+         * Yang disebut sistemnya, bukan sukunya.
          */}
         <Section title={t("landing.roots.title")} lead={t("landing.roots.lead")}>
           <div className="grid gap-5 sm:grid-cols-3">

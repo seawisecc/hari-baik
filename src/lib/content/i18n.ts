@@ -94,7 +94,7 @@ const dict = {
     "pro.lock.cta": "Aktifkan Langganan",
     "pro.lock.tagline": "Akses semua fitur tanpa batas.",
     "pro.lock.desc.nama":
-      "Analisis makna nama berdasarkan aksara Bali, tersedia untuk subscriber.",
+      "Analisis makna nama berdasarkan nilai aksara, tersedia untuk subscriber.",
     "pro.lock.desc.nasib":
       "Gambaran perjalanan rejeki & kesehatan per periode usia, tersedia untuk subscriber.",
     "pro.lock.desc.petemon":
@@ -230,8 +230,8 @@ const dict = {
     "calendar.subscribeCta": "Lihat paket langganan",
     "calendar.prevMonth": "Bulan sebelumnya",
     "calendar.nextMonth": "Bulan berikutnya",
-    "calendar.legend.purnama": "Purnama",
-    "calendar.legend.tilem": "Tilem",
+    "calendar.legend.purnama": "Bulan Purnama",
+    "calendar.legend.tilem": "Bulan Baru",
     "calendar.legend.holiday": "Hari raya",
     "traits.title": "Kepribadian",
     "traits.subtitle": "Dibaca dari weton kelahiranmu",
@@ -392,6 +392,17 @@ const dict = {
     "price.addonsPublicHint": "Bisa ditambahkan kapan saja, tanyakan ke admin.",
     "price.oneTimeTag": "sekali bayar",
     "price.perTerm": "mengikuti masa langganan",
+    "bayar.sekarang": "Bayar sekarang",
+    "bayar.menyiapkan": "Membuka pembayaran…",
+    "bayar.memeriksa": "Memeriksa pembayaran…",
+    "bayar.lunas": "Pembayaran diterima. Langgananmu sudah aktif.",
+    "bayar.gagal":
+      "Pembayaran tidak selesai. Tidak ada dana yang terpotong, silakan coba lagi.",
+    "bayar.tertunda":
+      "Pembayaranmu belum terbaca lunas. Kalau kamu membayar lewat virtual account atau QRIS, biasanya butuh beberapa menit. Halaman ini akan terbuka sendiri begitu dananya masuk.",
+    "bayar.aman": "Diproses Midtrans, berizin dan diawasi Bank Indonesia.",
+    "bayar.atauTransfer": "atau transfer manual",
+    "bayar.atauLangsung": "Tidak ingin menunggu admin? Bayar langsung di sini.",
     "req.iPaid": "Saya sudah bayar",
     "req.sending": "Mengirim…",
     "req.pickFirst": "Pilih paket dulu di atas.",
@@ -416,13 +427,39 @@ const dict = {
     "admin.req.note": "Catatan",
     "admin.req.decidedBy": "Diputuskan oleh",
     "admin.req.willExtend": "Menambah {n} tahun",
+    "admin.title.payments": "Pembayaran",
+    "admin.sub.payments":
+      "Pesanan lewat Midtrans. Cari di sini kalau ada yang mengaku sudah bayar.",
+    "admin.tab.payments": "Pembayaran",
+    "bayar.status.menunggu": "Menunggu",
+    "bayar.status.lunas": "Lunas",
+    "bayar.status.gagal": "Gagal",
+    "bayar.status.dikembalikan": "Dikembalikan",
+    "bayar.kol.paket": "Paket",
+    "bayar.kol.cara": "Cara bayar",
+    "bayar.kol.dibuat": "Dibuat",
+    "bayar.kol.dibayar": "Dibayar",
+    "bayar.kol.order": "Order ID",
+    "bayar.kol.transaksi": "ID transaksi",
+    "bayar.cari.placeholder": "Cari email, nama, order id, atau id transaksi",
+    "bayar.kosong": "Belum ada pesanan dengan status ini.",
+    "bayar.cek": "Periksa ulang ke Midtrans",
+    "bayar.cek.jalan": "Memeriksa…",
+    "bayar.cek.hint":
+      "Dipakai kalau pelanggan bilang sudah bayar tapi status di sini masih menunggu. Yang diterapkan tetap jawaban Midtrans.",
+    "bayar.cek.berubah": "Pembayaran terbaca lunas. Langganannya sudah diaktifkan.",
+    "bayar.cek.tetap": "Belum ada perubahan, statusnya masih {status}.",
+    "bayar.cek.belumAda":
+      "Midtrans belum punya transaksi untuk pesanan ini. Jendela pembayarannya dibuka lalu ditutup tanpa memilih cara bayar.",
+    "bayar.gatewayMati":
+      "Kunci Midtrans belum terpasang di lingkungan ini, jadi status pesanan tidak bisa ditanyakan ulang.",
     "admin.title.users": "Kelola Pengguna",
     "admin.title.requests": "Permintaan Aktivasi",
     "admin.title.pricing": "Harga Langganan",
     "admin.sub.requests": "Setujui setelah pembayaran kamu terima.",
     "admin.sub.pricing": "Perubahan langsung berlaku di halaman langganan.",
     "landing.hero.lead":
-      "Kalender siklus personal yang dihitung dari tanggal lahirmu, memadukan wariga Bali, primbon Jawa, dan fengshui ke dalam kalender Masehi.",
+      "Kalender siklus personal yang dihitung dari tanggal lahirmu, memadukan wariga, primbon, dan fengshui ke dalam kalender Masehi.",
     "landing.hero.eyebrow": "Warisan leluhur Nusantara, dihitung untuk hari ini",
     "landing.hero.hook": "Sudah kerja keras, tapi kenapa hasilnya sering meleset?",
     "landing.hero.sub":
@@ -447,13 +484,13 @@ const dict = {
       "Tanggal yang sama selalu memberi hasil yang sama, dan siapa pun bisa menghitung ulang.",
     "landing.why.point2.title": "Bukan AI, bukan tebakan",
     "landing.why.point2.desc":
-      "Tidak ada model yang mengarang jawaban. Yang berjalan rumus yang sama tuanya dengan kalender Bali.",
+      "Tidak ada model yang mengarang jawaban. Yang berjalan rumus yang sama tuanya dengan kalender wariga itu sendiri.",
     "landing.why.point3.title": "Milikmu sendiri",
     "landing.why.point3.desc":
-      "Kalender Bali berlaku sama untuk semua orang. Ini dihitung dari tanggal lahirmu, jadi harimu bukan hari orang lain.",
-    "landing.faq.5.q": "Saya bukan orang Bali dan bukan Hindu. Tetap bisa dipakai?",
+      "Kalender wariga berlaku sama untuk semua orang. Ini dihitung dari tanggal lahirmu, jadi harimu bukan hari orang lain.",
+    "landing.faq.5.q": "Apakah ini cuma untuk kalangan tertentu?",
     "landing.faq.5.a":
-      "Bisa, dan memang begitu maksudnya. Yang dipakai sistem perhitungannya, bukan ritualnya. Kamu cuma perlu tanggal lahir Masehi, dan yang keluar keterangan tentang hari, bukan tuntunan ibadah. Pengguna kami datang dari berbagai suku, agama, dan juga dari luar negeri.",
+      "Tidak, dan memang begitu maksudnya. Yang dipakai sistem perhitungannya, bukan ritual atau ibadah siapa pun. Kamu cuma perlu tanggal lahir Masehi, dan yang keluar keterangan tentang hari, bukan tuntunan beragama. Pengguna kami datang dari berbagai daerah, latar belakang, dan juga dari luar negeri.",
     "landing.faq.6.q": "Apakah ini memakai AI?",
     "landing.faq.6.a":
       "Tidak. Tidak ada model yang mengarang jawaban di sini. Semuanya rumus tetap, dijalankan apa adanya, dan diuji terhadap 210 hari siklus pawukon penuh serta 41 tanggal acuan.",
@@ -491,11 +528,11 @@ const dict = {
       "Kategori energi hari ini beserta yang didukung dan yang sebaiknya ditunda.",
     "landing.f.calendar.title": "Kalender sebulan penuh",
     "landing.f.calendar.desc":
-      "Purnama, tilem, hari raya Hindu, dan kategori energimu dalam satu tampilan.",
+      "Bulan purnama, bulan baru, hari raya, dan kategori energimu dalam satu tampilan.",
     "landing.f.traits.title": "Watak kelahiran",
     "landing.f.traits.desc": "Weton, wuku, pangarasan, dan pancasuda dari hari lahirmu.",
     "landing.f.name.title": "Makna nama",
-    "landing.f.name.desc": "Urai namamu ke aksara Bali dan unsur yang dikandungnya.",
+    "landing.f.name.desc": "Urai namamu ke nilai aksara dan unsur yang dikandungnya.",
     "landing.f.match.title": "Kecocokan pasangan",
     "landing.f.match.desc": "Hitung pancapetemon dan sadpetemon dari dua tanggal lahir.",
     "landing.f.journey.title": "Perjalanan hidup",
@@ -507,11 +544,11 @@ const dict = {
     "landing.roots.title": "Tiga warisan, satu perhitungan",
     "landing.roots.lead":
       "Bukan salinan satu tradisi, melainkan tiga sistem yang sudah lama dipakai orang untuk membaca waktu, dihitung ulang dari tanggal lahirmu.",
-    "landing.roots.bali.title": "Wariga Bali",
-    "landing.roots.bali.desc":
-      "Siklus pawukon 210 hari, wewaran, sasih, dan purnama tilem. Dari sinilah kategori harianmu dihitung.",
-    "landing.roots.jawa.title": "Primbon Jawa",
-    "landing.roots.jawa.desc":
+    "landing.roots.wariga.title": "Wariga",
+    "landing.roots.wariga.desc":
+      "Siklus pawukon 210 hari, wewaran, sasih, serta bulan purnama dan bulan baru. Dari sinilah kategori harianmu dihitung.",
+    "landing.roots.primbon.title": "Primbon",
+    "landing.roots.primbon.desc":
       "Weton, pangarasan, dan pancasuda dari hari lahirmu, dibaca sebagai watak dan kecenderungan, bukan nasib yang sudah tertutup.",
     "landing.roots.fengshui.title": "Fengshui 81 angka",
     "landing.roots.fengshui.desc":
@@ -529,10 +566,10 @@ const dict = {
     "landing.faq.title": "Pertanyaan umum",
     "landing.faq.1.q": "Apakah ini ramalan?",
     "landing.faq.1.a":
-      "Bukan. Ini perhitungan siklus kalender Bali yang sudah dipakai turun-temurun, disajikan sebagai bahan pertimbangan. Keputusan tetap milikmu.",
-    "landing.faq.2.q": "Apa bedanya dengan kalender Bali biasa?",
+      "Bukan. Ini perhitungan siklus kalender wariga yang sudah dipakai turun-temurun, disajikan sebagai bahan pertimbangan. Keputusan tetap milikmu.",
+    "landing.faq.2.q": "Apa bedanya dengan kalender wariga biasa?",
     "landing.faq.2.a":
-      "Kalender Bali berlaku sama untuk semua orang. Di sini kategori harinya dihitung dari tanggal lahirmu, jadi hari yang sama bisa berbeda artinya untuk dua orang.",
+      "Kalender wariga berlaku sama untuk semua orang. Di sini kategori harinya dihitung dari tanggal lahirmu, jadi hari yang sama bisa berbeda artinya untuk dua orang.",
     "landing.faq.3.q": "Bagaimana cara membayar?",
     "landing.faq.3.a":
       "Pilih paket di aplikasi, transfer, lalu tekan tombol konfirmasi. Admin mengaktifkan langgananmu setelah pembayaran diterima.",
@@ -561,7 +598,7 @@ const dict = {
     "laporan.current": "Periode saat ini",
     "laporan.noName": "Nama belum diisi, jadi bagian makna nama dilewati.",
     "laporan.footer":
-      "Disusun oleh Hari Baik, Seawise Studio. Ini hasil perhitungan siklus kalender Bali, bukan ramalan.",
+      "Disusun oleh Hari Baik, dikembangkan Seawise Studio dan dioperasikan Mayaloka Digital. Ini hasil perhitungan siklus kalender wariga, bukan ramalan.",
     "keluarga.subtitle": "Pantau siklus harian orang-orang terdekatmu dalam satu halaman.",
     "keluarga.add": "Tambah anggota",
     "keluarga.name": "Nama",
@@ -609,8 +646,8 @@ const dict = {
     "acara.jenis.perjalanan": "Perjalanan",
     "acara.jenis.upacara": "Upacara",
     "acara.jenis.pindah": "Pindah rumah",
-    "acara.tanda.purnama": "Purnama",
-    "acara.tanda.tilem": "Tilem",
+    "acara.tanda.purnama": "Bulan Purnama",
+    "acara.tanda.tilem": "Bulan Baru",
     "acara.tanda.kajengKliwon": "Kajeng Kliwon",
     "acara.tanda.hariRaya": "Bertepatan hari raya",
     "acara.tanda.libur": "Libur nasional",
@@ -647,10 +684,11 @@ const dict = {
       "Setiap huruf diberi nilai 1 sampai 9 secara berulang (A sampai I bernilai 1 sampai 9, lalu J kembali ke 1). Nilainya dijumlahkan, lalu dikurangi 80 sampai masuk rentang 1 sampai 81, dan angka itu dibaca di tabel 81 angka. Digit terakhirnya menentukan unsurnya.",
     "fengshui.disclaimer":
       "Angka membantu memilih di antara nama yang sama-sama kamu suka, bukan menentukan nasib usaha. Nama yang baik tetap kalah oleh produk yang buruk, dan nama yang angkanya biasa saja bisa besar karena pelayanannya.",
-    "studio.by": "Dibuat oleh Seawise Studio",
+    "studio.by": "Dikembangkan Seawise Studio, dioperasikan Mayaloka Digital",
     "studio.name": "Seawise Studio",
+    "studio.operator": "Mayaloka Digital",
     "studio.about":
-      "Hari Baik dikembangkan Seawise Studio, memadukan Wariga dan kalender Bali dengan kalender Masehi.",
+      "Hari Baik dikembangkan Seawise Studio dan dioperasikan Mayaloka Digital, memadukan wariga, primbon, dan fengshui dengan kalender Masehi.",
   },
   en: {
     "app.tagline": "Everyone has their own perfect timing",
@@ -733,7 +771,8 @@ const dict = {
     "pro.lock.title": "Pro Feature",
     "pro.lock.cta": "Activate Subscription",
     "pro.lock.tagline": "Access all features without limits.",
-    "pro.lock.desc.nama": "Name analysis based on Balinese script, available for subscribers.",
+    "pro.lock.desc.nama":
+      "Name analysis based on the value of each letter, available for subscribers.",
     "pro.lock.desc.nasib":
       "Fortune & health journey overview per age period, available for subscribers.",
     "pro.lock.desc.petemon":
@@ -872,7 +911,7 @@ const dict = {
     "calendar.nextMonth": "Next month",
     "calendar.legend.purnama": "Full moon",
     "calendar.legend.tilem": "New moon",
-    "calendar.legend.holiday": "Holy day",
+    "calendar.legend.holiday": "Festival day",
     "traits.title": "Personality",
     "traits.subtitle": "Read from your birth weton",
     "traits.birthWeton": "Birth weton",
@@ -1028,6 +1067,16 @@ const dict = {
     "price.addonsPublicHint": "Can be added at any time, just ask the admin.",
     "price.oneTimeTag": "one-time",
     "price.perTerm": "for the subscription term",
+    "bayar.sekarang": "Pay now",
+    "bayar.menyiapkan": "Opening checkout…",
+    "bayar.memeriksa": "Checking your payment…",
+    "bayar.lunas": "Payment received. Your subscription is active.",
+    "bayar.gagal": "The payment did not go through. Nothing was charged, please try again.",
+    "bayar.tertunda":
+      "We cannot see your payment as settled yet. Bank transfers and QRIS usually take a few minutes. This page opens by itself once the money arrives.",
+    "bayar.aman": "Processed by Midtrans, licensed and supervised by Bank Indonesia.",
+    "bayar.atauTransfer": "or pay by bank transfer",
+    "bayar.atauLangsung": "Rather not wait for the admin? Pay directly here.",
     "req.iPaid": "I have paid",
     "req.sending": "Sending…",
     "req.pickFirst": "Choose a plan above first.",
@@ -1052,13 +1101,39 @@ const dict = {
     "admin.req.note": "Note",
     "admin.req.decidedBy": "Decided by",
     "admin.req.willExtend": "Adds {n} years",
+    "admin.title.payments": "Payments",
+    "admin.sub.payments":
+      "Orders through Midtrans. Look here when someone says they have paid.",
+    "admin.tab.payments": "Payments",
+    "bayar.status.menunggu": "Awaiting",
+    "bayar.status.lunas": "Paid",
+    "bayar.status.gagal": "Failed",
+    "bayar.status.dikembalikan": "Refunded",
+    "bayar.kol.paket": "Plan",
+    "bayar.kol.cara": "Method",
+    "bayar.kol.dibuat": "Created",
+    "bayar.kol.dibayar": "Paid at",
+    "bayar.kol.order": "Order ID",
+    "bayar.kol.transaksi": "Transaction ID",
+    "bayar.cari.placeholder": "Search email, name, order id, or transaction id",
+    "bayar.kosong": "No orders with this status yet.",
+    "bayar.cek": "Re-check with Midtrans",
+    "bayar.cek.jalan": "Checking…",
+    "bayar.cek.hint":
+      "For when a customer says they have paid but this still shows as awaiting. What gets applied is Midtrans's answer, not yours.",
+    "bayar.cek.berubah": "The payment reads as settled. The subscription is now active.",
+    "bayar.cek.tetap": "Nothing changed, it is still {status}.",
+    "bayar.cek.belumAda":
+      "Midtrans has no transaction for this order. The checkout window was opened and closed without picking a method.",
+    "bayar.gatewayMati":
+      "No Midtrans keys in this environment, so order status cannot be re-checked.",
     "admin.title.users": "Manage Users",
     "admin.title.requests": "Activation Requests",
     "admin.title.pricing": "Subscription Pricing",
     "admin.sub.requests": "Approve once you have received the payment.",
     "admin.sub.pricing": "Changes take effect immediately on the subscription page.",
     "landing.hero.lead":
-      "A personal cycle calendar reckoned from your birth date, weaving Balinese wariga, Javanese primbon, and fengshui into the Gregorian one.",
+      "A personal cycle calendar reckoned from your birth date, weaving wariga, primbon, and fengshui into the Gregorian one.",
     "landing.hero.eyebrow": "Ancestral knowledge of the archipelago, reckoned for today",
     "landing.hero.hook": "Working this hard, so why does it so often fall flat?",
     "landing.hero.sub":
@@ -1083,13 +1158,13 @@ const dict = {
       "The same date always gives the same answer, and anyone can work it out again.",
     "landing.why.point2.title": "Not AI, not guesswork",
     "landing.why.point2.desc":
-      "No model is inventing answers here. What runs is arithmetic as old as the Balinese calendar itself.",
+      "No model is inventing answers here. What runs is arithmetic as old as the wariga calendar itself.",
     "landing.why.point3.title": "Yours, not everyone's",
     "landing.why.point3.desc":
-      "A Balinese calendar reads the same for everybody. This is worked out from your birth date, so your day is not someone else's day.",
-    "landing.faq.5.q": "I am not Balinese and not Hindu. Can I still use it?",
+      "A wariga calendar reads the same for everybody. This is worked out from your birth date, so your day is not someone else's day.",
+    "landing.faq.5.q": "Is this only for one particular community?",
     "landing.faq.5.a":
-      "Yes, and that is the point. What you are using is the reckoning, not the ritual. All it needs is your Gregorian birth date, and what comes back is a reading of the day, not religious instruction. Our users come from many backgrounds and faiths, and from outside Indonesia too.",
+      "No, and that is the point. What you are using is the reckoning, not the ritual. All it needs is your Gregorian birth date, and what comes back is a reading of the day, not religious instruction. Our users come from many backgrounds and faiths, and from outside Indonesia too.",
     "landing.faq.6.q": "Does this use AI?",
     "landing.faq.6.a":
       "No. Nothing here invents an answer. It is fixed arithmetic, run as written, and checked against all 210 days of the pawukon cycle plus 41 reference dates.",
@@ -1126,12 +1201,12 @@ const dict = {
       "Today's energy category, what it supports, and what is better postponed.",
     "landing.f.calendar.title": "Full month calendar",
     "landing.f.calendar.desc":
-      "Purnama, tilem, Hindu holy days, and your own energy categories in one view.",
+      "Full moons, new moons, festival days, and your own energy categories in one view.",
     "landing.f.traits.title": "Birth traits",
     "landing.f.traits.desc":
       "Weton, wuku, pangarasan, and pancasuda from the day you were born.",
     "landing.f.name.title": "Name meaning",
-    "landing.f.name.desc": "Break your name into Balinese script and the elements it carries.",
+    "landing.f.name.desc": "Break your name into letter values and the elements it carries.",
     "landing.f.match.title": "Partner compatibility",
     "landing.f.match.desc": "Calculate pancapetemon and sadpetemon from two birth dates.",
     "landing.f.journey.title": "Life journey",
@@ -1142,11 +1217,11 @@ const dict = {
     "landing.roots.title": "Three inheritances, one reckoning",
     "landing.roots.lead":
       "Not a copy of one tradition but three systems people have long used to read time, worked out afresh from your birth date.",
-    "landing.roots.bali.title": "Balinese wariga",
-    "landing.roots.bali.desc":
-      "The 210-day pawukon cycle, the wewaran, sasih, and the full and dark moons. This is where your daily category comes from.",
-    "landing.roots.jawa.title": "Javanese primbon",
-    "landing.roots.jawa.desc":
+    "landing.roots.wariga.title": "Wariga",
+    "landing.roots.wariga.desc":
+      "The 210-day pawukon cycle, the wewaran, sasih, and the full and new moons. This is where your daily category comes from.",
+    "landing.roots.primbon.title": "Primbon",
+    "landing.roots.primbon.desc":
       "Weton, pangarasan, and pancasuda from your birth day, read as character and leaning, not as a fate already closed.",
     "landing.roots.fengshui.title": "The 81-number fengshui",
     "landing.roots.fengshui.desc":
@@ -1163,10 +1238,10 @@ const dict = {
     "landing.faq.title": "Common questions",
     "landing.faq.1.q": "Is this fortune telling?",
     "landing.faq.1.a":
-      "No. It is a calculation of Balinese calendar cycles that have been used for generations, offered as something to weigh. The decision stays yours.",
-    "landing.faq.2.q": "How is this different from an ordinary Balinese calendar?",
+      "No. It is a calculation of wariga calendar cycles that have been used for generations, offered as something to weigh. The decision stays yours.",
+    "landing.faq.2.q": "How is this different from an ordinary wariga calendar?",
     "landing.faq.2.a":
-      "An ordinary Balinese calendar reads the same for everyone. Here the category is calculated from your birth date, so the same day can mean different things to two people.",
+      "An ordinary wariga calendar reads the same for everyone. Here the category is calculated from your birth date, so the same day can mean different things to two people.",
     "landing.faq.3.q": "How do I pay?",
     "landing.faq.3.a":
       "Pick a plan in the app, transfer the amount, then press the confirm button. The admin activates your subscription once payment arrives.",
@@ -1194,7 +1269,7 @@ const dict = {
     "laporan.current": "Current period",
     "laporan.noName": "No name on file, so the name meaning section is skipped.",
     "laporan.footer":
-      "Prepared by Hari Baik, Seawise Studio. This is a Balinese calendar cycle calculation, not a prediction.",
+      "Prepared by Hari Baik, built by Seawise Studio and operated by Mayaloka Digital. This is a wariga calendar cycle calculation, not a prediction.",
     "keluarga.subtitle": "Follow the daily cycles of the people closest to you, on one page.",
     "keluarga.add": "Add a member",
     "keluarga.name": "Name",
@@ -1244,7 +1319,7 @@ const dict = {
     "acara.tanda.purnama": "Full moon",
     "acara.tanda.tilem": "New moon",
     "acara.tanda.kajengKliwon": "Kajeng Kliwon",
-    "acara.tanda.hariRaya": "Falls on a holy day",
+    "acara.tanda.hariRaya": "Falls on a festival day",
     "acara.tanda.libur": "Public holiday",
     "nav.short.fengshui": "Fengshui",
     "fengshui.title": "Business Name Fengshui",
@@ -1279,10 +1354,11 @@ const dict = {
       "Each letter is given a value from 1 to 9, repeating (A through I are 1 through 9, then J returns to 1). The values are summed, then reduced by 80 until they fall between 1 and 81, and that number is read in the 81-number table. Its last digit sets the element.",
     "fengshui.disclaimer":
       "The number helps you choose between names you already like; it does not decide the fate of a business. A good name still loses to a poor product, and an ordinary number can grow large on service alone.",
-    "studio.by": "Made by Seawise Studio",
+    "studio.by": "Built by Seawise Studio, operated by Mayaloka Digital",
     "studio.name": "Seawise Studio",
+    "studio.operator": "Mayaloka Digital",
     "studio.about":
-      "Hari Baik is built by Seawise Studio, weaving Wariga and the Balinese calendar into the Gregorian one.",
+      "Hari Baik is built by Seawise Studio and operated by Mayaloka Digital, weaving wariga, primbon, and fengshui into the Gregorian calendar.",
   },
 } as const;
 

@@ -2,7 +2,7 @@
 
 import { Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AjukanAktivasi } from "@/components/AjukanAktivasi";
 import { DaftarHarga } from "@/components/DaftarHarga";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -26,10 +26,28 @@ function paketAwal(harga: PengaturanHarga): PaketLangganan | null {
 export function ExpiredClient({ harga }: { harga: PengaturanHarga }) {
   const t = useT();
   const router = useRouter();
-  const { profile, logout } = useAuth();
+  const { profile, access, logout } = useAuth();
   const [paket, setPaket] = useState<PaketLangganan | null>(() => paketAwal(harga));
+  const [lunas, setLunas] = useState(false);
 
   const menunggu = profile?.subscriptionStatus === "pending";
+
+  /*
+   * Setelah lunas, pindah baru dilakukan ketika aksesnya benar-benar terlihat
+   * hidup di layar ini, bukan seketika server menjawab.
+   *
+   * Langganannya memang sudah dinyalakan di Firestore sebelum jawabannya
+   * dikirim, tapi profil di halaman ini datang lewat onSnapshot yang tiba
+   * beberapa saat kemudian. Pindah selagi profil di memori masih yang lama
+   * membuat penjaga akses melihat akses yang belum hidup lalu memantulkannya
+   * kembali ke halaman ini, tanpa keterangan apa pun, tepat setelah orangnya
+   * membayar. Menunggu `canView` berarti pindahnya terjadi persis sekali,
+   * pada saat yang benar, dan selama menunggu pengguna melihat kabar
+   * lunasnya, bukan layar yang diam.
+   */
+  useEffect(() => {
+    if (lunas && access.canView) router.replace("/hari-ini");
+  }, [lunas, access.canView, router]);
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col justify-center px-6 py-14">
@@ -78,10 +96,15 @@ export function ExpiredClient({ harga }: { harga: PengaturanHarga }) {
               paket={paket}
               addOnTersedia={harga.addOn.filter((a) => a.aktif)}
               sudahMenunggu={menunggu}
+              onLunas={() => setLunas(true)}
             />
           </div>
         </CardBody>
       </Card>
+
+      <p className="mt-6 text-center text-[11px] leading-relaxed text-ink-faint">
+        {t("studio.by")}
+      </p>
 
       <button
         onClick={async () => {

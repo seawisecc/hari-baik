@@ -2,6 +2,7 @@
 
 import { Check, MessageCircle, Send } from "lucide-react";
 import { useState } from "react";
+import { BayarMidtrans, MIDTRANS_AKTIF } from "@/components/BayarMidtrans";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Label } from "@/components/ui/Input";
@@ -13,7 +14,17 @@ import { rupiah, teks, type AddOn, type PaketLangganan } from "@/lib/harga";
 import { ambilToken } from "@/lib/firebase/client";
 
 /**
- * Ajukan aktivasi setelah membayar.
+ * Dua jalur membayar, satu pilihan paket.
+ *
+ * Bayar lewat Midtrans ada di atas karena itu jalur yang selesai sendiri:
+ * begitu uangnya masuk, langganannya menyala tanpa siapa pun perlu menekan
+ * apa pun. Transfer manual tetap di bawahnya, bukan sebagai cadangan yang
+ * malu-malu melainkan sebagai jalur penuh, karena sebagian pelanggan memang
+ * membayar lewat transfer dan sudah terbiasa mengabari admin.
+ *
+ * Keduanya berbagi satu pilihan add-on dan satu total. Kalau masing-masing
+ * punya penghitungnya sendiri, cepat atau lambat keduanya akan berbeda, dan
+ * yang membayar lewat jalur yang salah hitung tidak akan tahu.
  *
  * Tombolnya baru bisa ditekan setelah paket dipilih: permintaan tanpa paket
  * memaksa admin bertanya balik, dan itu justru menambah pekerjaan yang
@@ -23,10 +34,13 @@ export function AjukanAktivasi({
   paket,
   addOnTersedia,
   sudahMenunggu,
+  onLunas,
 }: {
   paket: PaketLangganan | null;
   addOnTersedia: AddOn[];
   sudahMenunggu: boolean;
+  /** Dipanggil saat pembayaran gateway terbukti lunas di sisi server. */
+  onLunas: () => void;
 }) {
   const t = useT();
   const { lang } = useLang();
@@ -41,10 +55,26 @@ export function AjukanAktivasi({
   const addOnDipilih = addOnTersedia.filter((a) => dipilih.includes(a.id));
   const total = (paket?.harga ?? 0) + addOnDipilih.reduce((n, a) => n + a.harga, 0);
 
+  /*
+   * Permintaan manual yang masih menunggu tidak menutup jalur gateway.
+   *
+   * Orang yang mengaku sudah transfer lalu bosan menunggu admin harus tetap
+   * bisa membayar lewat Midtrans dan langsung masuk. Menyembunyikan seluruh
+   * halaman pembayaran karena ada satu permintaan menggantung berarti
+   * satu-satunya jalan keluarnya adalah menunggu orang lain bangun.
+   */
   if (sudahMenunggu || hasil === "terkirim") {
     return (
-      <div className="space-y-4">
+      <div className="space-y-5">
         <Alert tone="success">{hasil === "terkirim" ? t("req.sent") : t("req.pending")}</Alert>
+        {MIDTRANS_AKTIF && paket && (
+          <div className="space-y-3">
+            <p className="text-center text-xs leading-relaxed text-ink-faint">
+              {t("bayar.atauLangsung")}
+            </p>
+            <BayarMidtrans paketId={paket.id} addOnIds={dipilih} onLunas={onLunas} />
+          </div>
+        )}
         <TombolWa profil={profile} paket={paket} />
       </div>
     );
@@ -114,6 +144,20 @@ export function AjukanAktivasi({
           <span className="text-sm text-ink-soft">{t("req.total")}</span>
           <span className="font-heading text-2xl font-bold text-ink">{rupiah(total)}</span>
         </div>
+      )}
+
+      {MIDTRANS_AKTIF && (
+        <>
+          <BayarMidtrans paketId={paket?.id ?? null} addOnIds={dipilih} onLunas={onLunas} />
+
+          <div className="flex items-center gap-3">
+            <span className="h-px flex-1 bg-border-soft" />
+            <span className="text-[11px] font-medium uppercase tracking-wider text-ink-faint">
+              {t("bayar.atauTransfer")}
+            </span>
+            <span className="h-px flex-1 bg-border-soft" />
+          </div>
+        </>
       )}
 
       <div className="space-y-2">

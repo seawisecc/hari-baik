@@ -11,6 +11,7 @@ import { readFileSync } from "node:fs";
 import { cariPengguna, cocokCari, angkaNomor, normalkan } from "../admin-cari";
 import { barisPengguna, csvPengguna, nilaiCsv, namaBerkas, KOLOM } from "../admin-ekspor";
 import { alasanTolak, bolehDihapus, emailCocok } from "../admin-hapus";
+import { bolehPeriksaUlang, cocokPembayaran, saringPembayaran } from "../admin-pembayaran";
 import type { PenggunaAdmin } from "../../types";
 
 let fail = 0;
@@ -319,6 +320,136 @@ function buat(ubah: Partial<PenggunaAdmin> = {}): PenggunaAdmin {
     true,
     ekspor.includes('"Cache-Control": "no-store"'),
   );
+}
+
+/*
+ * Panel kelola dirender dua kali, jadi id kolom isian tidak boleh ditulis
+ * sendiri.
+ *
+ * UserTable merender kartu ponsel DAN tabel layar lebar sekaligus; yang
+ * menyembunyikan salah satunya cuma CSS, jadi keduanya ada di DOM. Id yang
+ * ditulis sendiri jadi kembar, dan setiap label menunjuk elemen PERTAMA yang
+ * ber-id itu, yaitu salinan kartu ponsel yang display-nya none. Elemen
+ * ber-display none tidak bisa menerima fokus, jadi di laptop menekan label
+ * tidak memfokuskan apa pun dan yang diketik tidak masuk ke mana-mana.
+ *
+ * Gejalanya persis seperti fitur yang mati: tombol hapus tidak pernah menyala
+ * karena kolom konfirmasinya tetap kosong, padahal di ponsel semuanya normal.
+ * Terukur di peramban pada lebar 1680: fokus mendarat di BODY. Tiga kolom kena
+ * sekaligus (tanggal habis, tanggal lahir, konfirmasi hapus) dan hanya satu
+ * yang dilaporkan, jadi dua sisanya sempat tidak diketahui siapa pun.
+ */
+{
+  const tabel = readFileSync("src/components/admin/UserTable.tsx", "utf8");
+
+  // Kalau suatu hari hanya satu pohon yang dirender, aturan di bawah boleh
+  // dilonggarkan. Selama keduanya ada, tidak boleh.
+  eq("kartu ponsel dan tabel dirender berdampingan", true, /md:hidden/.test(tabel));
+  eq("tabel disembunyikan lewat CSS, bukan dilepas", true, /hidden[^"]*md:block/.test(tabel));
+
+  const dipakaiDuaKali = [
+    "src/components/admin/HapusPengguna.tsx",
+    "src/components/admin/AturTanggalLahir.tsx",
+    "src/components/admin/AturLangganan.tsx",
+    "src/components/admin/AturAddOn.tsx",
+    "src/components/admin/TandaiVerifikasi.tsx",
+  ];
+
+  for (const f of dipakaiDuaKali) {
+    const isi = readFileSync(f, "utf8");
+    if (!isi.includes("htmlFor")) continue;
+
+    // htmlFor yang berupa untaian harfiah pasti kembar: nilainya sama untuk
+    // kedua salinan.
+    eq(`${f}: htmlFor bukan untaian harfiah`, false, /htmlFor="/.test(isi));
+    // id yang berupa untaian harfiah, sama saja.
+    eq(`${f}: id bukan untaian harfiah`, false, /\sid="/.test(isi));
+    // Termasuk id yang dirangkai dari uid: satu pengguna tetap punya dua
+    // salinan di layar, jadi uid tidak membuatnya unik.
+    eq(`${f}: id tidak dirangkai dari uid`, false, /id=\{`[^`]*\$\{u\.uid\}/.test(isi));
+    eq(`${f}: memakai useId`, true, isi.includes("useId()"));
+  }
+}
+
+/*
+ * Daftar pembayaran di panel admin.
+ *
+ * Layar ini dibuka justru ketika ada yang salah: seseorang mengaku sudah
+ * membayar tapi aplikasinya masih terkunci. Pencarian yang meleset di sini
+ * terbaca sebagai "pesanannya memang tidak ada", dan itu jawaban yang salah
+ * kepada orang yang uangnya sudah keluar.
+ */
+{
+  const contoh = {
+    orderId: "HB-abc123-m5x7q9-8f2a",
+    email: "Wayan.Sutrisna@Gmail.com",
+    nama: "Wayan Sutrisna",
+    transactionId: "05eab30a-2c8a-46ef-922d-db704c45e426",
+  };
+
+  eq("cocok lewat email", true, cocokPembayaran(contoh, "wayan.sutrisna@gmail.com"));
+  eq("besar kecil huruf diabaikan", true, cocokPembayaran(contoh, "WAYAN"));
+  eq("cocok lewat order id", true, cocokPembayaran(contoh, "HB-abc123-m5x7q9-8f2a"));
+  // Arah pencarian yang sering terbalik: admin membuka dashboard Midtrans
+  // lebih dulu, melihat ada uang masuk, lalu ingin tahu itu siapa. Yang ada
+  // di tangannya id transaksi, bukan email.
+  eq("cocok lewat id transaksi Midtrans", true, cocokPembayaran(contoh, "05eab30a"));
+  eq("dua kata harus dua-duanya ketemu", true, cocokPembayaran(contoh, "wayan gmail"));
+  eq("kata yang tidak ada menggugurkan", false, cocokPembayaran(contoh, "wayan yahoo"));
+  eq("kunci kosong meloloskan semua", true, cocokPembayaran(contoh, "   "));
+
+  const daftar = [
+    { ...contoh, orderId: "HB-a-b-lama", createdAt: "2026-08-01T00:00:00.000Z" },
+    { ...contoh, orderId: "HB-a-b-baru", createdAt: "2026-08-30T00:00:00.000Z" },
+  ];
+  // eq() di berkas ini membandingkan dengan !==, jadi array digabung jadi
+  // untaian lebih dulu. Dibandingkan apa adanya, dua array berisi sama
+  // persis tetap dianggap berbeda dan tesnya merah tanpa ada yang salah.
+  eq(
+    "terbaru dulu",
+    "HB-a-b-baru,HB-a-b-lama",
+    saringPembayaran(daftar, "")
+      .map((p) => p.orderId)
+      .join(","),
+  );
+
+  /*
+   * Tombol periksa ulang hanya untuk yang memang bisa berubah.
+   *
+   * Yang sudah diterapkan tidak boleh ditanyakan lagi: bukan karena berbahaya
+   * (penerapannya sendiri sudah menolak berjalan dua kali), melainkan karena
+   * tombol yang tidak melakukan apa pun membuat admin ragu apakah tombolnya
+   * bekerja, lalu menekannya berulang kali.
+   */
+  eq(
+    "yang menunggu boleh diperiksa",
+    true,
+    bolehPeriksaUlang({ status: "menunggu", diterapkanPada: null }),
+  );
+  eq(
+    "yang sudah diterapkan tidak",
+    false,
+    bolehPeriksaUlang({ status: "lunas", diterapkanPada: "2026-08-31T00:00:00.000Z" }),
+  );
+  eq(
+    "yang gagal tidak",
+    false,
+    bolehPeriksaUlang({ status: "gagal", diterapkanPada: null }),
+  );
+  eq(
+    "yang dikembalikan tidak",
+    false,
+    bolehPeriksaUlang({ status: "dikembalikan", diterapkanPada: null }),
+  );
+
+  const route = readFileSync("src/app/api/admin/pembayaran/route.ts", "utf8");
+  eq("route pembayaran butuh admin", true, route.includes("requireAdmin(req)"));
+  eq("route pembayaran menulis jejak", true, route.includes("catatJejak("));
+  // Tidak boleh ada jalan di layar ini untuk menandai lunas sesuatu yang tidak
+  // dibayar. Yang diterapkan harus jawaban Midtrans, bukan isi permintaan.
+  eq("status tidak diterima dari klien", false, /body\.status|\{\s*status\s*\}\s*=\s*await req/.test(route));
+  eq("status ditanyakan ke Midtrans", true, route.includes("ambilStatusTransaksi("));
+  eq("penerapannya lewat fungsi bersama", true, route.includes("terapkanPembayaran("));
 }
 
 console.log(fail === 0 ? "✓ admin: semua lolos" : `✗ admin: ${fail} gagal`);

@@ -2,8 +2,9 @@
 
 # Hari Baik
 
-Kalender siklus personal Bali, dijual sebagai langganan. Pemiliknya Agus
-Yulyastrawan, Seawise Studio. Live di https://haribaik.seawise.id
+Kalender siklus personal, dijual sebagai langganan. Pemiliknya Agus
+Yulyastrawan. Dikembangkan Seawise Studio, dioperasikan Mayaloka Digital.
+Live di https://haribaik.seawise.id
 
 Next.js App Router, Tailwind v4, Firebase (Auth + Firestore), deploy lewat
 Vercel dari GitHub `seawisecc/hari-baik`, cabang `main`.
@@ -21,7 +22,7 @@ halaman pakai `|`. Ini permintaan tegas pemilik: em dash membuat produknya
 terlihat tidak profesional. Sebelum menerbitkan dokumen panjang, periksa
 dengan grep.
 
-**`npm run verify` sebelum push.** Merangkai lint, empat belas suite tes, build,
+**`npm run verify` sebelum push.** Merangkai lint, lima belas suite tes, build,
 dan uji asap route API di build produksi asli. Perintah ini lahir dari
 kejadian nyata, lihat "Yang pernah menggigit" di bawah.
 
@@ -38,8 +39,9 @@ halamannya dan periksa DOM-nya.
 | Perintah               | Guna                                               |
 | ---------------------- | -------------------------------------------------- |
 | `npm run verify`       | Gerbang sebelum push: lint, tes, build, uji asap   |
-| `npm test`             | Empat belas suite tes                              |
-| `npm run smoke`        | Tembak kesepuluh route API di build produksi asli  |
+| `npm test`             | Lima belas suite tes                               |
+| `npm run smoke`        | Tembak ketiga belas route API di build produksi asli |
+| `npm run akun-uji`     | Buat atau kunci ulang akun uji pembayaran          |
 | `npm run deploy-rules` | Terapkan `firestore.rules`                         |
 | `npm run set-admin`    | Beri custom claim admin                            |
 | `npm run protection`   | Nyalakan atau matikan Vercel Deployment Protection |
@@ -356,6 +358,127 @@ dengan home indicator. Terukur di WebKit: `padding-bottom` bilah terkomputasi
 menyebut, jadi `viewport.test.ts` yang menahannya: selama ada yang memakai
 `env(safe-area-inset-*)`, `viewportFit: "cover"` wajib ada.
 
+**Teks publik menyebut sistemnya, bukan sukunya.** Halaman depan, metadata,
+manifest, dan label kalender dulu berbunyi "kalender Bali", "Wariga Bali",
+"Primbon Jawa", "hari raya Hindu", dan "aksara Bali". Hitungannya sendiri
+memang berasal dari sana dan itu tidak disembunyikan, tapi judul yang menyebut
+satu suku membuat pembaca dari daerah lain menyimpulkan aplikasinya bukan
+untuk mereka sebelum sempat melihat isinya, padahal angkanya sama untuk siapa
+pun. Sekarang: "kalender wariga", "Wariga", "Primbon", "hari raya", "nilai
+aksara", dan purnama/tilem disebut "bulan purnama" dan "bulan baru". Kutipan
+testimoni TIDAK ikut diubah: itu kata orangnya, bukan teks kita.
+
+**Pembayaran punya dua jalur, dan keduanya harus tetap hidup.** Midtrans Snap
+untuk yang mau langsung masuk, transfer manual untuk yang sudah terbiasa
+mengabari admin. Kalau `MIDTRANS_SERVER_KEY` dan
+`NEXT_PUBLIC_MIDTRANS_CLIENT_KEY` kosong, tombol gateway tidak dirender dan
+route-nya menjawab 503; jalur manual berjalan persis seperti sebelumnya.
+Sandbox atau produksi dibaca dari awalan kunci (`SB-`), bukan dari saklar
+tersendiri yang bisa berbeda dari kuncinya. Kunci server dan kunci klien dari
+lingkungan berbeda ditolak di `konfigurasiMidtrans()`, karena gejalanya di
+layar cuma "transaksi tidak ditemukan" yang tidak menunjuk ke mana pun.
+
+**Pesanan gateway tinggal di koleksi `pembayaran`, bukan `aktivasi`.** Koleksi
+`aktivasi` adalah antrean kerja admin: yang berstatus "menunggu" di sana
+menunggu orang memeriksanya. Pesanan Midtrans yang dibuat lalu ditinggalkan
+bukan itu, dan kalau ikut masuk akan menumpuk sebagai pekerjaan palsu yang
+tidak pernah bisa diselesaikan. Begitu lunas, barulah dokumen `aktivasi`
+ditulis, sudah berstatus disetujui dengan `diputuskanOleh: "midtrans"`, supaya
+catatan uang semua pelanggan tetap berkumpul di satu koleksi.
+
+**Nonaktifkan harus ikut mengakhiri masa coba.** Aksi `deactivate` dulu hanya
+menyetel `subscriptionStatus` ke "expired" dan mengosongkan
+`subscriptionExpiresAt`, sementara `trialEndsAt` dibiarkan. Untuk siapa pun
+yang masa cobanya belum lewat, itu tidak mencabut apa pun: `evaluateAccess()`
+membaca `trialEndsAt` tanpa peduli status, jadi orangnya tetap bisa membuka
+seluruh aplikasi dan yang berubah cuma lencana di panel admin. Yang membuatnya
+ketahuan bukan aksesnya, melainkan tombol hapus yang menolak bekerja dengan
+alasan "aksesnya masih berjalan" pada akun yang jelas-jelas tertulis Expired,
+dan menekan Nonaktifkan sekali lagi tidak mengubah apa pun. Sekarang lewat
+`trialDiakhiri()`, yang hanya memajukan tanggal yang masih di masa depan;
+yang sudah lewat dibiarkan supaya riwayatnya tidak ditulis ulang. Tanggal
+lamanya masuk jejak audit, jadi salah pencet masih bisa dikembalikan.
+
+**Panel kelola dirender dua kali, jadi id kolom isian wajib dari `useId()`.**
+`UserTable` merender kartu ponsel DAN tabel layar lebar sekaligus; yang
+menyembunyikan salah satunya cuma CSS, jadi keduanya ada di DOM. Id yang
+ditulis sendiri jadi kembar, dan tiap label menunjuk elemen PERTAMA yang
+ber-id itu, yaitu salinan kartu ponsel yang `display: none`. Elemen
+ber-display none tidak bisa menerima fokus, jadi di laptop menekan label tidak
+memfokuskan apa pun dan yang diketik tidak masuk ke mana-mana. Gejalanya
+persis seperti fitur yang mati: tombol hapus tidak pernah menyala karena kolom
+konfirmasinya tetap kosong, sementara di ponsel semuanya normal. Terukur di
+peramban pada lebar 1680: fokus mendarat di BODY. Tiga kolom kena sekaligus
+(tanggal habis, tanggal lahir, konfirmasi hapus) dan hanya satu yang
+dilaporkan. Ditahan `admin.test.ts`.
+
+**Tab Pembayaran menampilkan jawaban Midtrans, bukan kehendak admin.** Tombol
+"periksa ulang" menanyakan status ke Midtrans lalu menerapkannya lewat
+`terapkanPembayaran()`, fungsi yang sama dengan webhook. Tidak ada jalan di
+layar itu untuk menandai lunas sesuatu yang tidak dibayar; admin yang memang
+ingin memberi akses gratis memakai pengatur langganan di daftar pengguna, dan
+itu tercatat atas namanya sendiri, bukan atas nama Midtrans. Pesanan sandbox
+diberi penanda mode supaya hasil percobaan tidak terbaca sebagai uang masuk.
+
+**URL notifikasi didaftarkan di Settings, Payment, bukan Settings,
+Configuration.** Midtrans memindahkan seluruh kolom notifikasi (Payment
+Notification URL, Recurring, Account Linking) ke halaman Settings, Payment,
+dan halaman Configuration yang disebut hampir semua panduan yang beredar,
+termasuk sebagian dokumentasi resmi mereka sendiri, sudah tidak ada. Yang
+mencarinya akan menelusuri menu yang tidak akan pernah ditemukan. Sandbox dan
+produksi juga punya dashboard terpisah (`dashboard.sandbox.midtrans.com` dan
+`dashboard.midtrans.com`) yang pengaturannya tidak saling menyalin: URL yang
+didaftarkan di satu sisi tidak berlaku di sisi lain.
+
+**Notifikasi Midtrans dipercaya karena tanda tangannya, bukan karena isinya.**
+Route `/api/bayar/notifikasi` terbuka untuk umum, dan memang harus: yang
+memanggilnya server Midtrans, bukan peramban, jadi tidak ada token Firebase
+yang bisa diminta. Penggantinya sha512 dari `order_id + status_code +
+gross_amount + server_key`. Tanpa pemeriksaan itu, satu POST berisi
+`{"order_id":"...","transaction_status":"settlement"}` cukup untuk memberi
+diri sendiri langganan tiga tahun gratis. Rumusnya dikunci di
+`midtrans.test.ts` terhadap nilai acuan yang dihitung terpisah, jadi urutan
+penggabungannya pun ikut terjaga. `gross_amount` dipakai apa adanya berikut
+dua desimalnya ("150000.00"); membulatkannya membuat setiap pembayaran yang
+benar-benar lunas ditolak sebagai palsu.
+
+**`capture` bukan berarti lunas.** Untuk kartu kredit, Midtrans menahan
+transaksi mencurigakan dengan `fraud_status: "challenge"`: uangnya belum tentu
+jadi milik kita. Yang dibaca lunas hanya `settlement` dan `capture` yang
+`accept`. Status yang belum dikenal jatuh ke `gagal`, bukan ke lunas: menebak
+ke arah membuka akses adalah arah tebakan yang salah.
+
+**Penerapan pembayaran dibungkus satu transaksi dan hanya boleh sekali.**
+`terapkanPembayaran()` di `src/lib/pembayaran-server.ts` menulis
+`diterapkanPada` di dalam transaksi yang sama dengan perpanjangan
+langganannya, jadi tidak ada celah di antara "sudah diperpanjang" dan "sudah
+ditandai". Midtrans memang mengirim ulang notifikasi yang sama sampai dijawab
+200, dan halaman pembayaran ikut bertanya sendiri; tanpa penjaga ini satu kali
+bayar bisa memperpanjang langganan dua kali.
+
+**Halaman pembayaran ikut bertanya sendiri, tidak cuma menunggu webhook.**
+Notifikasi bisa tidak sampai (URL belum didaftarkan di dashboard, deploy
+sedang berganti), dan yang menanggung akibatnya orang yang uangnya sudah
+keluar tapi aplikasinya masih terkunci. Karena itu `GET /api/bayar?orderId=`
+menanyakan statusnya langsung ke Midtrans lalu menerapkannya lewat fungsi yang
+sama dengan webhook. Dua jalur, satu kesimpulan.
+
+**Pindah ke aplikasi menunggu `canView`, bukan jawaban server.** Langganan
+memang sudah dinyalakan di Firestore sebelum jawaban "lunas" dikirim, tapi
+profil di layar datang lewat onSnapshot yang tiba beberapa saat kemudian.
+Pindah lebih dulu membuat penjaga akses melihat akses yang belum hidup lalu
+memantulkan pengguna kembali ke halaman terkunci, tanpa keterangan apa pun,
+tepat setelah dia membayar.
+
+**CSP harus mengizinkan host Midtrans di empat arahan.** `script-src` untuk
+snap.js, `frame-src` untuk jendela pembayarannya (dan iframe bank 3DS di
+dalamnya), `connect-src` untuk permintaan yang dilakukannya, `img-src` untuk
+logo bank dan e-wallet. `Permissions-Policy` juga melepas `payment` untuk
+halaman sendiri dan iframe Midtrans. Sama seperti apis.google.com pada masuk
+dengan Google: skrip yang ditolak CSP gagal tanpa satu pun permintaan
+jaringan, jadi yang terlihat cuma tombol yang tidak membuka apa-apa.
+`midtrans.test.ts` menahannya.
+
 ## Yang pernah menggigit
 
 **`next dev` bukan produksi.** Route API lolos semua di dev lalu balas 500 di
@@ -418,6 +541,15 @@ yang pasti, bukan setelah "impor terakhir".
   atas.
 - **Pengingat WhatsApp dibuang** dari katalog, butuh layanan pengirim pesan
   dan penjadwal di luar aplikasi ini.
+- **Pengembalian dana Midtrans belum ditangani otomatis.** `refund`,
+  `partial_refund`, dan `chargeback` dicatat sebagai `dikembalikan` di dokumen
+  pembayaran, tapi langganan yang sudah menyala tidak dicabut. Itu disengaja:
+  aksesnya mungkin sudah dipakai, dan keputusannya milik orang, bukan
+  otomatis. Yang belum ada cara memberi tahu admin bahwa itu terjadi.
+- **Pesanan yang ditinggalkan tidak pernah dibersihkan.** Dokumen
+  `pembayaran` berstatus menunggu menumpuk selamanya. Transaksinya sendiri
+  kedaluwarsa 24 jam di sisi Midtrans, jadi tidak ada yang bisa dibayar
+  belakangan; yang menumpuk cuma dokumennya.
 
 ## Struktur singkat
 
@@ -429,6 +561,11 @@ src/lib/gate.ts        semua keputusan akses, fungsi murni, ada tesnya
 src/lib/addon-registry add-on mana yang fiturnya sudah ada
 src/lib/harga-server   satu pintu baca harga di server
 src/lib/audit.ts       jejak audit, ditulis semua route admin yang mengubah data
+src/lib/midtrans.ts    murni: tanda tangan, terjemahan status, order id
+src/lib/midtrans-server  yang memegang kunci server, server-only
+src/lib/pembayaran-server  satu pintu mengubah pembayaran jadi langganan
+src/lib/admin-pembayaran  pencarian dan penyaringan pesanan, fungsi murni
+scripts/akun-uji.ts    akun uji pembayaran, bisa dikunci ulang
 src/app/api/           route admin selalu requireAdmin, harga dihitung server
 docs/email/            template email Firebase dan batasnya
 ```
