@@ -113,8 +113,10 @@ export interface Aktivasi {
 
   /** Salinan dari daftar harga saat permintaan dibuat. Harga bisa berubah
    *  nanti; yang mengikat adalah yang dilihat pengguna waktu itu. */
-  paketId: string;
+  /** null bila pesanannya add-on saja, tanpa perpanjangan langganan. */
+  paketId: string | null;
   paketNama: string;
+  /** 0 berarti tidak memperpanjang apa pun. */
   paketTahun: number;
   harga: number;
   addOn: { id: string; nama: string; harga: number }[];
@@ -153,8 +155,16 @@ export interface Pembayaran {
   nama: string;
   phoneNumber: string | null;
 
-  /** Salinan harga saat pesanan dibuat, sama seperti pada Aktivasi. */
-  paketId: string;
+  /**
+   * Salinan harga saat pesanan dibuat, sama seperti pada Aktivasi.
+   *
+   * `paketId` null dan `paketTahun` 0 berarti pesanan ini isinya add-on saja,
+   * tanpa perpanjangan langganan. Dibedakan lewat angka, bukan lewat penanda
+   * tersendiri, supaya tidak ada dua sumber kebenaran yang bisa berbeda:
+   * penerapannya memang memperpanjang sebanyak `paketTahun` tahun, dan nol
+   * tahun berarti tidak memperpanjang apa pun.
+   */
+  paketId: string | null;
   paketNama: string;
   paketTahun: number;
   harga: number;

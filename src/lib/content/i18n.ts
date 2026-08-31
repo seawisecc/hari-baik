@@ -413,6 +413,30 @@ const dict = {
     "bayar.aman": "Diproses Midtrans, berizin dan diawasi Bank Indonesia.",
     "bayar.atauTransfer": "atau transfer manual",
     "bayar.atauLangsung": "Tidak ingin menunggu admin? Bayar langsung di sini.",
+    "tk.memeriksa.title": "Memeriksa pembayaranmu",
+    "tk.memeriksa.desc": "Sebentar, kami sedang memastikan dananya sudah masuk.",
+    "tk.lunas.title": "Terima kasih, pembayaranmu diterima",
+    "tk.lunas.desc": "Langgananmu sudah aktif dan semua fiturnya terbuka sekarang.",
+    "tk.tertunda.title": "Pembayaranmu sedang diproses",
+    "tk.tertunda.desc":
+      "Kalau kamu membayar lewat virtual account atau QRIS, dananya biasanya masuk dalam beberapa menit. Akunmu terbuka sendiri begitu itu terjadi, tidak perlu membayar lagi.",
+    "tk.gagal.title": "Pembayaran tidak selesai",
+    "tk.gagal.desc":
+      "Tidak ada dana yang terpotong. Kamu bisa mencobanya lagi dari halaman langganan.",
+    "tk.tanpaPesanan.title": "Pesanan tidak ditemukan",
+    "tk.tanpaPesanan.desc":
+      "Alamat halaman ini tidak menyebut pesanan mana pun, atau pesanannya bukan milik akun ini.",
+    "tk.item": "Dibeli",
+    "tk.addon": "Tambahan",
+    "tk.buka": "Buka aplikasi",
+    "tk.kembali": "Kembali ke halaman langganan",
+    "addon.buy.title": "Tambah fitur",
+    "addon.buy.desc":
+      "Buka fitur tambahan tanpa perlu memperpanjang langganan. Sekali bayar, langsung terpakai.",
+    "addon.buy.note":
+      "Yang ditambahkan hanya fiturnya. Masa berlaku langgananmu tidak berubah.",
+    "addon.buy.needPro":
+      "Fitur tambahan hanya bisa dibeli kalau langgananmu sedang aktif. Aktifkan langganan dulu, lalu tambahan bisa dipilih dari sini kapan saja.",
     "req.iPaid": "Saya sudah bayar",
     "req.sending": "Mengirim…",
     "req.pickFirst": "Pilih paket dulu di atas.",
@@ -1097,6 +1121,28 @@ const dict = {
     "bayar.aman": "Processed by Midtrans, licensed and supervised by Bank Indonesia.",
     "bayar.atauTransfer": "or pay by bank transfer",
     "bayar.atauLangsung": "Rather not wait for the admin? Pay directly here.",
+    "tk.memeriksa.title": "Checking your payment",
+    "tk.memeriksa.desc": "One moment, we are confirming the money has arrived.",
+    "tk.lunas.title": "Thank you, your payment came through",
+    "tk.lunas.desc": "Your subscription is active and every feature is open now.",
+    "tk.tertunda.title": "Your payment is being processed",
+    "tk.tertunda.desc":
+      "Bank transfers and QRIS usually settle within a few minutes. Your account opens by itself once that happens, with nothing more to pay.",
+    "tk.gagal.title": "The payment did not go through",
+    "tk.gagal.desc": "Nothing was charged. You can try again from the subscription page.",
+    "tk.tanpaPesanan.title": "Order not found",
+    "tk.tanpaPesanan.desc":
+      "This page address does not name an order, or the order does not belong to this account.",
+    "tk.item": "Purchased",
+    "tk.addon": "Add-ons",
+    "tk.buka": "Open the app",
+    "tk.kembali": "Back to the subscription page",
+    "addon.buy.title": "Add a feature",
+    "addon.buy.desc":
+      "Open extra features without renewing your subscription. Pay once, use it right away.",
+    "addon.buy.note": "This adds the feature only. Your subscription end date does not change.",
+    "addon.buy.needPro":
+      "Extra features can only be bought while your subscription is active. Activate it first, then pick add-ons here whenever you like.",
     "req.iPaid": "I have paid",
     "req.sending": "Sending…",
     "req.pickFirst": "Choose a plan above first.",

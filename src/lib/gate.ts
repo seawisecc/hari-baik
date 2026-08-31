@@ -13,7 +13,21 @@ export const RUTE_PUBLIK = new Set(["/", "/login", "/register", "/lupa-sandi", "
  * dibuka justru ketika pemeriksaannya gagal, kalau tidak akan terjadi
  * lingkaran pengalihan tanpa akhir.
  */
-export const RUTE_TUJUAN = new Set(["/verify-email", "/onboarding", "/expired"]);
+export const RUTE_TUJUAN = new Set([
+  "/verify-email",
+  "/onboarding",
+  "/expired",
+  /*
+   * Halaman terima kasih wajib ada di sini.
+   *
+   * Yang membukanya baru saja membayar, dan pada metode yang penyelesaiannya
+   * lewat bank (virtual account, QRIS) aksesnya BELUM hidup saat dia mendarat.
+   * Tanpa pengecualian ini gerbang memantulkannya ke /expired, yaitu halaman
+   * yang berbunyi "aksesmu habis", persis pada detik dia paling butuh
+   * kepastian bahwa uangnya sampai.
+   */
+  "/terima-kasih",
+]);
 
 /**
  * Rute yang butuh langganan aktif, beserta teks layar kuncinya.

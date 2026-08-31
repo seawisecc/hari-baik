@@ -2,7 +2,7 @@
 
 import { Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AjukanAktivasi } from "@/components/AjukanAktivasi";
 import { MIDTRANS_AKTIF } from "@/components/BayarMidtrans";
 import { DaftarHarga } from "@/components/DaftarHarga";
@@ -27,9 +27,9 @@ function paketAwal(harga: PengaturanHarga): PaketLangganan | null {
 export function ExpiredClient({ harga }: { harga: PengaturanHarga }) {
   const t = useT();
   const router = useRouter();
-  const { profile, access, logout } = useAuth();
+  const { profile, logout } = useAuth();
   const [paket, setPaket] = useState<PaketLangganan | null>(() => paketAwal(harga));
-  const [lunas, setLunas] = useState(false);
+
 
   // Langkah "cara berlangganan" di bawah menjelaskan alur transfer manual,
   // jadi ia ikut hilang ketika jalur itu tidak ditawarkan. Petunjuk yang
@@ -43,21 +43,20 @@ export function ExpiredClient({ harga }: { harga: PengaturanHarga }) {
   const menunggu = profile?.subscriptionStatus === "pending";
 
   /*
-   * Setelah lunas, pindah baru dilakukan ketika aksesnya benar-benar terlihat
-   * hidup di layar ini, bukan seketika server menjawab.
+   * Setelah lunas, orangnya dibawa ke halaman terima kasih, bukan langsung ke
+   * aplikasi.
    *
-   * Langganannya memang sudah dinyalakan di Firestore sebelum jawabannya
-   * dikirim, tapi profil di halaman ini datang lewat onSnapshot yang tiba
-   * beberapa saat kemudian. Pindah selagi profil di memori masih yang lama
-   * membuat penjaga akses melihat akses yang belum hidup lalu memantulkannya
-   * kembali ke halaman ini, tanpa keterangan apa pun, tepat setelah orangnya
-   * membayar. Menunggu `canView` berarti pindahnya terjadi persis sekali,
-   * pada saat yang benar, dan selama menunggu pengguna melihat kabar
-   * lunasnya, bukan layar yang diam.
+   * Bukan sekadar basa-basi. Halaman itu terdaftar di RUTE_TUJUAN, jadi ia
+   * bisa dibuka walau akses belum hidup, dan ia memeriksa sendiri status
+   * pesanannya. Membawa orangnya langsung ke /hari-ini berarti bertaruh pada
+   * profil di memori yang datang lewat onSnapshot dan tiba beberapa saat
+   * kemudian: kalau gerbang sempat memeriksa sebelum itu, ia memantulkannya
+   * kembali ke halaman terkunci ini tanpa keterangan apa pun, persis setelah
+   * orangnya membayar.
    */
-  useEffect(() => {
-    if (lunas && access.canView) router.replace("/hari-ini");
-  }, [lunas, access.canView, router]);
+  const keTerimaKasih = (orderId: string) => {
+    router.replace(`/terima-kasih?bayar=${encodeURIComponent(orderId)}`);
+  };
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col justify-center px-6 py-14">
@@ -107,7 +106,7 @@ export function ExpiredClient({ harga }: { harga: PengaturanHarga }) {
               addOnTersedia={harga.addOn.filter((a) => a.aktif)}
               sudahMenunggu={menunggu}
               transferManual={harga.transferManual}
-              onLunas={() => setLunas(true)}
+              onLunas={keTerimaKasih}
             />
           </div>
         </CardBody>

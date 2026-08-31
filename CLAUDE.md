@@ -386,6 +386,33 @@ tidak pernah bisa diselesaikan. Begitu lunas, barulah dokumen `aktivasi`
 ditulis, sudah berstatus disetujui dengan `diputuskanOleh: "midtrans"`, supaya
 catatan uang semua pelanggan tetap berkumpul di satu koleksi.
 
+**Pembayaran punya dua bentuk pesanan, dibedakan `paketTahun`.** Dengan paket
+berarti berlangganan atau memperpanjang. Tanpa paket (`paketId` null,
+`paketTahun` 0) berarti pelanggan menambah add-on di tengah masa langganan.
+Nol tahun tidak boleh lolos ke `extendYears()`: hasilnya tanggal habis ditulis
+ulang DAN status disetel "active", jadi pemegang langganan seumur hidup yang
+membeli satu add-on turun jadi pelanggan tahunan. `hanyaAddOn` di
+`pembayaran-server.ts` yang menahannya, dan ia harus tetap diturunkan dari
+`paketTahun`, bukan ditulis sebagai nilai tetap.
+
+**Add-on hanya dijual ke langganan berbayar yang hidup.** `alasanTolakAddOn()`
+memeriksa `evaluateAccess().isPro`, bukan `canView`. Yang masa cobanya masih
+berjalan punya akses, tapi add-on tidak akan bisa dibuka begitu trialnya habis
+beberapa hari lagi, dan yang membelinya tidak akan menyangka itu yang dia
+beli. Yang sudah dimiliki ikut disaring `addOnBelumDimiliki()` supaya menekan
+tombol dua kali tidak jadi membayar dua kali untuk barang yang sama. Aturannya
+dipakai layar profil dan route `/api/bayar` sekaligus.
+
+**Setelah membayar, orangnya mendarat di `/terima-kasih`, bukan `/hari-ini`.**
+Sebagian metode (e-wallet, kartu dengan 3DS) meninggalkan aplikasi ini
+sepenuhnya, dan `finish` URL dulu menunjuk balik ke `/expired`: orang yang baru
+saja membayar mendarat di layar yang berbunyi "aksesmu habis", lalu
+menyimpulkan uangnya hilang. Halaman itu juga tempat yang benar untuk keadaan
+menggantung, karena virtual account dan QRIS baru masuk beberapa menit
+kemudian. Ia WAJIB ada di `RUTE_TUJUAN` dan `RUTE_TELANJANG` sekaligus: tanpa
+yang pertama, gerbang memantulkan orang yang aksesnya belum hidup kembali ke
+`/expired`, tepat pada detik dia paling butuh kepastian.
+
 **Halaman langganan tidak boleh pernah kehabisan cara membayar.**
 `transferManual` di pengaturan harga mematikan jalur transfer manual setelah
 gateway berjalan, supaya antrean konfirmasi admin berhenti terisi. Tapi ada

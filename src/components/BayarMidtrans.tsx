@@ -90,7 +90,7 @@ export function BayarMidtrans({
   paketId: string | null;
   addOnIds: string[];
   /** Dipanggil sekali begitu pembayaran terbukti lunas di sisi server. */
-  onLunas: () => void;
+  onLunas: (orderId: string) => void;
 }) {
   const t = useT();
   const [keadaan, setKeadaan] = useState<Keadaan>("diam");
@@ -141,7 +141,7 @@ export function BayarMidtrans({
 
         if (status === "lunas") {
           setKeadaan("lunas");
-          onLunas();
+          onLunas(orderId);
           return;
         }
         if (status === "gagal") {
@@ -194,8 +194,18 @@ export function BayarMidtrans({
 
   if (!MIDTRANS_AKTIF) return null;
 
+  /*
+   * Ada yang bisa dibeli kalau ada paket, ATAU ada add-on.
+   *
+   * Dua bentuk pesanan lewat tombol yang sama: berlangganan (paket, add-on
+   * opsional) dan menambah add-on di tengah masa langganan (tanpa paket).
+   * Syarat lamanya cuma "harus ada paket", dan itu membuat tombol di halaman
+   * profil mati selamanya: di sana paketId memang selalu null.
+   */
+  const adaYangDibeli = Boolean(paketId) || addOnIds.length > 0;
+
   const bayar = async () => {
-    if (!paketId) return;
+    if (!adaYangDibeli) return;
     setError(null);
     setKeadaan("menyiapkan");
     try {
@@ -240,7 +250,7 @@ export function BayarMidtrans({
       {keadaan === "lunas" && <Alert tone="success">{t("bayar.lunas")}</Alert>}
       {keadaan === "tertunda" && <Alert tone="warning">{t("bayar.tertunda")}</Alert>}
 
-      <Button block size="lg" disabled={sibuk || !paketId} onClick={bayar}>
+      <Button block size="lg" disabled={sibuk || !adaYangDibeli} onClick={bayar}>
         <CreditCard className="h-4 w-4" aria-hidden />
         {keadaan === "menyiapkan" || keadaan === "membayar"
           ? t("bayar.menyiapkan")

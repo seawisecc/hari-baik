@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { adminAuth, adminDb } from "@/lib/firebase/admin";
 import { bacaHarga } from "@/lib/harga-server";
+import { addOnBelumDimiliki, alasanTolakAddOn, NAMA_PESANAN_ADDON } from "@/lib/addon-beli";
 import { buatOrderId, orderIdValid, rincianItem, totalItem } from "@/lib/midtrans";
 import {
   ambilStatusTransaksi,
@@ -54,16 +55,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const body = (await req.json()) as { paketId?: string; addOnIds?: string[] };
+    const body = (await req.json()) as { paketId?: string | null; addOnIds?: string[] };
 
     const harga = await bacaHarga();
-    const paket = harga.paket.find((p) => p.id === body.paketId && p.aktif);
-    if (!paket) return Response.json({ error: "Paket tidak ditemukan." }, { status: 400 });
-
     const idAddOn = Array.isArray(body.addOnIds) ? body.addOnIds : [];
-    const addOn = harga.addOn
-      .filter((a) => a.aktif && idAddOn.includes(a.id))
-      .map((a) => ({ id: a.id, nama: a.nama.id, harga: a.harga }));
 
     const db = adminDb();
     const userRef = db.collection("users").doc(decoded.uid);
@@ -72,7 +67,54 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: "Profil tidak ditemukan." }, { status: 404 });
     const user = userSnap.data() as UserProfile;
 
-    const items = rincianItem({ id: paket.id, nama: paket.nama.id, harga: paket.harga }, addOn);
+    /*
+     * Dua bentuk pesanan, satu route.
+     *
+     * Dengan paket: berlangganan atau memperpanjang, add-on ikut kalau
+     * dipilih. Tanpa paket: pelanggan yang langganannya sudah berjalan
+     * menambah add-on di tengah jalan, tanpa harus membeli setahun lagi
+     * yang belum dia butuhkan.
+     */
+    const paket = body.paketId
+      ? harga.paket.find((p) => p.id === body.paketId && p.aktif)
+      : null;
+    if (body.paketId && !paket) {
+      return Response.json({ error: "Paket tidak ditemukan." }, { status: 400 });
+    }
+
+    // Yang sudah dimiliki tidak ditagih lagi. Tanpa ini, pelanggan yang
+    // menekan tombol dua kali membayar dua kali untuk barang yang sama, dan
+    // yang kedua tidak menambah apa pun ke akunnya.
+    const idBaru = paket ? idAddOn : addOnBelumDimiliki(idAddOn, user.addOn);
+
+    if (!paket) {
+      const tolak = alasanTolakAddOn(user, idBaru, harga.addOn);
+      if (tolak) {
+        const pesan: Record<string, string> = {
+          kosong: "Pilih dulu add-on yang mau ditambahkan.",
+          "tidak-dijual": "Add-on itu sedang tidak dijual.",
+          "sudah-punya": "Add-on itu sudah kamu miliki.",
+          "tanpa-langganan":
+            "Add-on hanya bisa ditambahkan kalau langgananmu sedang aktif. Aktifkan langganan dulu.",
+        };
+        return Response.json({ error: pesan[tolak], tolak }, { status: 409 });
+      }
+    }
+
+    const addOn = harga.addOn
+      .filter((a) => a.aktif && idBaru.includes(a.id))
+      .map((a) => ({ id: a.id, nama: a.nama.id, harga: a.harga }));
+
+    // Rincian dirakit dari daftar yang sama dengan totalnya, jadi keduanya
+    // tidak bisa berbeda. Tanpa paket, barisnya cuma add-on.
+    const items = paket
+      ? rincianItem({ id: paket.id, nama: paket.nama.id, harga: paket.harga }, addOn)
+      : addOn.map((a) => ({
+          id: a.id,
+          price: a.harga,
+          quantity: 1,
+          name: a.nama.slice(0, 50),
+        }));
     const total = totalItem(items);
 
     const orderId = buatOrderId(
@@ -87,10 +129,10 @@ export async function POST(req: NextRequest) {
       email: user.email ?? decoded.email ?? "",
       nama: user.nama ?? "",
       phoneNumber: user.phoneNumber ?? null,
-      paketId: paket.id,
-      paketNama: paket.nama.id,
-      paketTahun: paket.tahun,
-      harga: paket.harga,
+      paketId: paket?.id ?? null,
+      paketNama: paket?.nama.id ?? NAMA_PESANAN_ADDON,
+      paketTahun: paket?.tahun ?? 0,
+      harga: paket?.harga ?? 0,
       addOn,
       total,
       status: "menunggu",
@@ -118,7 +160,11 @@ export async function POST(req: NextRequest) {
       nama: doc.nama,
       email: doc.email,
       phoneNumber: doc.phoneNumber,
-      urlSelesai: `${req.nextUrl.origin}/expired?bayar=${encodeURIComponent(orderId)}`,
+      // Dipulangkan ke halaman terima kasih, bukan ke halaman terkunci.
+      // Sebagian metode (e-wallet, kartu dengan 3DS) meninggalkan halaman ini
+      // sepenuhnya, dan sebelum ini mereka kembali ke /expired: orang yang
+      // baru saja membayar mendarat di layar yang berbunyi "aksesmu habis".
+      urlSelesai: `${req.nextUrl.origin}/terima-kasih?bayar=${encodeURIComponent(orderId)}`,
     });
 
     return Response.json({
@@ -166,20 +212,36 @@ export async function GET(req: NextRequest) {
       return Response.json({ error: "Pesanan tidak ditemukan." }, { status: 404 });
     }
 
+    // Rincian ikut dikirim supaya halaman terima kasih bisa menyebutkan apa
+    // yang barusan dibeli, bukan cuma "berhasil". Yang baru membayar ingin
+    // melihat kembali apa yang dia bayar, dan itu juga yang membuatnya sadar
+    // lebih awal kalau ternyata salah pilih.
+    const rincian = {
+      paketNama: bayar.paketNama,
+      paketTahun: bayar.paketTahun,
+      addOn: bayar.addOn.map((a) => a.nama),
+      total: bayar.total,
+    };
+
     if (bayar.diterapkanPada) {
-      return Response.json({ ok: true, status: bayar.status, sudahDiterapkan: true });
+      return Response.json({
+        ok: true,
+        status: bayar.status,
+        sudahDiterapkan: true,
+        ...rincian,
+      });
     }
 
     const cfg = konfigurasiMidtrans();
-    if (!cfg) return Response.json({ ok: true, status: bayar.status });
+    if (!cfg) return Response.json({ ok: true, status: bayar.status, ...rincian });
 
     const notif = await ambilStatusTransaksi(cfg, orderId);
     // Belum ada transaksi di sisi Midtrans, yaitu jendela Snap dibuka lalu
     // ditutup tanpa memilih cara bayar. Statusnya tetap menunggu.
-    if (!notif) return Response.json({ ok: true, status: bayar.status });
+    if (!notif) return Response.json({ ok: true, status: bayar.status, ...rincian });
 
     const hasil = await terapkanPembayaran(orderId, notif, req);
-    return Response.json({ ok: true, status: hasil.status, baru: hasil.baru });
+    return Response.json({ ok: true, status: hasil.status, baru: hasil.baru, ...rincian });
   } catch (err) {
     if (err instanceof PembayaranTidakDitemukan) {
       return Response.json({ error: "Pesanan tidak ditemukan." }, { status: 404 });

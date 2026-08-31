@@ -43,7 +43,7 @@ export function AjukanAktivasi({
   /** Dari pengaturan admin. Bisa ditolak jalurBayar() kalau gateway mati. */
   transferManual: boolean;
   /** Dipanggil saat pembayaran gateway terbukti lunas di sisi server. */
-  onLunas: () => void;
+  onLunas: (orderId: string) => void;
 }) {
   const t = useT();
   const { lang } = useLang();

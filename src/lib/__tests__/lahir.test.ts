@@ -123,7 +123,21 @@ const baca = (f: string) => readFileSync(f, "utf8");
 
 // ── Halaman profil tidak lagi menawarkan ubah tanggal lahir ───────────────
 {
-  const isi = baca("src/app/profil/page.tsx");
+  /*
+   * Dibaca seluruh berkas di folder halamannya, bukan page.tsx saja.
+   *
+   * Halaman profil sempat dipecah jadi page.tsx (server, membaca katalog
+   * add-on) dan ProfilClient.tsx (isinya). Pemeriksa yang menunjuk satu nama
+   * berkas langsung merah, dan yang lebih berbahaya: kalau kalimatnya
+   * kebetulan pindah ke berkas lain tanpa page.tsx ikut berubah, pemeriksanya
+   * akan tetap hijau sambil tidak memeriksa apa pun.
+   */
+  const isi = readdirSync("src/app/profil")
+    .filter((n) => n.endsWith(".tsx"))
+    .map((n) => baca(join("src/app/profil", n)))
+    .join("\n");
+
+  eq("ada berkas halaman profil", true, isi.length > 0);
   eq("profil tidak menulis profil dari klien", false, isi.includes("perbaruiProfil"));
   eq("profil menjelaskan kuncinya", true, isi.includes("birth.locked"));
 }

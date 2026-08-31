@@ -143,4 +143,7 @@ export const RUTE_TELANJANG = [
   "/onboarding",
   // Terkunci berarti terkunci: jangan tampilkan menu yang tidak bisa dibuka.
   "/expired",
+  // Halaman terima kasih berdiri sendiri: yang membukanya baru saja membayar
+  // dan cuma perlu tahu satu hal, berhasil atau belum.
+  "/terima-kasih",
 ];

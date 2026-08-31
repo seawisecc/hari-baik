@@ -19,6 +19,7 @@ function ringkas(j: { midtrans: boolean; transfer: boolean }): string {
   return ada.join("+") || "buntu";
 }
 import { HARGA_BAWAAN, gabungAddOn, jalurBayar } from "../harga";
+import { addOnBelumDimiliki, alasanTolakAddOn } from "../addon-beli";
 
 let fail = 0;
 const eq = (label: string, expected: unknown, actual: unknown) => {
@@ -243,6 +244,168 @@ for (const id of Object.keys(ADDON_SIAP)) {
     "layar tidak menulis ulang aturannya",
     false,
     /MIDTRANS_AKTIF\s*&&\s*transferManual|transferManual\s*&&\s*MIDTRANS_AKTIF/.test(layar),
+  );
+}
+
+/*
+ * Menambah add-on di tengah masa langganan.
+ *
+ * Sebelumnya tidak ada jalannya: pelanggan yang sudah membayar setahun lalu
+ * ingin satu fitur tambahan harus membeli setahun lagi. Yang dijaga di sini
+ * bukan cuma bahwa jalurnya ada, melainkan bahwa ia tidak menjual barang yang
+ * tidak bisa dipakai pembelinya.
+ */
+{
+  const katalog = HARGA_BAWAAN.addOn;
+  const sekarang = new Date("2026-08-31T00:00:00Z");
+  const setahunLagi = new Date("2027-08-31T00:00:00Z").toISOString();
+  const kemarin = new Date("2026-08-30T00:00:00Z").toISOString();
+
+  const pelanggan = {
+    subscriptionStatus: "active" as const,
+    subscriptionExpiresAt: setahunLagi,
+    trialEndsAt: null,
+    addOn: ["profil-keluarga"],
+  };
+
+  eq(
+    "pelanggan aktif boleh menambah",
+    null,
+    alasanTolakAddOn(pelanggan, ["fengshui-nama"], katalog, sekarang),
+  );
+  eq(
+    "tanpa memilih apa pun ditolak",
+    "kosong",
+    alasanTolakAddOn(pelanggan, [], katalog, sekarang),
+  );
+  eq(
+    "id karangan ditolak",
+    "tidak-dijual",
+    alasanTolakAddOn(pelanggan, ["add-on-hantu"], katalog, sekarang),
+  );
+  // Menekan tombol dua kali tidak boleh jadi membayar dua kali untuk barang
+  // yang sama.
+  eq(
+    "yang sudah dimiliki ditolak",
+    "sudah-punya",
+    alasanTolakAddOn(pelanggan, ["profil-keluarga"], katalog, sekarang),
+  );
+
+  /*
+   * Yang masa cobanya masih berjalan tidak boleh membelinya.
+   *
+   * evaluateAccess() bilang aksesnya hidup, tapi isPro false: add-on hanya
+   * terbuka bagi langganan berbayar. Menjualnya kepada mereka berarti menjual
+   * sesuatu yang berhenti bisa dibuka beberapa hari lagi, dan yang membelinya
+   * tidak akan menyangka itu yang dia beli.
+   */
+  eq(
+    "yang masih trial ditolak",
+    "tanpa-langganan",
+    alasanTolakAddOn(
+      {
+        subscriptionStatus: "trial",
+        subscriptionExpiresAt: null,
+        trialEndsAt: setahunLagi,
+        addOn: [],
+      },
+      ["fengshui-nama"],
+      katalog,
+      sekarang,
+    ),
+  );
+  eq(
+    "yang langganannya sudah lewat ditolak",
+    "tanpa-langganan",
+    alasanTolakAddOn(
+      {
+        subscriptionStatus: "active",
+        subscriptionExpiresAt: kemarin,
+        trialEndsAt: null,
+        addOn: [],
+      },
+      ["fengshui-nama"],
+      katalog,
+      sekarang,
+    ),
+  );
+  eq(
+    "pemegang seumur hidup boleh",
+    null,
+    alasanTolakAddOn(
+      {
+        subscriptionStatus: "lifetime",
+        subscriptionExpiresAt: null,
+        trialEndsAt: null,
+        addOn: [],
+      },
+      ["fengshui-nama"],
+      katalog,
+      sekarang,
+    ),
+  );
+
+  eq(
+    "yang ditagih hanya yang belum dimiliki",
+    "fengshui-nama",
+    addOnBelumDimiliki(["profil-keluarga", "fengshui-nama"], ["profil-keluarga"]).join(","),
+  );
+  eq("id kembar dihitung sekali", "a", addOnBelumDimiliki(["a", "a"], []).join(","));
+
+  /*
+   * Pesanan tanpa paket tidak boleh menyentuh masa berlaku langganan.
+   *
+   * paketTahun nol yang lolos ke extendYears() akan menulis ulang tanggal
+   * habis DAN menyetel status jadi "active". Untuk pemegang langganan seumur
+   * hidup itu berarti membeli satu add-on menurunkannya jadi pelanggan
+   * tahunan.
+   */
+  const terap = readFileSync("src/lib/pembayaran-server.ts", "utf8");
+  // Diturunkan dari paketTahun, bukan ditulis sebagai nilai tetap. Konstanta
+  // di sini akan lolos dari pemeriksaan bentuk mana pun sambil mematikan
+  // seluruh cabangnya.
+  eq(
+    "hanyaAddOn dihitung dari paketTahun",
+    true,
+    /const hanyaAddOn = bayar\.paketTahun <= 0;/.test(terap),
+  );
+  eq(
+    "status tidak disentuh untuk pesanan tanpa paket",
+    true,
+    /hanyaAddOn\s*\n?\s*\?\s*\{\}/.test(terap),
+  );
+
+  // Aturannya ditegakkan server, bukan cuma disembunyikan di layar.
+  const route = readFileSync("src/app/api/bayar/route.ts", "utf8");
+  eq("route bayar menegakkan aturan add-on", true, route.includes("alasanTolakAddOn("));
+  eq("route bayar membuang yang sudah dimiliki", true, route.includes("addOnBelumDimiliki("));
+
+  const layar = readFileSync("src/components/TambahAddOn.tsx", "utf8");
+  eq("layar profil menyembunyikan yang sudah dimiliki", true, layar.includes("tersedia"));
+
+  /*
+   * Halaman terima kasih wajib ada di DUA daftar.
+   *
+   * RUTE_TUJUAN menentukan siapa boleh membukanya, RUTE_TELANJANG menentukan
+   * apakah bilah samping ikut tampil. Keduanya di berkas berbeda dan tidak
+   * saling menyebut. Kalau cuma terdaftar di yang kedua, gerbang memantulkan
+   * orang yang baru membayar lewat virtual account kembali ke /expired,
+   * karena aksesnya memang belum hidup saat dia mendarat.
+   */
+  eq(
+    "terima kasih ada di RUTE_TUJUAN",
+    true,
+    readFileSync("src/lib/gate.ts", "utf8").includes('"/terima-kasih"'),
+  );
+  eq(
+    "terima kasih ada di RUTE_TELANJANG",
+    true,
+    readFileSync("src/lib/nav.ts", "utf8").includes('"/terima-kasih"'),
+  );
+  eq(
+    "midtrans memulangkan ke halaman terima kasih",
+    true,
+    route.includes("/terima-kasih?bayar="),
   );
 }
 

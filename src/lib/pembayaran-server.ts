@@ -101,13 +101,24 @@ export async function terapkanPembayaran(
     if (!userSnap.exists) throw new PembayaranTidakDitemukan(orderId);
     const user = userSnap.data() as UserProfile & { addOn?: string[] };
 
+    /*
+     * Pesanan yang isinya add-on saja tidak menyentuh langganan sama sekali.
+     *
+     * `paketTahun` nol berarti tidak ada yang diperpanjang. Kalau ini
+     * dilewatkan ke extendYears(), hasilnya tanggal habis yang sama persis
+     * ditulis ulang, dan yang lebih buruk: status pengguna ikut disetel
+     * "active". Untuk pemegang langganan seumur hidup itu berarti membeli satu
+     * add-on menurunkannya jadi pelanggan tahunan.
+     */
+    const hanyaAddOn = bayar.paketTahun <= 0;
     // Seumur hidup tidak punya tanggal habis dan tidak boleh diturunkan jadi
     // langganan tahunan hanya karena pemiliknya membeli add-on. Aturan yang
     // sama persis dengan jalur persetujuan admin.
     const seumurHidup = user.subscriptionStatus === "lifetime";
-    const expiresAt = seumurHidup
-      ? null
-      : extendYears(user.subscriptionExpiresAt ?? null, bayar.paketTahun, now);
+    const expiresAt =
+      hanyaAddOn || seumurHidup
+        ? null
+        : extendYears(user.subscriptionExpiresAt ?? null, bayar.paketTahun, now);
 
     // Add-on ditumpuk, bukan ditimpa: yang sudah dibayar sebelumnya tidak
     // boleh hilang saat membeli tambahan berikutnya.
@@ -137,8 +148,13 @@ export async function terapkanPembayaran(
 
     tx.set(aktivasiRef, aktivasi);
     tx.update(userRef, {
-      subscriptionStatus: seumurHidup ? "lifetime" : "active",
-      ...(seumurHidup ? {} : { subscriptionExpiresAt: expiresAt }),
+      // Pembelian add-on saja tidak mengubah status maupun tanggal habis.
+      ...(hanyaAddOn
+        ? {}
+        : {
+            subscriptionStatus: seumurHidup ? "lifetime" : "active",
+            ...(seumurHidup ? {} : { subscriptionExpiresAt: expiresAt }),
+          }),
       addOn: addOnDimiliki,
       lastChangedBy: "midtrans",
       lastChangedAt: now.toISOString(),
@@ -162,8 +178,8 @@ export async function terapkanPembayaran(
         addOn: user.addOn ?? [],
       },
       sesudah: {
-        status: seumurHidup ? "lifetime" : "active",
-        expiresAt,
+        status: hanyaAddOn ? user.subscriptionStatus : seumurHidup ? "lifetime" : "active",
+        expiresAt: hanyaAddOn ? (user.subscriptionExpiresAt ?? null) : expiresAt,
         addOn: addOnDimiliki,
       },
     };
@@ -179,7 +195,7 @@ export async function terapkanPembayaran(
         aktor: "midtrans",
         aktorUid: "midtrans",
         sasaran: r.uid,
-        ringkasan: `Pembayaran ${r.paketNama} dari ${r.email} lunas lewat Midtrans, aktif sampai ${hasil.expiresAt ?? "tanpa batas"}.`,
+        ringkasan: `Pembayaran ${r.paketNama} dari ${r.email} lunas lewat Midtrans, ${hasil.expiresAt ? `aktif sampai ${hasil.expiresAt}` : "tanpa mengubah masa berlaku"}.`,
         detail: {
           orderId,
           total: r.total,
