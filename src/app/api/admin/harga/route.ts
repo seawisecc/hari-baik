@@ -5,6 +5,7 @@ import { adminDb } from "@/lib/firebase/admin";
 import { AdminError, handleAdminError, requireAdmin } from "@/lib/firebase/requireAdmin";
 import { DOKUMEN_HARGA as DOKUMEN, bacaHarga } from "@/lib/harga-server";
 import type { AddOn, PaketLangganan } from "@/lib/harga";
+import { DISKON_MAKS, type PengaturanPromo } from "@/lib/promo";
 
 /** Halaman yang menampilkan harga hasil render server dan harus ikut segar. */
 const HALAMAN_BERHARGA = ["/", "/expired"];
@@ -95,6 +96,52 @@ function bersihkanAddOn(masuk: unknown): AddOn[] {
   return hasil;
 }
 
+/**
+ * Bersihkan pengaturan promo.
+ *
+ * Yang bisa diatur di sini cuma saklarnya: jalan atau tidak, sampai kapan, dan
+ * berapa persen. Bonus add-on tiap paket tidak ikut, dan memang tidak boleh:
+ * ia ada di `PROMO_BONUS` di kode, karena daftar yang tersimpan di Firestore
+ * akan beku pada nilai saat pertama disimpan dan bonus yang ditambahkan
+ * belakangan tidak akan pernah muncul. Itu persis kesalahan yang sudah pernah
+ * terjadi pada katalog add-on.
+ */
+function bersihkanPromo(masuk: unknown): PengaturanPromo {
+  const m = (masuk ?? {}) as Record<string, unknown>;
+
+  let berakhirPada: string | null = null;
+  if (typeof m.berakhirPada === "string" && m.berakhirPada.trim()) {
+    const waktu = Date.parse(m.berakhirPada);
+    if (!Number.isFinite(waktu)) {
+      throw new AdminError(400, "Tanggal berakhir promo tidak bisa dibaca.");
+    }
+    berakhirPada = new Date(waktu).toISOString();
+  }
+
+  // Promo yang dinyalakan tanpa tanggal berakhir ditolak, bukan diterima lalu
+  // dimatikan diam-diam. Kalau ditolak di sini, admin tahu apa yang kurang;
+  // kalau diterima lalu tidak berlaku, yang terlihat cuma promo yang tidak
+  // muncul di halaman tanpa sebab apa pun.
+  if (Boolean(m.aktif) && !berakhirPada) {
+    throw new AdminError(400, "Promo yang aktif harus punya tanggal berakhir.");
+  }
+
+  const masukPaket = Array.isArray(m.paket) ? m.paket : [];
+  const paket = masukPaket.map((p: Record<string, unknown>) => {
+    const persen = Number(p.diskonPersen);
+    if (!Number.isInteger(persen) || persen < 0 || persen > DISKON_MAKS) {
+      throw new AdminError(400, `Potongan promo harus 0 sampai ${DISKON_MAKS} persen.`);
+    }
+    return { paketId: wajibTeks(p.paketId, "id paket promo"), diskonPersen: persen };
+  });
+
+  if (paket.length !== new Set(paket.map((p) => p.paketId)).size) {
+    throw new AdminError(400, "Ada paket yang disebut dua kali di promo.");
+  }
+
+  return { aktif: Boolean(m.aktif), berakhirPada, paket };
+}
+
 /** Baca pengaturan harga. Terbuka untuk siapa pun: ini daftar harga publik. */
 export async function GET() {
   try {
@@ -111,7 +158,16 @@ export async function PUT(req: NextRequest) {
       paket?: unknown;
       addOn?: unknown;
       transferManual?: unknown;
+      promo?: unknown;
     };
+
+    // Dokumen harga disimpan utuh, jadi field yang tidak dikirim akan hilang.
+    // Panel harga yang belum tahu soal promo akan menghapusnya setiap kali
+    // admin menyimpan harga, dan promo yang sedang berjalan mati di tengah
+    // jalan tanpa ada yang menyentuh saklarnya. Yang tidak disebutkan berarti
+    // tidak diubah, sama seperti `transferManual` di bawah.
+    const promo =
+      body.promo === undefined ? (await bacaHarga()).promo : bersihkanPromo(body.promo);
 
     const data = {
       paket: bersihkanPaket(body.paket),
@@ -122,6 +178,7 @@ export async function PUT(req: NextRequest) {
       // kehilangan satu jalur tanpa ada yang menyentuh saklarnya. Yang tidak
       // disebutkan berarti tidak diubah, jadi bawaannya true.
       transferManual: body.transferManual === undefined ? true : Boolean(body.transferManual),
+      promo,
       diperbaruiPada: new Date().toISOString(),
       diperbaruiOleh: admin.email ?? admin.uid,
     };
@@ -138,11 +195,12 @@ export async function PUT(req: NextRequest) {
         aktor: admin.email ?? admin.uid,
         aktorUid: admin.uid,
         sasaran: null,
-        ringkasan: `Daftar harga disimpan: ${data.paket.length} paket, ${data.addOn.length} add-on, transfer manual ${data.transferManual ? "hidup" : "mati"}.`,
+        ringkasan: `Daftar harga disimpan: ${data.paket.length} paket, ${data.addOn.length} add-on, transfer manual ${data.transferManual ? "hidup" : "mati"}, promo ${data.promo.aktif ? `hidup sampai ${data.promo.berakhirPada}` : "mati"}.`,
         detail: {
           paket: data.paket.map((p) => ({ id: p.id, harga: p.harga, aktif: p.aktif })),
           addOn: data.addOn.map((a) => ({ id: a.id, harga: a.harga, aktif: a.aktif })),
           transferManual: data.transferManual,
+          promo: data.promo,
         },
       },
       req,

@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, Plus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -18,6 +18,7 @@ import {
   type PaketLangganan,
   type PengaturanHarga,
 } from "@/lib/harga";
+import { DISKON_MAKS, PROMO_BONUS, bulatkanHarga, promoBerlaku } from "@/lib/promo";
 
 /** Id dibuat dari nama supaya terbaca di data, bukan angka acak. */
 function buatId(nama: string, dipakai: string[]): string {
@@ -38,6 +39,9 @@ export function AturHarga() {
   const [data, setData] = useState<PengaturanHarga | null>(null);
   const [pesan, setPesan] = useState<{ nada: "success" | "error"; teks: string } | null>(null);
   const [busy, setBusy] = useState(false);
+  // Panel ini bisa dirender berdampingan dengan panel lain; id yang ditulis
+  // sendiri pernah jadi kembar dan membuat label menunjuk kolom yang salah.
+  const idBerakhir = useId();
 
   useEffect(() => {
     let batal = false;
@@ -87,6 +91,7 @@ export function AturHarga() {
           paket: data.paket,
           addOn: data.addOn,
           transferManual: data.transferManual,
+          promo: data.promo,
         }),
       });
       const hasil = await res.json();
@@ -347,6 +352,130 @@ export function AturHarga() {
               {t("price.manualTransferOffNote")}
             </p>
           )}
+        </CardBody>
+      </Card>
+
+      {/*
+       * Promo cuma punya saklar dan tanggal di sini, bukan bonusnya.
+       *
+       * Bonus tiap paket ada di `PROMO_BONUS` di kode: dokumen harga disimpan
+       * utuh, jadi daftar yang tersimpan akan beku pada nilai saat pertama
+       * kali tombol simpan ditekan, dan bonus yang ditambahkan belakangan
+       * tidak akan pernah muncul. Itu persis yang pernah terjadi pada katalog
+       * add-on. Yang diatur di sini adalah keputusan dagangnya: jalan atau
+       * tidak, sampai kapan, dan berapa persen.
+       */}
+      <Card elevation={2}>
+        <CardHeader>
+          <CardTitle>{t("price.promo")}</CardTitle>
+          <p className="mt-1 text-sm text-ink-soft">{t("price.promoHint")}</p>
+        </CardHeader>
+        <CardBody className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-md bg-surface-sunk px-5 py-4 hb-sink">
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-ink">{t("price.promoOn")}</p>
+              <p className="mt-0.5 text-xs leading-relaxed text-ink-soft">
+                {promoBerlaku(data.promo)
+                  ? t("price.promoRunning")
+                  : t("price.promoNotRunning")}
+              </p>
+            </div>
+            <Saklar
+              aktif={data.promo.aktif}
+              label={t(data.promo.aktif ? "price.on" : "price.off")}
+              onClick={() =>
+                setData({ ...data, promo: { ...data.promo, aktif: !data.promo.aktif } })
+              }
+            />
+          </div>
+
+          <div className="max-w-xs">
+            <Kolom label={t("price.promoEnds")}>
+              <Input
+                id={idBerakhir}
+                type="date"
+                value={data.promo.berakhirPada?.slice(0, 10) ?? ""}
+                onChange={(e) =>
+                  setData({
+                    ...data,
+                    promo: {
+                      ...data.promo,
+                      /*
+                       * Disimpan sebagai akhir hari, bukan tengah malam
+                       * awalnya. Yang mengetik 30 September bermaksud promo
+                       * masih berlaku sepanjang tanggal itu; menyimpannya
+                       * sebagai 00:00 memotong promonya satu hari penuh
+                       * lebih awal daripada yang tertulis di halaman depan.
+                       */
+                      berakhirPada: e.target.value
+                        ? new Date(`${e.target.value}T23:59:59`).toISOString()
+                        : null,
+                    },
+                  })
+                }
+              />
+            </Kolom>
+          </div>
+
+          {/* Promo yang dinyalakan tanpa tanggal ditolak server. Dikatakan di
+              sini juga supaya admin tahu sebelum menekan simpan, bukan
+              sesudahnya lewat pesan kesalahan. */}
+          {data.promo.aktif && !data.promo.berakhirPada && (
+            <Alert tone="error">{t("price.promoNeedsEnd")}</Alert>
+          )}
+
+          <div className="space-y-2">
+            {data.paket
+              .filter((p) => p.aktif)
+              .map((p) => {
+                const aturan = data.promo.paket.find((x) => x.paketId === p.id);
+                const persen = aturan?.diskonPersen ?? 0;
+                const bonus = PROMO_BONUS[p.id] ?? [];
+                return (
+                  <div
+                    key={p.id}
+                    className="flex flex-wrap items-center gap-3 rounded-md bg-surface-sunk px-5 py-3.5 hb-sink"
+                  >
+                    <span className="min-w-24 text-sm font-medium text-ink">{p.nama.id}</span>
+                    <Input
+                      type="number"
+                      min={0}
+                      max={DISKON_MAKS}
+                      aria-label={`${t("price.promoDiscount")} ${p.nama.id}`}
+                      className="w-24"
+                      value={persen}
+                      onChange={(e) => {
+                        const n = Math.max(
+                          0,
+                          Math.min(DISKON_MAKS, Math.round(Number(e.target.value) || 0)),
+                        );
+                        const lain = data.promo.paket.filter((x) => x.paketId !== p.id);
+                        setData({
+                          ...data,
+                          promo: {
+                            ...data.promo,
+                            paket: [...lain, { paketId: p.id, diskonPersen: n }],
+                          },
+                        });
+                      }}
+                    />
+                    <span className="text-xs text-ink-soft">
+                      {persen > 0
+                        ? `${rupiah(p.harga)} → ${rupiah(bulatkanHarga((p.harga * (100 - persen)) / 100))}`
+                        : t("price.promoNoDiscount")}
+                    </span>
+                    {bonus.length > 0 && (
+                      <span className="text-xs text-ink-faint">
+                        {t("price.promoBonusFixed")}:{" "}
+                        {bonus
+                          .map((id) => data.addOn.find((a) => a.id === id)?.nama.id ?? id)
+                          .join(", ")}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+          </div>
         </CardBody>
       </Card>
 

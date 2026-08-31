@@ -2,6 +2,7 @@ import "server-only";
 import { addOnSiapJual } from "@/lib/addon-registry";
 import { adminDb } from "@/lib/firebase/admin";
 import { HARGA_BAWAAN, gabungAddOn, type PengaturanHarga } from "@/lib/harga";
+import { gabungPromo, saringPromo } from "@/lib/promo";
 
 /**
  * Paksa nonaktif setiap add-on yang fiturnya belum ada.
@@ -12,13 +13,27 @@ import { HARGA_BAWAAN, gabungAddOn, type PengaturanHarga } from "@/lib/harga";
  * menembus ini, dan memang begitu maksudnya.
  */
 function saringAddOn(h: PengaturanHarga): PengaturanHarga {
+  const addOn = gabungAddOn(h.addOn).map((a) =>
+    addOnSiapJual(a.id) ? a : { ...a, aktif: false },
+  );
+
   return {
     ...h,
     // Digabung dulu dengan katalog di kode, baru disaring. Urutannya penting:
     // add-on yang belum pernah tersimpan di Firestore harus ikut masuk supaya
     // admin bisa melihatnya, dan tetap ikut disaring supaya yang fiturnya
     // belum ada tidak langsung terjual begitu muncul.
-    addOn: gabungAddOn(h.addOn).map((a) => (addOnSiapJual(a.id) ? a : { ...a, aktif: false })),
+    addOn,
+    // Potongan untuk paket yang sudah tidak dijual ikut dibuang di sini, satu
+    // pintu yang sama yang dilewati halaman depan maupun route pembayaran.
+    // Bonus add-on-nya sendiri disaring belakangan oleh `hargaPromo()`, yang
+    // menerima daftar add-on di atas: bonus yang fiturnya belum ada tidak
+    // boleh dijanjikan, karena orang membayar paket panjang justru karena
+    // fitur yang ikut di dalamnya.
+    promo: saringPromo(
+      gabungPromo(h.promo),
+      h.paket.filter((p) => p.aktif).map((p) => p.id),
+    ),
     // Siapa yang terakhir menyimpan harga adalah urusan internal, dan
     // nilainya adalah alamat email admin. Daftar harga ini dibaca siapa pun:
     // lewat GET /api/admin/harga yang memang publik, dan ikut terkirim di

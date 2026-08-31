@@ -11,12 +11,12 @@ import { Wordmark } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
-import { jalurBayar, type PengaturanHarga, type PaketLangganan } from "@/lib/harga";
+import { jalurBayar, type PengaturanHarga } from "@/lib/harga";
+import type { PaketPromo } from "@/lib/promo";
 
 /** Paket yang disorot lebih dulu, supaya tombol kirim langsung bisa ditekan. */
-function paketAwal(harga: PengaturanHarga): PaketLangganan | null {
-  const aktif = harga.paket.filter((p) => p.aktif);
-  return aktif.find((p) => p.populer) ?? aktif[0] ?? null;
+function paketAwal(paketPromo: PaketPromo[]): PaketPromo | null {
+  return paketPromo.find((p) => p.paket.populer) ?? paketPromo[0] ?? null;
 }
 
 /**
@@ -24,12 +24,24 @@ function paketAwal(harga: PengaturanHarga): PaketLangganan | null {
  * cat pertama. Tidak ada lagi fetch setelah hidrasi yang membuat halaman ini
  * kosong beberapa detik sebelum harganya muncul.
  */
-export function ExpiredClient({ harga }: { harga: PengaturanHarga }) {
+export function ExpiredClient({
+  harga,
+  paketPromo,
+  sisaPromo,
+}: {
+  harga: PengaturanHarga;
+  /** Paket aktif berikut harga promonya, dihitung di server. */
+  paketPromo: PaketPromo[];
+  /** Sisa hari promo, null bila tidak ada yang berjalan. Dari server. */
+  sisaPromo: number | null;
+}) {
   const t = useT();
   const router = useRouter();
   const { profile, logout } = useAuth();
-  const [paket, setPaket] = useState<PaketLangganan | null>(() => paketAwal(harga));
+  const [paket, setPaket] = useState<PaketPromo | null>(() => paketAwal(paketPromo));
 
+  const diskonMaks = Math.max(0, ...paketPromo.map((p) => p.diskonPersen));
+  const adaPromo = sisaPromo !== null && diskonMaks > 0;
 
   // Langkah "cara berlangganan" di bawah menjelaskan alur transfer manual,
   // jadi ia ikut hilang ketika jalur itu tidak ditawarkan. Petunjuk yang
@@ -76,12 +88,24 @@ export function ExpiredClient({ harga }: { harga: PengaturanHarga }) {
 
         <CardBody className="space-y-8 pb-7">
           {!menunggu && (
-            <DaftarHarga
-              data={harga}
-              dipilih={paket?.id ?? null}
-              onPilih={(p) => setPaket(p)}
-              tanpaAddOn
-            />
+            <>
+              {/* Hitungan mundurnya ikut sampai ke sini, bukan berhenti di
+                  halaman depan. Yang membuka layar ini justru sedang berdiri
+                  di depan tombol bayarnya. */}
+              {adaPromo && (
+                <p className="rounded-md bg-accent-wash px-4 py-2.5 text-center text-xs font-medium text-accent-deep hb-raise-1">
+                  {t("promo.off", { n: diskonMaks })} ·{" "}
+                  {sisaPromo <= 1 ? t("promo.endsToday") : t("promo.ends", { n: sisaPromo })}
+                </p>
+              )}
+              <DaftarHarga
+                data={harga}
+                paketPromo={paketPromo}
+                dipilih={paket?.paket.id ?? null}
+                onPilih={(p) => setPaket(p)}
+                tanpaAddOn
+              />
+            </>
           )}
 
           <div className="space-y-5 border-t border-border-soft pt-6">
@@ -102,6 +126,7 @@ export function ExpiredClient({ harga }: { harga: PengaturanHarga }) {
             )}
 
             <AjukanAktivasi
+              harga={harga}
               paket={paket}
               addOnTersedia={harga.addOn.filter((a) => a.aktif)}
               sudahMenunggu={menunggu}

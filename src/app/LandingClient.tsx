@@ -15,6 +15,7 @@ import {
   Sparkles,
   Store,
   Sun,
+  Tag,
   User,
   UserPlus,
   UsersRound,
@@ -30,7 +31,9 @@ import { WhatsAppCard } from "@/components/WhatsAppCard";
 import { useLang, useT } from "@/lib/content/LangProvider";
 import { TestimoniSlider } from "@/components/TestimoniSlider";
 import { TESTIMONI } from "@/lib/content/testimoni";
-import { hemat, perTahun, rupiah, teks, type PengaturanHarga } from "@/lib/harga";
+import { PerbandinganPaket } from "@/components/PerbandinganPaket";
+import { rupiah, teks, type PengaturanHarga } from "@/lib/harga";
+import { hematPromo, perTahunPromo, type PaketPromo } from "@/lib/promo";
 import { HARI_TRIAL } from "@/lib/subscription";
 
 const LANGKAH: { icon: LucideIcon; n: number }[] = [
@@ -140,6 +143,65 @@ function Section({
   );
 }
 
+/**
+ * Dua tombol, bukan satu, dan urutannya disengaja.
+ *
+ * Yang lebih menonjol adalah promonya, karena itu yang sedang ditawarkan dan
+ * karena ia punya batas waktu. Coba gratis tetap ada di sebelahnya dengan
+ * bobot lebih ringan: sebagian besar pengunjung belum siap membayar pada menit
+ * pertama, dan menghapus pintu masuk gratisnya akan memulangkan mereka
+ * daripada menaikkan mereka satu tingkat.
+ *
+ * Tombol promo turun ke bagian perbandingan di halaman yang sama, bukan
+ * langsung ke pendaftaran. Menjual sebelum menunjukkan angkanya membuat
+ * tombolnya cuma menjadi salinan kedua dari tombol di sebelahnya.
+ */
+function TombolAwal({ adaPromo }: { adaPromo: boolean }) {
+  const t = useT();
+  return (
+    <div className="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center sm:justify-center">
+      {adaPromo && (
+        <a href="#promo" className="sm:w-auto">
+          <Button size="lg" block className="sm:w-auto">
+            {t("landing.cta.promo")}
+            <ArrowRight className="h-4 w-4" aria-hidden />
+          </Button>
+        </a>
+      )}
+      <Link href="/register" className="sm:w-auto">
+        <Button
+          size="lg"
+          block
+          variant={adaPromo ? "surface" : "primary"}
+          className="sm:w-auto"
+        >
+          {t("landing.cta.trial", { n: HARI_TRIAL })}
+          {!adaPromo && <ArrowRight className="h-4 w-4" aria-hidden />}
+        </Button>
+      </Link>
+    </div>
+  );
+}
+
+/** Lencana promo berikut hitungan mundurnya. Sisa harinya dihitung di server. */
+function LencanaPromo({ sisa, diskonMaks }: { sisa: number; diskonMaks: number }) {
+  const t = useT();
+  return (
+    <div className="mx-auto mb-7 inline-flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 rounded-pill bg-accent-wash px-4 py-2 hb-raise-1">
+      <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-accent-deep">
+        <Tag className="h-3 w-3" aria-hidden />
+        {t("promo.badge")}
+      </span>
+      <span className="text-sm font-semibold text-ink">
+        {t("promo.off", { n: diskonMaks })}
+      </span>
+      <span className="text-xs text-ink-soft">
+        {sisa <= 1 ? t("promo.endsToday") : t("promo.ends", { n: sisa })}
+      </span>
+    </div>
+  );
+}
+
 function TombolDaftar({ size = "lg" }: { size?: "md" | "lg" }) {
   const t = useT();
   return (
@@ -154,17 +216,24 @@ function TombolDaftar({ size = "lg" }: { size?: "md" | "lg" }) {
 
 export function LandingClient({
   harga,
+  paketPromo,
+  sisaPromo,
   tahun,
 }: {
   harga: PengaturanHarga;
+  /** Paket aktif berikut harga promonya, dihitung di server. */
+  paketPromo: PaketPromo[];
+  /** Sisa hari promo, null bila tidak ada promo berjalan. Dari server. */
+  sisaPromo: number | null;
   /** Tahun untuk footer, ditentukan di server supaya hidrasi tidak berbeda. */
   tahun: number;
 }) {
   const t = useT();
   const { lang } = useLang();
 
-  const paket = harga.paket.filter((p) => p.aktif);
   const addOn = harga.addOn.filter((a) => a.aktif);
+  const diskonMaks = Math.max(0, ...paketPromo.map((p) => p.diskonPersen));
+  const adaPromo = sisaPromo !== null && diskonMaks > 0;
 
   return (
     <div className="mx-auto max-w-5xl px-6 pb-24 sm:px-8">
@@ -211,7 +280,8 @@ export function LandingClient({
         </p>
 
         <div className="mt-10 flex flex-col items-center gap-4">
-          <TombolDaftar />
+          {adaPromo && <LencanaPromo sisa={sisaPromo} diskonMaks={diskonMaks} />}
+          <TombolAwal adaPromo={adaPromo} />
           <p className="text-xs italic text-ink-faint">{t("landing.cta.noCard")}</p>
           <p className="text-sm font-medium text-ink-soft">{t("landing.hero.proof")}</p>
         </div>
@@ -386,9 +456,21 @@ export function LandingClient({
         )}
 
         <Section title={t("landing.price.title")} lead={t("landing.price.lead")}>
+          {/* Anchor tombol hero. Ditaruh di bagian harga, bukan di tabel
+              perbandingan, supaya yang turun mendarat pada angkanya lebih
+              dulu dan tabelnya menyusul tepat di bawah. */}
+          <div id="promo" className="scroll-mt-8" />
+
+          {adaPromo && (
+            <p className="text-center text-sm font-medium text-accent-deep">
+              {sisaPromo <= 1 ? t("promo.endsToday") : t("promo.ends", { n: sisaPromo })}
+            </p>
+          )}
+
           <div className="grid gap-5 sm:grid-cols-3">
-            {paket.map((p) => {
-              const diskon = hemat(p, harga.paket);
+            {paketPromo.map((item) => {
+              const p = item.paket;
+              const diskon = hematPromo(item, paketPromo);
               return (
                 <Card
                   key={p.id}
@@ -397,11 +479,16 @@ export function LandingClient({
                     p.populer ? "ring-2 ring-accent-strong/45" : ""
                   }`}
                 >
-                  <div className="mb-4 flex min-h-6 items-center justify-center">
+                  <div className="mb-4 flex min-h-6 items-center justify-center gap-2">
                     {p.populer && (
                       <span className="inline-flex items-center gap-1 rounded-pill bg-accent px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-accent-ink">
                         <Sparkles className="h-2.5 w-2.5" aria-hidden />
                         {t("price.mostPopular")}
+                      </span>
+                    )}
+                    {item.diskonPersen > 0 && (
+                      <span className="inline-flex items-center gap-1 rounded-pill bg-guru/20 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-guru-teks">
+                        {t("promo.off", { n: item.diskonPersen })}
                       </span>
                     )}
                   </div>
@@ -409,18 +496,75 @@ export function LandingClient({
                   <p className="font-heading text-lg font-semibold text-ink">
                     {teks(p.nama, lang)}
                   </p>
-                  <p className="mt-3 font-heading text-3xl font-bold text-ink">
-                    {rupiah(p.harga)}
+
+                  {/* Harga asli dicoret di atas harga promo, bukan di
+                      sebelahnya: di kartu selebar ini keduanya berdampingan
+                      akan membungkus, dan angka yang membungkus terbaca
+                      seperti satu angka panjang. */}
+                  <p className="mt-3 min-h-5 text-sm text-ink-faint">
+                    {item.diskonPersen > 0 ? (
+                      <>
+                        <span className="sr-only">{t("promo.normalPrice")} </span>
+                        <span className="line-through">{rupiah(item.hargaAsli)}</span>
+                      </>
+                    ) : (
+                      ""
+                    )}
+                  </p>
+                  <p className="font-heading text-3xl font-bold text-ink">
+                    {rupiah(item.harga)}
                   </p>
                   <p className="mt-1.5 text-xs text-ink-soft">
-                    {rupiah(perTahun(p))} {t("price.perYear")}
+                    {rupiah(perTahunPromo(item))} {t("price.perYear")}
                   </p>
                   <p className="mt-1 min-h-5 text-xs font-medium text-guru-teks">
                     {diskon > 0 ? t("price.saveShort", { n: diskon }) : ""}
                   </p>
+
+                  {/* Bonus disebut namanya, bukan dihitung jumlahnya.
+                      "Plus 2 bonus" tidak memberi tahu apa pun tentang apa
+                      yang didapat, dan yang menimbang paket panjang menimbang
+                      isinya, bukan angkanya. */}
+                  {item.bonusAddOn.length > 0 && (
+                    <div className="mt-5 border-t border-border-soft pt-4 text-left">
+                      <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-ink-faint">
+                        {t("promo.bonusTitle")}
+                      </p>
+                      <ul className="space-y-1.5">
+                        {item.bonusAddOn.map((id) => {
+                          const a = addOn.find((x) => x.id === id);
+                          if (!a) return null;
+                          return (
+                            <li key={id} className="flex items-start gap-2 text-xs text-ink">
+                              <Check
+                                className="mt-0.5 h-3 w-3 shrink-0 text-guru-teks"
+                                aria-hidden
+                              />
+                              <span>
+                                {teks(a.nama, lang)}
+                                <span className="ml-1.5 text-ink-faint line-through">
+                                  {rupiah(a.harga)}
+                                </span>
+                              </span>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  )}
                 </Card>
               );
             })}
+          </div>
+
+          <div className="pt-2">
+            <h3 className="mb-2 text-center font-heading text-xl font-bold text-ink">
+              {t("landing.compare.title")}
+            </h3>
+            <p className="mx-auto mb-6 max-w-2xl text-center text-[15px] leading-relaxed text-ink-soft">
+              {t("landing.compare.lead")}
+            </p>
+            <PerbandinganPaket harga={harga} paket={paketPromo} />
           </div>
 
           {addOn.length > 0 && (

@@ -10,7 +10,9 @@ import { ADMIN_WA, ADMIN_WA_DISPLAY } from "@/components/WhatsAppCard";
 import { cn } from "@/lib/cn";
 import { useLang, useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
-import { jalurBayar, rupiah, teks, type AddOn, type PaketLangganan } from "@/lib/harga";
+import { jalurBayar, rupiah, teks, type AddOn, type PengaturanHarga } from "@/lib/harga";
+import { rakitPesanan } from "@/lib/pesanan";
+import type { PaketPromo } from "@/lib/promo";
 import { ambilToken } from "@/lib/firebase/client";
 
 /**
@@ -31,13 +33,17 @@ import { ambilToken } from "@/lib/firebase/client";
  * seharusnya dihilangkan antrean ini.
  */
 export function AjukanAktivasi({
+  harga,
   paket,
   addOnTersedia,
   sudahMenunggu,
   transferManual,
   onLunas,
 }: {
-  paket: PaketLangganan | null;
+  /** Daftar harga lengkap, dipakai merakit total dengan fungsi yang sama
+   *  dengan yang dipakai server saat menagih. */
+  harga: PengaturanHarga;
+  paket: PaketPromo | null;
   addOnTersedia: AddOn[];
   sudahMenunggu: boolean;
   /** Dari pengaturan admin. Bisa ditolak jalurBayar() kalau gateway mati. */
@@ -63,8 +69,24 @@ export function AjukanAktivasi({
     transferDiizinkan: transferManual,
   });
 
-  const addOnDipilih = addOnTersedia.filter((a) => dipilih.includes(a.id));
-  const total = (paket?.harga ?? 0) + addOnDipilih.reduce((n, a) => n + a.harga, 0);
+  /*
+   * Total dirakit oleh fungsi yang sama dengan yang dipakai kedua route
+   * pembayaran, bukan dihitung ulang di sini.
+   *
+   * Angka di tombol ini adalah janji, dan yang menagihnya server. Selama
+   * keduanya menghitung sendiri-sendiri, cepat atau lambat akan ada
+   * kombinasi yang membuat keduanya berbeda: add-on yang ternyata sudah jadi
+   * bonus paket, potongan promo yang tidak ikut, pembulatan yang berbeda.
+   * Yang membayar tidak akan melaporkannya, dia cuma berhenti.
+   */
+  const isi = rakitPesanan(harga, paket, dipilih);
+  const total = isi.total;
+
+  // Yang sudah jadi bonus paket tidak ditawarkan lagi sebagai barang yang
+  // bisa dicentang: mencentangnya tidak menambah apa pun ke tagihan, dan
+  // tombol yang tidak melakukan apa-apa terbaca seperti tombol yang rusak.
+  const idBonus = new Set(paket?.bonusAddOn ?? []);
+  const addOnPilihan = addOnTersedia.filter((a) => !idBonus.has(a.id));
 
   /*
    * Permintaan manual yang masih menunggu tidak menutup jalur gateway.
@@ -83,7 +105,7 @@ export function AjukanAktivasi({
             <p className="text-center text-xs leading-relaxed text-ink-faint">
               {t("bayar.atauLangsung")}
             </p>
-            <BayarMidtrans paketId={paket.id} addOnIds={dipilih} onLunas={onLunas} />
+            <BayarMidtrans paketId={paket.paket.id} addOnIds={dipilih} onLunas={onLunas} />
           </div>
         )}
         <TombolWa profil={profile} paket={paket} />
@@ -100,7 +122,7 @@ export function AjukanAktivasi({
       const res = await fetch("/api/aktivasi", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ paketId: paket.id, addOnIds: dipilih, catatan }),
+        body: JSON.stringify({ paketId: paket.paket.id, addOnIds: dipilih, catatan }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? t("admin.actionFailed"));
@@ -116,13 +138,36 @@ export function AjukanAktivasi({
     <div className="space-y-5">
       {error && <Alert tone="error">{error}</Alert>}
 
-      {addOnTersedia.length > 0 && paket && (
+      {isi.addOnBonus.length > 0 && paket && (
+        <div>
+          <p className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-ink-faint">
+            {t("promo.bonusTitle")}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {isi.addOnBonus.map((b) => {
+              const a = addOnTersedia.find((x) => x.id === b.id);
+              return (
+                <span
+                  key={b.id}
+                  className="inline-flex items-center gap-1.5 rounded-pill bg-guru/15 px-3.5 py-2 text-xs font-medium text-guru-teks"
+                >
+                  <Check className="h-3 w-3" aria-hidden />
+                  {a ? teks(a.nama, lang) : b.nama}
+                  <span className="opacity-70">{t("promo.free")}</span>
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {addOnPilihan.length > 0 && paket && (
         <div>
           <p className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-ink-faint">
             {t("req.addonsPick")}
           </p>
           <div className="flex flex-wrap gap-2">
-            {addOnTersedia.map((a) => {
+            {addOnPilihan.map((a) => {
               const aktif = dipilih.includes(a.id);
               return (
                 <button
@@ -153,13 +198,24 @@ export function AjukanAktivasi({
       {paket && (
         <div className="flex items-baseline justify-between rounded-md bg-surface-sunk px-5 py-4 hb-sink">
           <span className="text-sm text-ink-soft">{t("req.total")}</span>
-          <span className="font-heading text-2xl font-bold text-ink">{rupiah(total)}</span>
+          <span className="text-right">
+            {isi.diskonPersen > 0 && (
+              <span className="mr-2 text-sm text-ink-faint line-through">
+                {rupiah(isi.hargaPaketAsli + (total - isi.hargaPaket))}
+              </span>
+            )}
+            <span className="font-heading text-2xl font-bold text-ink">{rupiah(total)}</span>
+          </span>
         </div>
       )}
 
       {jalur.midtrans && (
         <>
-          <BayarMidtrans paketId={paket?.id ?? null} addOnIds={dipilih} onLunas={onLunas} />
+          <BayarMidtrans
+            paketId={paket?.paket.id ?? null}
+            addOnIds={dipilih}
+            onLunas={onLunas}
+          />
 
           {jalur.transfer && (
             <div className="flex items-center gap-3">
@@ -218,14 +274,14 @@ function TombolWa({
   paket,
 }: {
   profil: { nama?: string; email?: string } | null;
-  paket: PaketLangganan | null;
+  paket: PaketPromo | null;
 }) {
   const t = useT();
   const { lang } = useLang();
 
   const pesan = [
     "Halo, saya ingin berlangganan Hari Baik.",
-    paket ? `Paket: ${teks(paket.nama, lang)} (${rupiah(paket.harga)})` : null,
+    paket ? `Paket: ${teks(paket.paket.nama, lang)} (${rupiah(paket.harga)})` : null,
     `Nama: ${profil?.nama || "-"}`,
     `Email: ${profil?.email ?? "-"}`,
   ]

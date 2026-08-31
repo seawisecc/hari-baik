@@ -3,14 +3,8 @@
 import { Check, Sparkles } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useLang, useT } from "@/lib/content/LangProvider";
-import {
-  hemat,
-  perTahun,
-  rupiah,
-  teks,
-  type PaketLangganan,
-  type PengaturanHarga,
-} from "@/lib/harga";
+import { rupiah, teks, type PengaturanHarga } from "@/lib/harga";
+import { hematPromo, perTahunPromo, type PaketPromo } from "@/lib/promo";
 
 /**
  * Daftar harga yang dilihat pengguna.
@@ -23,21 +17,30 @@ import {
  */
 export function DaftarHarga({
   data,
+  paketPromo,
   dipilih,
   onPilih,
   tanpaAddOn = false,
 }: {
   data: PengaturanHarga;
+  /**
+   * Paket aktif berikut harga promonya, dihitung di server.
+   *
+   * Bukan dihitung ulang di sini. Harga promo yang dihitung di peramban
+   * memakai jam peramban, dan jam itu tidak selalu sama dengan jam server
+   * yang nanti menagih. Selisihnya jarang, tapi bentuknya adalah angka di
+   * layar yang berbeda dari angka di tagihan.
+   */
+  paketPromo: PaketPromo[];
   /** Id paket yang sedang dipilih; diberi tanda di daftar. */
   dipilih?: string | null;
-  onPilih?: (paket: PaketLangganan) => void;
+  onPilih?: (paket: PaketPromo) => void;
   /** Sembunyikan daftar add-on, mis. bila pemilihannya ada di tempat lain. */
   tanpaAddOn?: boolean;
 }) {
   const t = useT();
   const { lang } = useLang();
 
-  const paket = data.paket.filter((p) => p.aktif);
   const addOn = data.addOn.filter((a) => a.aktif);
 
   return (
@@ -48,13 +51,14 @@ export function DaftarHarga({
         </p>
 
         <ul className="space-y-3">
-          {paket.map((p) => {
-            const diskon = hemat(p, data.paket);
+          {paketPromo.map((item) => {
+            const p = item.paket;
+            const diskon = hematPromo(item, paketPromo);
             return (
               <li key={p.id}>
                 <button
                   type="button"
-                  onClick={() => onPilih?.(p)}
+                  onClick={() => onPilih?.(item)}
                   className={cn(
                     "flex w-full items-center gap-4 rounded-lg px-5 py-4 text-left",
                     "transition-shadow duration-150",
@@ -76,19 +80,47 @@ export function DaftarHarga({
                           {t("price.mostPopular")}
                         </span>
                       )}
+                      {item.diskonPersen > 0 && (
+                        <span className="inline-flex items-center gap-1 rounded-pill bg-guru/20 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-guru-teks">
+                          {t("promo.off", { n: item.diskonPersen })}
+                        </span>
+                      )}
                     </div>
                     <p className="mt-0.5 text-xs text-ink-soft">
-                      {rupiah(perTahun(p))} {t("price.perYear")}
+                      {rupiah(perTahunPromo(item))} {t("price.perYear")}
                       {diskon > 0 && (
                         <span className="ml-2 font-medium text-guru-teks">
                           {t("price.saveShort", { n: diskon })}
                         </span>
                       )}
                     </p>
+                    {/* Bonusnya disebut di baris paketnya sendiri, bukan cuma
+                        di halaman depan. Yang sampai ke layar ini lewat
+                        tautan langsung tidak pernah melihat halaman depan,
+                        dan dialah yang sedang memutuskan. */}
+                    {item.bonusAddOn.length > 0 && (
+                      <p className="mt-1 text-xs font-medium text-guru-teks">
+                        {t("promo.bonusTitle")}:{" "}
+                        {item.bonusAddOn
+                          .map((id) => {
+                            const a = addOn.find((x) => x.id === id);
+                            return a ? teks(a.nama, lang) : null;
+                          })
+                          .filter(Boolean)
+                          .join(", ")}
+                      </p>
+                    )}
                   </div>
 
-                  <span className="shrink-0 font-heading text-xl font-bold text-ink">
-                    {rupiah(p.harga)}
+                  <span className="shrink-0 text-right">
+                    {item.diskonPersen > 0 && (
+                      <span className="block text-xs text-ink-faint line-through">
+                        {rupiah(item.hargaAsli)}
+                      </span>
+                    )}
+                    <span className="block font-heading text-xl font-bold text-ink">
+                      {rupiah(item.harga)}
+                    </span>
                   </span>
                 </button>
               </li>

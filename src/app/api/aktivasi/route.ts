@@ -3,6 +3,8 @@ import { adminAuth, adminDb } from "@/lib/firebase/admin";
 import { jalurBayar } from "@/lib/harga";
 import { bacaHarga } from "@/lib/harga-server";
 import { konfigurasiMidtrans } from "@/lib/midtrans-server";
+import { rakitPesanan } from "@/lib/pesanan";
+import { bonusBolehDijual, hargaPromo } from "@/lib/promo";
 import { punyaAksesBerbayar } from "@/lib/subscription";
 import type { Aktivasi, UserProfile } from "@/types";
 
@@ -59,9 +61,15 @@ export async function POST(req: NextRequest) {
     }
 
     const idAddOn = Array.isArray(body.addOnIds) ? body.addOnIds : [];
-    const addOn = harga.addOn
-      .filter((a) => a.aktif && idAddOn.includes(a.id))
-      .map((a) => ({ id: a.id, nama: a.nama.id, harga: a.harga }));
+    // Jalur transfer manual memakai perakit yang sama dengan jalur gateway.
+    // Kalau tidak, promo hanya berlaku bagi yang membayar lewat Midtrans, dan
+    // yang mentransfer sendiri ditagih harga penuh untuk penawaran yang sama.
+    const isi = rakitPesanan(
+      harga,
+      hargaPromo(paket, harga.promo, new Date(), bonusBolehDijual(harga)),
+      idAddOn,
+    );
+    const addOn = isi.addOn;
 
     const db = adminDb();
 
@@ -87,7 +95,7 @@ export async function POST(req: NextRequest) {
     }
     const user = userSnap.data() as UserProfile;
 
-    const total = paket.harga + addOn.reduce((n, a) => n + a.harga, 0);
+    const total = isi.total;
     const catatan = (body.catatan ?? "").trim().slice(0, CATATAN_MAKS) || null;
 
     const doc: Omit<Aktivasi, "id"> = {
@@ -98,7 +106,7 @@ export async function POST(req: NextRequest) {
       paketId: paket.id,
       paketNama: paket.nama.id,
       paketTahun: paket.tahun,
-      harga: paket.harga,
+      harga: isi.hargaPaket,
       addOn,
       total,
       catatan,

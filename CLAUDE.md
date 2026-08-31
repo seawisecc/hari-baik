@@ -446,6 +446,43 @@ menentukan yang aman. Dipakai tampilan DAN route `/api/aktivasi` sekaligus,
 jadi tombol yang disembunyikan juga benar-benar ditolak server. Dijaga
 `addon.test.ts`, yang menamai kegagalannya "buntu".
 
+**Promo tanpa tanggal berakhir adalah promo yang mati.** `promoBerlaku()` di
+`src/lib/promo.ts` menolak `berakhirPada` yang null, dan route PUT harga
+menolak menyimpan promo aktif tanpa tanggal. Arah bawaan itu disengaja:
+promo yang kehilangan tanggalnya adalah bentuk yang sama persis dengan harga
+uji Rp 1.000 yang tertinggal di produksi, yaitu potongan harga yang berlaku
+selamanya karena tidak ada apa pun yang mengingatkan untuk mengembalikannya.
+Lewat tanggalnya, `hargaPromo()` mengembalikan harga asli apa adanya tanpa
+ada yang perlu menyentuh saklar. Karena itu pula halaman depan dan `/expired`
+turun ke `revalidate = 600`: masa kedaluwarsa halaman statis adalah lamanya
+harga promo masih terpajang setelah promonya benar-benar berakhir, sementara
+route pembayaran sudah menagih harga normal. Sejam terlalu lama untuk jendela
+di mana angka di layar berbeda dari angka di tagihan.
+
+**Bonus add-on paket ada di kode, bukan di pengaturan.** `PROMO_BONUS` di
+`src/lib/promo.ts` menentukan add-on mana yang ikut gratis di tiap paket, dan
+`gabungPromo()` membuang `bonusAddOn` apa pun yang datang dari Firestore.
+Alasannya sama persis dengan `addon-registry`: dokumen harga disimpan utuh,
+jadi daftar yang tersimpan akan beku pada nilai saat admin pertama kali
+menekan simpan, dan bonus yang ditambahkan belakangan di kode tidak akan
+pernah muncul. Yang boleh diatur admin cuma keputusan dagangnya: promo jalan
+atau tidak, sampai kapan, dan berapa persen. Bonus yang add-on-nya tidak
+dijual ikut disaring `hargaPromo()`, karena menjanjikan fitur yang tidak bisa
+dibuka lebih buruk daripada tidak menjanjikan apa-apa: kesalahannya baru
+terasa setelah uangnya masuk.
+
+**Total di layar dan total di tagihan dirakit satu fungsi.** `rakitPesanan()`
+di `src/lib/pesanan.ts` dipakai layar langganan, `/api/bayar`, dan
+`/api/aktivasi` sekaligus. Di dalamnya bonus menang atas pilihan sendiri:
+mencentang add-on yang sudah jadi bonus paket tidak menambah tagihan, karena
+kalau lolos yang terjadi persis kebalikan dari yang dijanjikan halaman depan.
+Promonya diterima sudah jadi sebagai `PaketPromo`, bukan dihitung di dalam,
+supaya sisi peramban tidak pernah memanggil `new Date()`: hasil hitungan
+server yang diturunkan sebagai prop tidak bisa berbeda dari waktu server yang
+nanti menagih. Pembulatan promo selalu ke bawah ke ribuan terdekat, karena ke
+atas berarti pelanggan membayar sedikit lebih mahal daripada persen yang
+tertulis di halaman.
+
 Midtrans sengaja tidak diberi saklar di panel admin: saklarnya sudah ada dan
 lebih tegas, yaitu ada tidaknya kunci di env. Dua saklar berarti dua sumber
 kebenaran yang bisa berbeda, dan yang paling mungkin terjadi adalah admin
@@ -624,7 +661,11 @@ karena ini.
 
 **Prettier merapikan ulang.** Pencocokan string persis sering meleset setelah
 Prettier menggabung impor multi-baris. Sisipkan setelah baris impor satu baris
-yang pasti, bukan setelah "impor terakhir".
+yang pasti, bukan setelah "impor terakhir". Ini juga berlaku pada tes yang
+memeriksa kode dengan membaca sumbernya: `addon.test.ts` pernah merah bukan
+karena aturannya dilanggar, melainkan karena baris yang dicarinya dipecah
+Prettier setelah berkasnya disentuh. Pola seperti itu harus menoleransi spasi
+dan pindah baris, kalau tidak ia menjaga tata letak, bukan aturannya.
 
 ## Yang masih terbuka
 
@@ -683,6 +724,8 @@ src/lib/midtrans-server  yang memegang kunci server, server-only
 src/lib/pembayaran-server  satu pintu mengubah pembayaran jadi langganan
 src/lib/admin-pembayaran  pencarian dan penyaringan pesanan, fungsi murni
 src/lib/addon-beli.ts  siapa boleh menambah add-on tanpa berlangganan lagi
+src/lib/promo.ts       promo berjangka: potongan, bonus, tanggal berakhirnya
+src/lib/pesanan.ts     satu perakit isi pesanan, dipakai layar dan kedua route
 src/app/terima-kasih/  ke mana orang mendarat setelah membayar
 scripts/akun-uji.ts    akun uji pembayaran, bisa dikunci ulang
 src/app/api/           route admin selalu requireAdmin, harga dihitung server

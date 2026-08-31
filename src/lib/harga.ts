@@ -1,4 +1,5 @@
 import type { Lang } from "@/lib/content/i18n";
+import { PROMO_BAWAAN, type PengaturanPromo } from "@/lib/promo";
 
 /** Teks yang punya versi dua bahasa. */
 export interface Dwibahasa {
@@ -42,6 +43,14 @@ export interface PengaturanHarga {
    * ada orang yang ingin membayar sekarang.
    */
   transferManual: boolean;
+  /**
+   * Promo berjangka yang sedang dipasang.
+   *
+   * Disimpan berdampingan dengan harga aslinya, bukan menimpanya, supaya
+   * harga normal tetap ada untuk dicoret di halaman depan dan untuk
+   * dikembalikan sendiri begitu tanggalnya lewat. Aturannya di `promo.ts`.
+   */
+  promo: PengaturanPromo;
   diperbaruiPada: string | null;
   diperbaruiOleh: string | null;
 }
@@ -134,6 +143,7 @@ export const HARGA_BAWAAN: PengaturanHarga = {
   // ada gateway, jadi bawaan yang mematikannya akan mencabut satu-satunya cara
   // membayar pada pemasangan mana pun yang kunci Midtrans-nya belum diisi.
   transferManual: true,
+  promo: PROMO_BAWAAN,
   diperbaruiPada: null,
   diperbaruiOleh: null,
 };

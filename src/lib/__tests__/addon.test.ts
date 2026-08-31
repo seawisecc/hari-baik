@@ -196,10 +196,15 @@ for (const id of Object.keys(ADDON_SIAP)) {
   // sebelum: kalau tidak, add-on baru lolos tanpa diperiksa kesiapannya.
   const sumber = readFileSync("src/lib/harga-server.ts", "utf8");
   eq("bacaHarga menggabungkan katalog", true, /gabungAddOn\(h\.addOn\)/.test(sumber));
+  // Polanya menoleransi spasi dan pindah baris: yang dijaga adalah urutannya,
+  // yaitu penyaring dipanggil pada hasil penggabungan, bukan pada daftar
+  // mentahnya. Pernah tertulis sebagai satu baris persis, lalu Prettier
+  // memecahnya saat berkasnya disentuh dan tes ini merah tanpa ada aturan
+  // yang benar-benar dilanggar.
   eq(
     "hasil gabungan tetap disaring",
     true,
-    /gabungAddOn\(h\.addOn\)\.map\(\(a\) => \(addOnSiapJual/.test(sumber),
+    /gabungAddOn\(h\.addOn\)\s*\.map\(\(a\)\s*=>\s*\(?\s*addOnSiapJual/.test(sumber),
   );
 }
 

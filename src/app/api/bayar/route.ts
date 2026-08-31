@@ -8,6 +8,8 @@ import {
   buatTransaksiSnap,
   konfigurasiMidtrans,
 } from "@/lib/midtrans-server";
+import { rakitPesanan } from "@/lib/pesanan";
+import { bonusBolehDijual, hargaPromo } from "@/lib/promo";
 import {
   KOLEKSI_PEMBAYARAN,
   PembayaranTidakDitemukan,
@@ -101,21 +103,39 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const addOn = harga.addOn
-      .filter((a) => a.aktif && idBaru.includes(a.id))
-      .map((a) => ({ id: a.id, nama: a.nama.id, harga: a.harga }));
+    // Harga paket dan bonus promonya dirakit di satu tempat yang sama dengan
+    // yang dipakai jalur transfer manual, jadi kedua jalur tidak bisa berbeda
+    // soal berapa yang ditagih dan apa yang ikut.
+    const isi = rakitPesanan(
+      harga,
+      paket ? hargaPromo(paket, harga.promo, new Date(), bonusBolehDijual(harga)) : null,
+      idBaru,
+    );
 
-    // Rincian dirakit dari daftar yang sama dengan totalnya, jadi keduanya
-    // tidak bisa berbeda. Tanpa paket, barisnya cuma add-on.
+    /*
+     * Bonus tidak dikirim sebagai baris ke Midtrans.
+     *
+     * Baris berharga nol belum pernah diuji pada akun produksi ini, dan yang
+     * dipertaruhkan kalau ternyata ditolak bukan tampilan melainkan seluruh
+     * pembayarannya. Bonusnya tetap tercatat di dokumen pesanan dan tetap
+     * diberikan saat lunas; yang tidak dilihat pembeli cuma barisnya di
+     * jendela Snap, dan halaman terima kasih menyebutkannya kembali.
+     */
     const items = paket
-      ? rincianItem({ id: paket.id, nama: paket.nama.id, harga: paket.harga }, addOn)
-      : addOn.map((a) => ({
+      ? rincianItem(
+          { id: paket.id, nama: paket.nama.id, harga: isi.hargaPaket },
+          isi.addOnBayar,
+        )
+      : isi.addOnBayar.map((a) => ({
           id: a.id,
           price: a.harga,
           quantity: 1,
           name: a.nama.slice(0, 50),
         }));
+    // Rincian dirakit dari daftar yang sama dengan totalnya, jadi keduanya
+    // tidak bisa berbeda.
     const total = totalItem(items);
+    const addOn = isi.addOn;
 
     const orderId = buatOrderId(
       decoded.uid,
@@ -132,7 +152,7 @@ export async function POST(req: NextRequest) {
       paketId: paket?.id ?? null,
       paketNama: paket?.nama.id ?? NAMA_PESANAN_ADDON,
       paketTahun: paket?.tahun ?? 0,
-      harga: paket?.harga ?? 0,
+      harga: isi.hargaPaket,
       addOn,
       total,
       status: "menunggu",
