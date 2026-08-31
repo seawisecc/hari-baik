@@ -12,7 +12,13 @@
 import { existsSync, readFileSync } from "node:fs";
 import { ADDON_SIAP, addOnSiapJual, periksaAddOn } from "../addon-registry";
 import { RUTE_ADDON } from "../gate";
-import { HARGA_BAWAAN, gabungAddOn } from "../harga";
+
+/** "midtrans+transfer", "midtrans", "transfer", atau "buntu". */
+function ringkas(j: { midtrans: boolean; transfer: boolean }): string {
+  const ada = [j.midtrans ? "midtrans" : "", j.transfer ? "transfer" : ""].filter(Boolean);
+  return ada.join("+") || "buntu";
+}
+import { HARGA_BAWAAN, gabungAddOn, jalurBayar } from "../harga";
 
 let fail = 0;
 const eq = (label: string, expected: unknown, actual: unknown) => {
@@ -193,6 +199,50 @@ for (const id of Object.keys(ADDON_SIAP)) {
     "hasil gabungan tetap disaring",
     true,
     /gabungAddOn\(h\.addOn\)\.map\(\(a\) => \(addOnSiapJual/.test(sumber),
+  );
+}
+
+/*
+ * Halaman langganan tidak boleh pernah kehabisan cara membayar.
+ *
+ * Saklar transfer manual ada supaya admin tidak perlu lagi memeriksa antrean
+ * konfirmasi setelah gateway berjalan. Tapi saklar itu punya satu kombinasi
+ * yang mematikan: dimatikan, lalu gateway ikut mati (kunci belum dipasang di
+ * lingkungan itu, atau salah pasang server/klien). Yang tersisa halaman
+ * berisi daftar harga tanpa satu pun tombol untuk membelinya. Itu jalan buntu
+ * yang tidak terlihat seperti kerusakan, jadi tidak ada yang melaporkannya;
+ * yang terjadi cuma orang pergi.
+ */
+{
+  const j = (m: boolean, t: boolean) => jalurBayar({ midtransAktif: m, transferDiizinkan: t });
+
+  eq("keduanya hidup", "midtrans+transfer", ringkas(j(true, true)));
+  eq("gateway hidup, manual dimatikan admin", "midtrans", ringkas(j(true, false)));
+  eq("gateway mati, manual hidup", "transfer", ringkas(j(false, true)));
+  // Inilah kombinasi yang dijaga: keduanya mati, tapi transfer dipaksa hidup.
+  eq(
+    "gateway mati DAN manual dimatikan: manual tetap dipaksa hidup",
+    "transfer",
+    ringkas(j(false, false)),
+  );
+
+  // Bawaannya harus hidup. Pemasangan yang kunci Midtrans-nya belum diisi dan
+  // dokumen harganya belum pernah tersimpan tidak boleh kehilangan jalur
+  // satu-satunya hanya karena field baru ini belum ada nilainya.
+  eq("bawaan transfer manual hidup", true, HARGA_BAWAAN.transferManual);
+
+  // Ditegakkan di server juga, bukan cuma disembunyikan di layar.
+  const route = readFileSync("src/app/api/aktivasi/route.ts", "utf8");
+  eq("route aktivasi menegakkan saklar", true, route.includes("jalurBayar("));
+  eq("route aktivasi menolak saat mati", true, /status:\s*409/.test(route));
+
+  // Dan aturannya dipanggil dari satu fungsi yang sama, bukan ditulis ulang.
+  const layar = readFileSync("src/components/AjukanAktivasi.tsx", "utf8");
+  eq("layar memakai fungsi yang sama", true, layar.includes("jalurBayar("));
+  eq(
+    "layar tidak menulis ulang aturannya",
+    false,
+    /MIDTRANS_AKTIF\s*&&\s*transferManual|transferManual\s*&&\s*MIDTRANS_AKTIF/.test(layar),
   );
 }
 

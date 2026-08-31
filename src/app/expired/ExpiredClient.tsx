@@ -4,13 +4,14 @@ import { Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AjukanAktivasi } from "@/components/AjukanAktivasi";
+import { MIDTRANS_AKTIF } from "@/components/BayarMidtrans";
 import { DaftarHarga } from "@/components/DaftarHarga";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Wordmark } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { useT } from "@/lib/content/LangProvider";
 import { useAuth } from "@/lib/firebase/AuthProvider";
-import { type PengaturanHarga, type PaketLangganan } from "@/lib/harga";
+import { jalurBayar, type PengaturanHarga, type PaketLangganan } from "@/lib/harga";
 
 /** Paket yang disorot lebih dulu, supaya tombol kirim langsung bisa ditekan. */
 function paketAwal(harga: PengaturanHarga): PaketLangganan | null {
@@ -29,6 +30,15 @@ export function ExpiredClient({ harga }: { harga: PengaturanHarga }) {
   const { profile, access, logout } = useAuth();
   const [paket, setPaket] = useState<PaketLangganan | null>(() => paketAwal(harga));
   const [lunas, setLunas] = useState(false);
+
+  // Langkah "cara berlangganan" di bawah menjelaskan alur transfer manual,
+  // jadi ia ikut hilang ketika jalur itu tidak ditawarkan. Petunjuk yang
+  // menyuruh menghubungi admin di halaman yang tidak lagi menerima transfer
+  // lebih membingungkan daripada tidak ada petunjuk sama sekali.
+  const jalur = jalurBayar({
+    midtransAktif: MIDTRANS_AKTIF,
+    transferDiizinkan: harga.transferManual,
+  });
 
   const menunggu = profile?.subscriptionStatus === "pending";
 
@@ -76,7 +86,7 @@ export function ExpiredClient({ harga }: { harga: PengaturanHarga }) {
           )}
 
           <div className="space-y-5 border-t border-border-soft pt-6">
-            {!menunggu && (
+            {!menunggu && jalur.transfer && (
               <div>
                 <p className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-ink-faint">
                   {t("expired.howTo")}
@@ -96,6 +106,7 @@ export function ExpiredClient({ harga }: { harga: PengaturanHarga }) {
               paket={paket}
               addOnTersedia={harga.addOn.filter((a) => a.aktif)}
               sudahMenunggu={menunggu}
+              transferManual={harga.transferManual}
               onLunas={() => setLunas(true)}
             />
           </div>

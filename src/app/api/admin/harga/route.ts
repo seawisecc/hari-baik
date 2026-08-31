@@ -107,11 +107,21 @@ export async function GET() {
 export async function PUT(req: NextRequest) {
   try {
     const admin = await requireAdmin(req);
-    const body = (await req.json()) as { paket?: unknown; addOn?: unknown };
+    const body = (await req.json()) as {
+      paket?: unknown;
+      addOn?: unknown;
+      transferManual?: unknown;
+    };
 
     const data = {
       paket: bersihkanPaket(body.paket),
       addOn: bersihkanAddOn(body.addOn),
+      // Boolean() atas nilai yang hilang menghasilkan false, dan itu arah
+      // salah yang berbahaya: satu permintaan lama yang belum membawa field
+      // ini akan diam-diam mematikan transfer manual, lalu halaman langganan
+      // kehilangan satu jalur tanpa ada yang menyentuh saklarnya. Yang tidak
+      // disebutkan berarti tidak diubah, jadi bawaannya true.
+      transferManual: body.transferManual === undefined ? true : Boolean(body.transferManual),
       diperbaruiPada: new Date().toISOString(),
       diperbaruiOleh: admin.email ?? admin.uid,
     };
@@ -128,10 +138,11 @@ export async function PUT(req: NextRequest) {
         aktor: admin.email ?? admin.uid,
         aktorUid: admin.uid,
         sasaran: null,
-        ringkasan: `Daftar harga disimpan: ${data.paket.length} paket, ${data.addOn.length} add-on.`,
+        ringkasan: `Daftar harga disimpan: ${data.paket.length} paket, ${data.addOn.length} add-on, transfer manual ${data.transferManual ? "hidup" : "mati"}.`,
         detail: {
           paket: data.paket.map((p) => ({ id: p.id, harga: p.harga, aktif: p.aktif })),
           addOn: data.addOn.map((a) => ({ id: a.id, harga: a.harga, aktif: a.aktif })),
+          transferManual: data.transferManual,
         },
       },
       req,

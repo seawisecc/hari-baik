@@ -83,7 +83,11 @@ export function AturHarga() {
       const res = await fetch("/api/admin/harga", {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ paket: data.paket, addOn: data.addOn }),
+        body: JSON.stringify({
+          paket: data.paket,
+          addOn: data.addOn,
+          transferManual: data.transferManual,
+        }),
       });
       const hasil = await res.json();
       if (!res.ok) throw new Error(hasil.error ?? t("admin.actionFailed"));
@@ -306,6 +310,43 @@ export function AturHarga() {
             <Plus className="h-4 w-4" aria-hidden />
             {t("price.addAddon")}
           </Button>
+        </CardBody>
+      </Card>
+
+      {/*
+       * Metode pembayaran, satu saklar.
+       *
+       * Midtrans tidak diberi saklar di sini karena saklarnya sudah ada di
+       * tempat lain dan lebih tegas: ada tidaknya kunci di env. Menaruh
+       * saklar kedua berarti dua sumber kebenaran yang bisa berbeda, dan
+       * yang paling mungkin terjadi adalah admin mematikannya di sini lalu
+       * lupa, sementara kuncinya masih terpasang.
+       */}
+      <Card elevation={2}>
+        <CardHeader>
+          <CardTitle>{t("price.methods")}</CardTitle>
+          <p className="mt-1 text-sm text-ink-soft">{t("price.methodsHint")}</p>
+        </CardHeader>
+        <CardBody className="space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-md bg-surface-sunk px-5 py-4 hb-sink">
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-ink">{t("price.manualTransfer")}</p>
+              <p className="mt-0.5 text-xs leading-relaxed text-ink-soft">
+                {t("price.manualTransferHint")}
+              </p>
+            </div>
+            <Saklar
+              aktif={data.transferManual}
+              label={t(data.transferManual ? "price.on" : "price.off")}
+              onClick={() => setData({ ...data, transferManual: !data.transferManual })}
+            />
+          </div>
+
+          {!data.transferManual && (
+            <p className="text-xs leading-relaxed text-ink-faint">
+              {t("price.manualTransferOffNote")}
+            </p>
+          )}
         </CardBody>
       </Card>
 

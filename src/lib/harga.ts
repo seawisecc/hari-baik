@@ -32,6 +32,16 @@ export interface AddOn {
 export interface PengaturanHarga {
   paket: PaketLangganan[];
   addOn: AddOn[];
+  /**
+   * Boleh atau tidaknya pelanggan membayar lewat transfer manual.
+   *
+   * Dimatikan setelah gateway berjalan, supaya tidak ada lagi antrean
+   * konfirmasi yang harus diperiksa admin satu per satu. Tetap bisa
+   * dihidupkan lagi tanpa deploy, karena yang paling mungkin membutuhkannya
+   * adalah keadaan yang tidak bisa ditunggu: gateway sedang bermasalah dan
+   * ada orang yang ingin membayar sekarang.
+   */
+  transferManual: boolean;
   diperbaruiPada: string | null;
   diperbaruiOleh: string | null;
 }
@@ -120,9 +130,38 @@ export const HARGA_BAWAAN: PengaturanHarga = {
       aktif: true, // fiturnya sudah ada di /fengshui-nama
     },
   ],
+  // Bawaannya hidup. Aplikasi ini sudah menerima transfer manual jauh sebelum
+  // ada gateway, jadi bawaan yang mematikannya akan mencabut satu-satunya cara
+  // membayar pada pemasangan mana pun yang kunci Midtrans-nya belum diisi.
+  transferManual: true,
   diperbaruiPada: null,
   diperbaruiOleh: null,
 };
+
+/**
+ * Jalur pembayaran mana yang boleh ditampilkan.
+ *
+ * Aturan yang sebenarnya cuma satu, dan itu bukan soal preferensi admin:
+ * halaman langganan tidak boleh pernah kehabisan cara membayar. Kalau gateway
+ * mati (kunci belum dipasang, atau salah pasang) sementara transfer manual
+ * sudah dimatikan admin, yang tersisa adalah halaman berisi daftar harga dan
+ * tidak satu pun tombol untuk membelinya. Itu jalan buntu yang tidak terlihat
+ * seperti kerusakan, jadi tidak ada yang melaporkannya; yang terjadi cuma
+ * orang pergi.
+ *
+ * Karena itu transfer manual dipaksa hidup ketika gateway tidak aktif, apa
+ * pun isi pengaturannya. Saklar admin menentukan apa yang diinginkan, fungsi
+ * ini menentukan apa yang aman.
+ */
+export function jalurBayar(k: { midtransAktif: boolean; transferDiizinkan: boolean }): {
+  midtrans: boolean;
+  transfer: boolean;
+} {
+  return {
+    midtrans: k.midtransAktif,
+    transfer: k.transferDiizinkan || !k.midtransAktif,
+  };
+}
 
 /**
  * Gabungkan katalog add-on di kode dengan pengaturan yang tersimpan admin.

@@ -1,6 +1,8 @@
 import type { NextRequest } from "next/server";
 import { adminAuth, adminDb } from "@/lib/firebase/admin";
+import { jalurBayar } from "@/lib/harga";
 import { bacaHarga } from "@/lib/harga-server";
+import { konfigurasiMidtrans } from "@/lib/midtrans-server";
 import { punyaAksesBerbayar } from "@/lib/subscription";
 import type { Aktivasi, UserProfile } from "@/types";
 
@@ -33,6 +35,24 @@ export async function POST(req: NextRequest) {
     };
 
     const harga = await bacaHarga();
+
+    // Saklar transfer manual ditegakkan di sini juga, bukan cuma di tampilan.
+    // Tombolnya memang disembunyikan, tapi route ini terbuka bagi siapa pun
+    // yang pernah melihatnya sekali dan menyimpan permintaannya. Aturannya
+    // dipanggil dari fungsi yang sama dengan yang dipakai layar, jadi
+    // keduanya tidak bisa berbeda pendapat, termasuk soal pengecualian yang
+    // menghidupkan jalur ini kembali saat gateway mati.
+    const jalur = jalurBayar({
+      midtransAktif: konfigurasiMidtrans() !== null,
+      transferDiizinkan: harga.transferManual,
+    });
+    if (!jalur.transfer) {
+      return Response.json(
+        { error: "Pembayaran lewat transfer manual sedang tidak dibuka." },
+        { status: 409 },
+      );
+    }
+
     const paket = harga.paket.find((p) => p.id === body.paketId && p.aktif);
     if (!paket) {
       return Response.json({ error: "Paket tidak ditemukan." }, { status: 400 });

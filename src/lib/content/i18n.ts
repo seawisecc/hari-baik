@@ -380,6 +380,16 @@ const dict = {
     "price.save": "Simpan harga",
     "price.saved": "Harga tersimpan.",
     "price.saveShort": "Hemat {n}%",
+    "price.methods": "Metode Pembayaran",
+    "price.methodsHint":
+      "Midtrans tidak diatur di sini: hidup atau matinya ditentukan ada tidaknya kunci di env, supaya tidak ada dua saklar yang bisa berbeda.",
+    "price.manualTransfer": "Transfer manual",
+    "price.manualTransferHint":
+      'Pelanggan transfer sendiri lalu menekan "Saya sudah bayar", dan kamu yang menyetujuinya di tab Permintaan.',
+    "price.manualTransferOffNote":
+      "Dimatikan. Halaman langganan hanya menawarkan pembayaran otomatis, dan tidak ada lagi permintaan aktivasi baru yang masuk ke antreanmu. Kalau suatu saat Midtrans bermasalah, jalur ini menyala sendiri supaya halamannya tidak kehabisan cara membayar.",
+    "price.on": "Hidup",
+    "price.off": "Mati",
     "price.active": "Aktif",
     "price.popular": "Populer",
     "price.oneTime": "Bayar sekali",
@@ -1055,6 +1065,16 @@ const dict = {
     "price.save": "Save pricing",
     "price.saved": "Pricing saved.",
     "price.saveShort": "Save {n}%",
+    "price.methods": "Payment Methods",
+    "price.methodsHint":
+      "Midtrans is not set here: whether it is on depends on the keys in the environment, so there are never two switches that can disagree.",
+    "price.manualTransfer": "Bank transfer",
+    "price.manualTransferHint":
+      'Customers transfer on their own, press "I have paid", and you approve it under Requests.',
+    "price.manualTransferOffNote":
+      "Off. The subscription page offers automatic payment only, and no new activation requests reach your queue. If Midtrans ever fails, this path turns itself back on so the page never runs out of ways to pay.",
+    "price.on": "On",
+    "price.off": "Off",
     "price.active": "Active",
     "price.popular": "Popular",
     "price.oneTime": "One-time",

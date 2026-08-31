@@ -386,6 +386,30 @@ tidak pernah bisa diselesaikan. Begitu lunas, barulah dokumen `aktivasi`
 ditulis, sudah berstatus disetujui dengan `diputuskanOleh: "midtrans"`, supaya
 catatan uang semua pelanggan tetap berkumpul di satu koleksi.
 
+**Halaman langganan tidak boleh pernah kehabisan cara membayar.**
+`transferManual` di pengaturan harga mematikan jalur transfer manual setelah
+gateway berjalan, supaya antrean konfirmasi admin berhenti terisi. Tapi ada
+satu kombinasi yang mematikan: saklar itu mati DAN gateway ikut mati (kunci
+belum dipasang di lingkungan itu, atau server dan klien beda lingkungan).
+Yang tersisa halaman berisi daftar harga tanpa satu pun tombol untuk
+membelinya, dan itu jalan buntu yang tidak terlihat seperti kerusakan: tidak
+ada yang melaporkannya, yang terjadi cuma orang pergi. Karena itu
+`jalurBayar()` memaksa transfer manual hidup ketika gateway tidak aktif, apa
+pun isi pengaturannya. Saklar menentukan yang diinginkan, fungsi itu
+menentukan yang aman. Dipakai tampilan DAN route `/api/aktivasi` sekaligus,
+jadi tombol yang disembunyikan juga benar-benar ditolak server. Dijaga
+`addon.test.ts`, yang menamai kegagalannya "buntu".
+
+Midtrans sengaja tidak diberi saklar di panel admin: saklarnya sudah ada dan
+lebih tegas, yaitu ada tidaknya kunci di env. Dua saklar berarti dua sumber
+kebenaran yang bisa berbeda, dan yang paling mungkin terjadi adalah admin
+mematikannya di panel lalu lupa sementara kuncinya masih terpasang.
+
+Field yang hilang dari badan permintaan PUT harga dibaca `true`, bukan
+`Boolean(undefined)`. Permintaan lama yang belum membawa field ini akan
+diam-diam mematikan transfer manual, dan halaman langganan kehilangan satu
+jalur tanpa ada yang pernah menyentuh saklarnya.
+
 **Nonaktifkan harus ikut mengakhiri masa coba.** Aksi `deactivate` dulu hanya
 menyetel `subscriptionStatus` ke "expired" dan mengosongkan
 `subscriptionExpiresAt`, sementara `trialEndsAt` dibiarkan. Untuk siapa pun
@@ -513,10 +537,20 @@ bukan redeploy.
 Cara memastikannya tanpa perlu masuk sebagai pengguna: ambil chunk yang
 dirujuk HTML halamannya lalu cari untaian `app.midtrans.com` di dalamnya.
 Untaian itu ada di `urlSnapJs()` dan ikut ke bundel apa pun yang memuat
-BayarMidtrans, jadi nol hasil berarti komponennya memang tidak ikut, bukan
-sekadar kuncinya yang berbeda. Meng-grep HTML-nya saja tidak menjawab apa
-pun: teks tombolnya dirender setelah hidrasi, jadi tidak ada di HTML bahkan
-ketika tombolnya jelas terlihat di layar.
+BayarMidtrans. Meng-grep HTML-nya saja tidak menjawab apa pun: teks tombolnya
+dirender setelah hidrasi, jadi tidak ada di HTML bahkan ketika tombolnya jelas
+terlihat di layar.
+
+**Daftar chunk diambil dengan `/_next/static/[^"]*\.js`, bukan dari `src="`.**
+Sebagian chunk dirujuk bukan lewat atribut `src`, termasuk yang memuat
+komponen halaman itu sendiri. Memindai hanya yang ber-`src=` melewatkan persis
+chunk yang dicari, dan hasilnya nol untuk build yang sebenarnya baik-baik
+saja. Ini sudah pernah menyesatkan satu putaran penuh: produksi dilaporkan
+tidak membawa kode Midtrans padahal membawanya, dan yang menyelamatkan hanya
+menjalankan pemindaian yang sama pada build lokal yang jelas berfungsi lalu
+mendapati hasilnya juga nol. Setiap pemindaian bundel wajib punya pembanding
+yang diketahui benar; tanpa itu, nol tidak bisa dibedakan dari alat yang
+rusak.
 
 **`vercel env pull` mengosongkan env var yang ditandai sensitif.** Berkas yang
 dihasilkan tetap memuat semua namanya, tapi nilainya `""`, karena env var
