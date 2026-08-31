@@ -36,15 +36,15 @@ halamannya dan periksa DOM-nya.
 
 ## Perintah
 
-| Perintah               | Guna                                               |
-| ---------------------- | -------------------------------------------------- |
-| `npm run verify`       | Gerbang sebelum push: lint, tes, build, uji asap   |
-| `npm test`             | Lima belas suite tes                               |
+| Perintah               | Guna                                                 |
+| ---------------------- | ---------------------------------------------------- |
+| `npm run verify`       | Gerbang sebelum push: lint, tes, build, uji asap     |
+| `npm test`             | Lima belas suite tes                                 |
 | `npm run smoke`        | Tembak ketiga belas route API di build produksi asli |
-| `npm run akun-uji`     | Buat atau kunci ulang akun uji pembayaran          |
-| `npm run deploy-rules` | Terapkan `firestore.rules`                         |
-| `npm run set-admin`    | Beri custom claim admin                            |
-| `npm run protection`   | Nyalakan atau matikan Vercel Deployment Protection |
+| `npm run akun-uji`     | Buat atau kunci ulang akun uji pembayaran            |
+| `npm run deploy-rules` | Terapkan `firestore.rules`                           |
+| `npm run set-admin`    | Beri custom claim admin                              |
+| `npm run protection`   | Nyalakan atau matikan Vercel Deployment Protection   |
 
 ## Keputusan yang jangan dibongkar tanpa alasan
 
