@@ -69,6 +69,27 @@ const DAFTAR: Uji[] = [
     harap: [401],
     kenapa: "sama, dan route ini menarik SDK Resend ke sisi server",
   },
+  {
+    jalur: "/api/admin/pembayaran",
+    metode: "GET",
+    harap: [401],
+    kenapa: "sama, dan route ini menarik klien Midtrans ke sisi server",
+  },
+  {
+    jalur: "/api/bayar",
+    metode: "POST",
+    harap: [401],
+    kenapa: "sama, dan route ini merakit harga di server sebelum menagih",
+  },
+  {
+    // 503 bila kunci Midtrans belum dipasang, 400 bila sudah: keduanya
+    // berarti handler-nya berjalan. Yang dicari route yang gagal boot, dan
+    // itu selalu muncul sebagai 500 berbadan kosong.
+    jalur: "/api/bayar/notifikasi",
+    metode: "POST",
+    harap: [400, 503],
+    kenapa: "route webhook, tidak punya token, harus tetap boot",
+  },
 ];
 
 async function tungguSiap(batasDetik = 60) {

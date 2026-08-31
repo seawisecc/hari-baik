@@ -129,3 +129,53 @@ export interface Aktivasi {
   diputuskanOleh: string | null;
   alasanTolak: string | null;
 }
+
+/**
+ * Satu pesanan lewat payment gateway.
+ *
+ * Disimpan terpisah dari `aktivasi` dengan sengaja. Koleksi `aktivasi` adalah
+ * antrean kerja admin: yang ada di sana berstatus "menunggu" karena memang
+ * menunggu orang memeriksanya. Pesanan Midtrans yang belum dibayar bukan itu:
+ * tidak ada yang perlu diperiksa, dan yang dibuat lalu ditinggalkan akan
+ * menumpuk sebagai pekerjaan palsu yang tidak pernah bisa diselesaikan admin.
+ *
+ * Begitu pembayarannya lunas, barulah dokumen `aktivasi` ikut ditulis, sudah
+ * berstatus disetujui, supaya catatan uang semua pelanggan tetap berkumpul di
+ * satu koleksi entah dibayar lewat transfer atau lewat gateway.
+ */
+export type StatusPembayaranDoc = "menunggu" | "lunas" | "gagal" | "dikembalikan";
+
+export interface Pembayaran {
+  /** Sama dengan id dokumennya, dan sama dengan order_id di Midtrans. */
+  orderId: string;
+  uid: string;
+  email: string;
+  nama: string;
+  phoneNumber: string | null;
+
+  /** Salinan harga saat pesanan dibuat, sama seperti pada Aktivasi. */
+  paketId: string;
+  paketNama: string;
+  paketTahun: number;
+  harga: number;
+  addOn: { id: string; nama: string; harga: number }[];
+  total: number;
+
+  status: StatusPembayaranDoc;
+  /** "sandbox" atau "produksi", supaya pesanan uji tidak tertukar dengan yang asli. */
+  mode: string;
+
+  createdAt: string;
+  /** ISO, diisi saat notifikasi lunas pertama kali diterima. */
+  dibayarPada: string | null;
+  /** Diisi setelah langganan benar-benar diterapkan, jadi tidak bisa dobel. */
+  diterapkanPada: string | null;
+  /** Id dokumen aktivasi yang ditulis saat lunas. */
+  aktivasiId: string | null;
+
+  /** Apa adanya dari Midtrans, seperlunya untuk ditelusuri di dashboard mereka. */
+  transactionId: string | null;
+  paymentType: string | null;
+  transactionStatus: string | null;
+  fraudStatus: string | null;
+}

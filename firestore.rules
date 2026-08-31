@@ -146,6 +146,18 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // Pesanan lewat payment gateway. Sama seperti aktivasi: pengguna boleh
+    // melihat miliknya sendiri, tapi tidak ada satu pun jalan menulisnya dari
+    // klien. Nominalnya dirakit server dari daftar harga, dan status lunasnya
+    // hanya boleh datang dari notifikasi Midtrans yang tanda tangannya sudah
+    // diperiksa. Kalau klien bisa menyentuh dokumen ini, "status: lunas"
+    // tinggal diketik sendiri.
+    match /pembayaran/{orderId} {
+      allow get, list: if isAdmin()
+        || (isSignedIn() && resource.data.uid == request.auth.uid);
+      allow write: if false;
+    }
+
     // Jejak audit. Hanya ditulis Admin SDK di server, yang melewati rules;
     // dari klien mana pun tidak ada jalan menulis, menyunting, atau
     // menghapusnya. Admin boleh membaca supaya riwayat keputusan bisa
