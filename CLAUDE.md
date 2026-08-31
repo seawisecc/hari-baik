@@ -500,6 +500,24 @@ tidak berubah akan memakai ulang hasil render lama, termasuk datanya. Route
 PUT harga memanggil `revalidatePath`; kalau butuh segar segera di luar itu,
 sentuh kode halamannya.
 
+**`vercel redeploy` memakai env var milik deployment lama.** Ia benar-benar
+membangun ulang (nama chunk-nya berubah), tapi konfigurasinya diambil dari
+deployment yang di-redeploy, bukan dari pengaturan project saat ini. Env var
+yang baru ditambahkan TIDAK ikut. Gejalanya menyesatkan karena setengah
+jalan: `MIDTRANS_SERVER_KEY` terbaca dan route webhook menjawab 400 seolah
+gateway hidup, sementara `NEXT_PUBLIC_MIDTRANS_CLIENT_KEY` yang dibekukan saat
+build tetap kosong, jadi tombol bayarnya tidak pernah muncul. Untuk env var
+baru, picu build baru dari git (push ke `main`) atau `vercel deploy --prod`,
+bukan redeploy.
+
+Cara memastikannya tanpa perlu masuk sebagai pengguna: ambil chunk yang
+dirujuk HTML halamannya lalu cari untaian `app.midtrans.com` di dalamnya.
+Untaian itu ada di `urlSnapJs()` dan ikut ke bundel apa pun yang memuat
+BayarMidtrans, jadi nol hasil berarti komponennya memang tidak ikut, bukan
+sekadar kuncinya yang berbeda. Meng-grep HTML-nya saja tidak menjawab apa
+pun: teks tombolnya dirender setelah hidrasi, jadi tidak ada di HTML bahkan
+ketika tombolnya jelas terlihat di layar.
+
 **`vercel env pull` mengosongkan env var yang ditandai sensitif.** Berkas yang
 dihasilkan tetap memuat semua namanya, tapi nilainya `""`, karena env var
 sensitif memang tidak bisa dibaca balik oleh siapa pun. Menjalankannya begitu
