@@ -66,7 +66,7 @@ export function emailVerifikasi({
       "",
       "Kalau kamu tidak merasa mendaftar, abaikan saja email ini.",
       "",
-      "Hari Baik, oleh Seawise Studio",
+      "Hari Baik, dikembangkan Seawise Studio, dioperasikan Mayaloka Digital",
       "haribaik.seawise.id",
     ].join("\n"),
     html: `<body style="margin:0;padding:0;background-color:${KANVAS};">
@@ -128,7 +128,7 @@ export function emailVerifikasi({
               Kalau kamu tidak merasa mendaftar, abaikan saja email ini.
             </p>
             <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:${REDUP};">
-              Hari Baik, oleh Seawise Studio &middot; haribaik.seawise.id
+              Hari Baik, dikembangkan Seawise Studio, dioperasikan Mayaloka Digital<br />haribaik.seawise.id
             </p>
           </td>
         </tr>

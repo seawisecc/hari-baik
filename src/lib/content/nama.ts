@@ -1,5 +1,5 @@
 /**
- * Makna nama lewat aksara Bali.
+ * Makna nama lewat nilai aksara.
  *
  * Hanya konsonan yang dihitung: vokal tidak punya nilai aksara sendiri.
  * Digraf "ng" (Nga) dan "ny" (Nya) dibaca sebagai satu aksara, jadi harus

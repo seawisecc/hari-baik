@@ -27,7 +27,12 @@ const body = Inter({
 });
 
 const SITUS = "https://haribaik.seawise.id";
+// Dua pihak, dua peran. Seawise Studio yang membangun aplikasinya, Mayaloka
+// Digital yang menjalankan layanannya sehari-hari: langganan, pembayaran, dan
+// dukungan pelanggan. Keduanya ikut di metadata, bukan hanya di layar, supaya
+// terbaca mesin pencari dan pratinjau tautan saat halaman ini dibagikan.
 const STUDIO = "Seawise Studio";
+const OPERATOR = "Mayaloka Digital";
 const JUDUL = "Hari Baik | Kalender Siklus Personal";
 /*
  * Ringkasan membawa kailnya, bukan cuma keterangan kategorinya.
@@ -36,11 +41,12 @@ const JUDUL = "Hari Baik | Kalender Siklus Personal";
  * ia berdiri sendiri tanpa halaman di sekelilingnya untuk menjelaskan. Kalimat
  * yang cuma menyebutkan apa produknya menyerahkan seluruh pekerjaan menarik
  * perhatian kepada judul dan gambar. Ketiga tradisinya ikut disebut, karena
- * pratinjau yang hanya menyebut Bali membuat sebagian orang menyimpulkan
- * aplikasinya bukan untuk mereka sebelum sempat menekan tautannya.
+ * pratinjau yang hanya menyebut satu daerah membuat sebagian orang
+ * menyimpulkan aplikasinya bukan untuk mereka sebelum sempat menekan
+ * tautannya, jadi yang disebut nama sistemnya, bukan asal daerahnya.
  */
 const RINGKASAN =
-  "Sudah kerja keras, tapi kenapa hasilnya sering meleset? Kalender siklus personal yang dihitung dari tanggal lahirmu, memadukan wariga Bali, primbon Jawa, dan fengshui.";
+  "Sudah kerja keras, tapi kenapa hasilnya sering meleset? Kalender siklus personal yang dihitung dari tanggal lahirmu, memadukan wariga, primbon, dan fengshui.";
 
 export const metadata: Metadata = {
   // metadataBase membuat URL gambar jadi absolut. Tanpa ini WhatsApp dan
@@ -50,18 +56,16 @@ export const metadata: Metadata = {
   title: JUDUL,
   description: RINGKASAN,
   applicationName: "Hari Baik",
-  // Atribusi studio ikut di metadata, bukan hanya di layar, supaya terbaca
-  // mesin pencari dan pratinjau tautan saat halaman ini dibagikan.
-  authors: [{ name: STUDIO }],
+  authors: [{ name: STUDIO }, { name: OPERATOR }],
   creator: STUDIO,
-  publisher: STUDIO,
+  publisher: OPERATOR,
   openGraph: {
     type: "website",
     locale: "id_ID",
     url: SITUS,
     siteName: "Hari Baik",
     title: JUDUL,
-    description: `${RINGKASAN} Dibuat oleh ${STUDIO}.`,
+    description: `${RINGKASAN} Dikembangkan ${STUDIO}, dioperasikan ${OPERATOR}.`,
   },
   appleWebApp: {
     capable: true,
