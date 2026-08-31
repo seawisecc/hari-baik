@@ -446,6 +446,22 @@ menentukan yang aman. Dipakai tampilan DAN route `/api/aktivasi` sekaligus,
 jadi tombol yang disembunyikan juga benar-benar ditolak server. Dijaga
 `addon.test.ts`, yang menamai kegagalannya "buntu".
 
+**Penawaran sesudah onboarding adalah penawaran, bukan tembok.** `/penawaran`
+muncul sekali, dibawa alihan dari halaman onboarding, pada menit dengan niat
+paling tinggi yang dimiliki aplikasi ini: orangnya baru saja mengisi tanggal
+lahirnya sendiri. Yang memisahkannya dari tembok cuma jalan keluar yang
+benar-benar ada, jadi itu yang dikunci `gate.test.ts` dan bukan tampilannya:
+`tentukanAlihan()` tidak boleh pernah mengembalikan rute ini dari keadaan mana
+pun, ia tidak boleh masuk `RUTE_TUJUAN`, dan berkasnya wajib memuat tautan ke
+`/hari-ini`. Sekali sebuah layar penawaran jadi tujuan sebuah pemeriksaan, yang
+gagal pemeriksaan dikirim ke sana berulang kali tanpa cara keluar selain
+membayar, dan halaman depan sudah terlanjur menjanjikan "tanpa kartu kredit".
+Halaman itu juga mengalihkan sendiri ke `/hari-ini` di server ketika tidak ada
+promo berjalan, jadi layar harga tepat setelah mendaftar hanya muncul kalau
+memang ada yang ditawarkan. Alihannya tiba sebagai `NEXT_REDIRECT` di payload
+flight, bukan sebagai 307 pada dokumennya, jadi memeriksanya dengan kode
+balasan `curl` akan menjawab 200 dan terlihat seperti tidak bekerja.
+
 **Promo tanpa tanggal berakhir adalah promo yang mati.** `promoBerlaku()` di
 `src/lib/promo.ts` menolak `berakhirPada` yang null, dan route PUT harga
 menolak menyimpan promo aktif tanpa tanggal. Arah bawaan itu disengaja:
@@ -726,6 +742,7 @@ src/lib/admin-pembayaran  pencarian dan penyaringan pesanan, fungsi murni
 src/lib/addon-beli.ts  siapa boleh menambah add-on tanpa berlangganan lagi
 src/lib/promo.ts       promo berjangka: potongan, bonus, tanggal berakhirnya
 src/lib/pesanan.ts     satu perakit isi pesanan, dipakai layar dan kedua route
+src/app/penawaran/     penawaran sekali jalan sesudah onboarding, selalu bisa dilewati
 src/app/terima-kasih/  ke mana orang mendarat setelah membayar
 scripts/akun-uji.ts    akun uji pembayaran, bisa dikunci ulang
 src/app/api/           route admin selalu requireAdmin, harga dihitung server

@@ -146,4 +146,8 @@ export const RUTE_TELANJANG = [
   // Halaman terima kasih berdiri sendiri: yang membukanya baru saja membayar
   // dan cuma perlu tahu satu hal, berhasil atau belum.
   "/terima-kasih",
+  // Penawaran sesudah onboarding juga berdiri sendiri. Menu lengkap di
+  // sebelahnya justru mengajak orangnya pergi dari satu-satunya keputusan
+  // yang sedang diminta di layar itu.
+  "/penawaran",
 ];

@@ -1,7 +1,9 @@
 /** Keputusan pengalihan rute: siapa boleh melihat apa. */
+import { readFileSync } from "node:fs";
 import {
   RUTE_PRO,
   RUTE_PUBLIK,
+  RUTE_TUJUAN,
   perluLayarTunggu,
   tanggalKalender,
   tentukanAlihan,
@@ -210,6 +212,64 @@ for (const href of Object.keys(RUTE_PRO)) {
   eq("setiap rute publik juga tanpa kerangka", "", bocor.join(", "));
 }
 
+// ── Penawaran sesudah onboarding adalah penawaran, bukan tembok ──────────
+//
+// Layar harga yang muncul tepat setelah mendaftar berdiri di tempat yang
+// berbahaya: halaman depan baru saja menjanjikan "tanpa kartu kredit, coba
+// gratis tiga hari", dan apa pun yang menghalangi janji itu terbaca sebagai
+// janji yang ditarik kembali. Yang memisahkan penawaran dari tembok cuma satu
+// hal, yaitu jalan keluar yang benar-benar ada, jadi itulah yang dikunci di
+// sini dan bukan tampilannya.
+{
+  /*
+   * Tidak ada satu pun keadaan yang memantulkan orang ke sini.
+   *
+   * Sekali sebuah layar penawaran jadi TUJUAN sebuah pemeriksaan, ia berhenti
+   * jadi penawaran: yang gagal pemeriksaan akan dikirim ke sana berulang kali
+   * dan tidak punya cara keluar selain membayar. Satu-satunya yang boleh
+   * membawa orang ke halaman ini adalah alihan dari onboarding.
+   */
+  eq("penawaran bukan tujuan pemeriksaan mana pun", false, RUTE_TUJUAN.has("/penawaran"));
+
+  const keadaan: Partial<KondisiAkses>[] = [
+    {},
+    { signedIn: false },
+    { emailVerified: false },
+    { onboardingComplete: false },
+    { canView: false },
+    { canView: false, isAdmin: true },
+    { onboardingComplete: null },
+  ];
+  const nyasar = keadaan
+    .map((u) => tentukanAlihan(k(u)))
+    .filter((tujuan) => tujuan === "/penawaran");
+  eq("gerbang tidak pernah mengirim siapa pun ke penawaran", 0, nyasar.length);
+
+  // Dan dari halaman itu sendiri harus selalu ada pintu keluar yang tidak
+  // meminta bayaran. Tanpa tautan ini yang tersisa cuma tombol bayar, dan
+  // orang yang belum siap membayar tidak punya jalan masuk ke aplikasi yang
+  // baru saja dia daftari.
+  const sumber = readFileSync("src/app/penawaran/PenawaranClient.tsx", "utf8");
+  eq("penawaran punya jalan keluar tanpa membayar", true, /href="\/hari-ini"/.test(sumber));
+  eq(
+    "jalan keluarnya memakai teks yang bisa diterjemahkan",
+    true,
+    /penawaran\.skip/.test(sumber),
+  );
+
+  // Halaman ini berdiri sendiri: bilah samping di sebelahnya mengajak orangnya
+  // pergi dari satu-satunya keputusan yang sedang diminta di layar itu.
+  eq("penawaran tampil tanpa kerangka aplikasi", true, RUTE_TELANJANG.includes("/penawaran"));
+
+  // Alurnya benar-benar tersambung. Tanpa ini seluruh halaman bisa ada dan
+  // benar tapi tidak pernah dibuka siapa pun.
+  const onboarding = readFileSync("src/app/onboarding/page.tsx", "utf8");
+  eq(
+    "onboarding mengantar ke penawaran",
+    true,
+    /router\.push\("\/penawaran"\)/.test(onboarding),
+  );
+}
+
 console.log(fail === 0 ? "✓ gate: semua lolos" : `✗ gate: ${fail} gagal`);
 if (fail) process.exit(1);
-

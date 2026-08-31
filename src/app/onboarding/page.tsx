@@ -95,7 +95,15 @@ export default function OnboardingPage() {
         uripLahir: uripHari(tanggalLahir),
         uripPetemonLahir: petemon.totalUrip,
       });
-      router.push("/hari-ini");
+      /*
+       * Ke penawaran, bukan langsung ke aplikasi.
+       *
+       * Halaman itu sendiri yang memutuskan layak tidaknya muncul: kalau tidak
+       * ada promo berjalan ia mengalihkan ke /hari-ini di server, jadi
+       * keputusannya dibaca dengan waktu sungguhan dan cuma ada di satu
+       * tempat. Halaman ini tidak perlu tahu apa-apa soal harga.
+       */
+      router.push("/penawaran");
     } catch {
       setError(t("common.saveFailed"));
       setKonfirmasi(false);

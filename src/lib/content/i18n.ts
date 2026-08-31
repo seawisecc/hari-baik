@@ -384,10 +384,12 @@ const dict = {
     "price.promoHint":
       "Potongan harga untuk sementara waktu. Tanggal berakhirnya wajib: lewat tanggal itu harga kembali normal dengan sendirinya, tanpa perlu ada yang mengingatnya.",
     "price.promoOn": "Promo berjalan",
-    "price.promoRunning": "Sedang berjalan. Halaman depan dan halaman langganan memakai harga promo.",
+    "price.promoRunning":
+      "Sedang berjalan. Halaman depan dan halaman langganan memakai harga promo.",
     "price.promoNotRunning": "Tidak berjalan. Semua halaman memakai harga normal.",
     "price.promoEnds": "Berakhir tanggal",
-    "price.promoNeedsEnd": "Promo yang aktif harus punya tanggal berakhir. Isi dulu tanggalnya sebelum menyimpan.",
+    "price.promoNeedsEnd":
+      "Promo yang aktif harus punya tanggal berakhir. Isi dulu tanggalnya sebelum menyimpan.",
     "price.promoDiscount": "Potongan persen",
     "price.promoNoDiscount": "Tanpa potongan",
     "price.promoBonusFixed": "Bonus (diatur di kode)",
@@ -541,6 +543,13 @@ const dict = {
       "Tidak. Tidak ada model yang mengarang jawaban di sini. Semuanya rumus tetap, dijalankan apa adanya, dan diuji terhadap 210 hari siklus pawukon penuh serta 41 tanggal acuan.",
     "landing.cta.trial": "Coba gratis {n} hari",
     "landing.cta.promo": "Ambil promonya sekarang",
+    "penawaran.title": "Selamat datang, {nama}",
+    "penawaran.titleTanpaNama": "Selamat datang",
+    "penawaran.desc":
+      "Masa cobamu {n} hari sudah berjalan sejak sekarang, jadi kamu bisa langsung memakai semuanya. Yang tidak menunggu cuma promonya, dan mengambilnya sekarang membuatnya jauh lebih murah daripada nanti.",
+    "penawaran.skip": "Lanjutkan dengan masa coba {n} hari dulu",
+    "penawaran.note":
+      "Melewati halaman ini tidak mengurangi apa pun. Kamu tetap bisa berlangganan kapan saja lewat halaman profil.",
     "promo.badge": "Promo",
     "promo.ends": "Berakhir {n} hari lagi",
     "promo.endsToday": "Hari terakhir",
@@ -1128,7 +1137,8 @@ const dict = {
     "price.promoHint":
       "A price cut for a set period. The end date is required: past that date prices return to normal on their own, with nobody having to remember.",
     "price.promoOn": "Promo running",
-    "price.promoRunning": "Running now. The landing page and the subscription page both use promo prices.",
+    "price.promoRunning":
+      "Running now. The landing page and the subscription page both use promo prices.",
     "price.promoNotRunning": "Not running. Every page uses regular prices.",
     "price.promoEnds": "Ends on",
     "price.promoNeedsEnd": "An active promo needs an end date. Set the date before saving.",
@@ -1282,6 +1292,13 @@ const dict = {
       "No. Nothing here invents an answer. It is fixed arithmetic, run as written, and checked against all 210 days of the pawukon cycle plus 41 reference dates.",
     "landing.cta.trial": "Try {n} days free",
     "landing.cta.promo": "Take the promo now",
+    "penawaran.title": "Welcome, {nama}",
+    "penawaran.titleTanpaNama": "Welcome",
+    "penawaran.desc":
+      "Your {n}-day trial is already running, so you can start using everything right now. The promo is the part that will not wait, and taking it now costs far less than taking it later.",
+    "penawaran.skip": "Continue with the {n}-day trial for now",
+    "penawaran.note":
+      "Skipping this takes nothing away. You can subscribe at any time from your profile page.",
     "promo.badge": "Promo",
     "promo.ends": "Ends in {n} days",
     "promo.endsToday": "Last day",
