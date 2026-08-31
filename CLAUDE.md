@@ -386,6 +386,25 @@ tidak pernah bisa diselesaikan. Begitu lunas, barulah dokumen `aktivasi`
 ditulis, sudah berstatus disetujui dengan `diputuskanOleh: "midtrans"`, supaya
 catatan uang semua pelanggan tetap berkumpul di satu koleksi.
 
+**Gateway produksi sudah terbukti utuh, sekali, pada 31 Agustus 2026.** Satu
+pembayaran QRIS sungguhan (Rp 1.000, paket 1 Tahun) berstatus `settlement` dan
+langganannya menyala 66 detik kemudian. Artinya rantai lengkapnya jalan:
+tagihan dibuat, uang masuk, status terbaca, langganan diperpanjang, jejak
+audit tertulis. Yang BELUM pernah diuji sungguhan: pengembalian dana, kartu
+kredit dengan 3DS, dan pesanan yang isinya add-on saja.
+
+**Notifikasi sandbox yang menembak endpoint produksi ditolak 401, dan itu
+benar.** URL notifikasi didaftarkan di dua dashboard yang terpisah, dan
+mengisikan URL produksi ke dashboard sandbox membuat Midtrans mengirim
+notifikasi bertanda tangan kunci sandbox ke endpoint yang memegang kunci
+produksi. Tanda tangannya tidak cocok, endpoint menolak, Midtrans mengulang
+lalu mengirim email "having difficulty sending notification". Itu penjaga yang
+bekerja, bukan kerusakan: menerimanya berarti siapa pun yang punya akun
+sandbox Midtrans bisa mengaktifkan langganan di situs live secara gratis. Cara
+memastikan asalnya tanpa menebak: hitung sha512 dari `order_id + status_code +
+gross_amount + kunci` untuk kedua kunci, lalu bandingkan dengan `signature_key`
+di email itu.
+
 **Pembayaran punya dua bentuk pesanan, dibedakan `paketTahun`.** Dengan paket
 berarti berlangganan atau memperpanjang. Tanpa paket (`paketId` null,
 `paketTahun` 0) berarti pelanggan menambah add-on di tengah masa langganan.
@@ -551,6 +570,17 @@ tidak berubah akan memakai ulang hasil render lama, termasuk datanya. Route
 PUT harga memanggil `revalidatePath`; kalau butuh segar segera di luar itu,
 sentuh kode halamannya.
 
+**Harga uji yang ditinggalkan di produksi.** Paket 1 Tahun sempat disetel
+Rp 1.000 untuk menguji pembayaran sungguhan dengan biaya kecil, lalu tidak
+dikembalikan. Selama itu siapa pun bisa membeli setahun seharga seribu rupiah,
+dan tidak ada satu pun yang berbunyi salah: halaman harga tampil rapi, gateway
+menerima, langganan menyala. Yang berubah diam-diam cuma penghematan di
+halaman depan, karena `hemat()` menghitungnya terhadap paket satu tahun, jadi
+dengan acuan Rp 1.000 tidak ada paket yang terlihat hemat sama sekali.
+Menguji dengan nominal kecil itu benar; yang salah adalah tidak ada apa pun
+yang mengingatkan untuk mengembalikannya. Sebelum menutup sesi pengujian
+pembayaran, baca ulang harga live lewat `GET /api/admin/harga`.
+
 **`vercel redeploy` memakai env var milik deployment lama.** Ia benar-benar
 membangun ulang (nama chunk-nya berubah), tapi konfigurasinya diambil dari
 deployment yang di-redeploy, bukan dari pengaturan project saat ini. Env var
@@ -628,7 +658,15 @@ yang pasti, bukan setelah "impor terakhir".
 - **Pesanan yang ditinggalkan tidak pernah dibersihkan.** Dokumen
   `pembayaran` berstatus menunggu menumpuk selamanya. Transaksinya sendiri
   kedaluwarsa 24 jam di sisi Midtrans, jadi tidak ada yang bisa dibayar
-  belakangan; yang menumpuk cuma dokumennya.
+  belakangan; yang menumpuk cuma dokumennya. Sudah ada satu di produksi
+  (QRIS Rp 495.000, dibuat 31 Agustus 2026, tidak pernah dibayar).
+- **Tidak ada yang memberi tahu admin saat pembayaran masuk.** Uang yang
+  lunas cuma terlihat kalau ada yang membuka tab Pembayaran atau dashboard
+  Midtrans. Untuk sekarang itu cukup, karena jumlahnya masih sedikit.
+- **Kartu kredit dengan 3DS dan pesanan add-on saja belum pernah diuji
+  sungguhan.** Keduanya jalan di sandbox; yang belum terbukti adalah
+  kepulangan lewat alihan halaman pada kartu produksi, dan penerapan pesanan
+  ber-`paketTahun` nol pada akun yang langganannya benar-benar berjalan.
 
 ## Struktur singkat
 
@@ -644,6 +682,8 @@ src/lib/midtrans.ts    murni: tanda tangan, terjemahan status, order id
 src/lib/midtrans-server  yang memegang kunci server, server-only
 src/lib/pembayaran-server  satu pintu mengubah pembayaran jadi langganan
 src/lib/admin-pembayaran  pencarian dan penyaringan pesanan, fungsi murni
+src/lib/addon-beli.ts  siapa boleh menambah add-on tanpa berlangganan lagi
+src/app/terima-kasih/  ke mana orang mendarat setelah membayar
 scripts/akun-uji.ts    akun uji pembayaran, bisa dikunci ulang
 src/app/api/           route admin selalu requireAdmin, harga dihitung server
 docs/email/            template email Firebase dan batasnya
