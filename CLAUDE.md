@@ -4,7 +4,8 @@
 
 Kalender siklus personal, dijual sebagai langganan. Pemiliknya Agus
 Yulyastrawan. Dikembangkan Seawise Studio, dioperasikan Mayaloka Digital.
-Live di https://haribaik.seawise.id
+Live di https://www.cariharibaik.com, dan tetap dilayani juga di
+https://haribaik.seawise.id
 
 Next.js App Router, Tailwind v4, Firebase (Auth + Firestore), deploy lewat
 Vercel dari GitHub `seawisecc/hari-baik`, cabang `main`.
@@ -479,6 +480,33 @@ target setinggi nol tidak pernah dianggap berpotongan oleh
 bilahnya menutupi kartu yang sedang dibaca orangnya. Nilai hematnya disebut
 dalam rupiah lewat `nilaiHemat()`, bukan cuma persen, dan angka yang sama
 dipakai ketiganya. Dijaga `promo.test.ts` dan `kontras.test.ts`.
+
+**Dua alamat, satu kanonik, dan keduanya harus tetap melayani.**
+`SITUS` di `src/lib/situs.ts` adalah alamat yang aplikasi ini SEBUT tentang
+dirinya: metadataBase, openGraph, canonical halaman depan, dan kaki template
+email. Sekarang `https://www.cariharibaik.com`. Yang lama,
+`haribaik.seawise.id`, sengaja tidak dialihkan karena dua hal masih terdaftar
+atas namanya: URL notifikasi Midtrans di dashboard mereka, dan daftar domain
+terotorisasi Firebase Auth. Mengalihkannya sebelum keduanya dipindah membuat
+POST webhook Midtrans kena 308, dan pengirim webhook umumnya tidak mengirim
+ulang badan POST-nya: pembayaran lunas berhenti menyalakan langganan tanpa ada
+yang berbunyi salah.
+
+Alamat kanonik itu TIDAK boleh dipakai merakit tautan saat berjalan. Tautan
+verifikasi email dan URL kepulangan pembayaran diturunkan dari
+`req.nextUrl.origin`, yaitu host yang barusan dipakai orangnya. Kalau dipakai
+yang kanonik, orang yang mendaftar lewat domain lama menerima tautan ke domain
+lain, dan yang membayar di sana dipulangkan ke domain lain pula, mendarat di
+host yang belum mengenali sesinya, tepat setelah uangnya keluar. Dijaga
+`situs.test.ts`, yang juga menolak host kanonik yang dipatok sebagai untaian di
+kode, dengan atau tanpa `https://`.
+
+Domain terotorisasi Firebase per 3 September 2026: `localhost`,
+`hari-baik-7e56c.firebaseapp.com`, `hari-baik-7e56c.web.app`,
+`hari-baik-seawise.vercel.app`, `haribaik.seawise.id`, `cariharibaik.com`,
+`www.cariharibaik.com`. Domain baru yang tidak ada di daftar ini membuat masuk
+dengan Google gagal `auth/unauthorized-domain`, sementara email dan kata sandi
+tetap jalan: gejalanya setengah, dan itu yang membuatnya lama tidak ketahuan.
 
 **Promo tanpa tanggal berakhir adalah promo yang mati.** `promoBerlaku()` di
 `src/lib/promo.ts` menolak `berakhirPada` yang null, dan route PUT harga

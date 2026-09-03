@@ -21,6 +21,8 @@
  * berisi HTML lebih curiga daripada yang membawa keduanya.
  */
 
+import { SITUS_NAMA } from "@/lib/situs";
+
 const KANVAS = "#f2f0ec";
 const KARTU = "#fbfaf8";
 const GARIS = "#e4e0da";
@@ -67,7 +69,7 @@ export function emailVerifikasi({
       "Kalau kamu tidak merasa mendaftar, abaikan saja email ini.",
       "",
       "Hari Baik, dikembangkan Seawise Studio, dioperasikan Mayaloka Digital",
-      "haribaik.seawise.id",
+      SITUS_NAMA,
     ].join("\n"),
     html: `<body style="margin:0;padding:0;background-color:${KANVAS};">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${KANVAS};margin:0;padding:0;">
@@ -128,7 +130,7 @@ export function emailVerifikasi({
               Kalau kamu tidak merasa mendaftar, abaikan saja email ini.
             </p>
             <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:${REDUP};">
-              Hari Baik, dikembangkan Seawise Studio, dioperasikan Mayaloka Digital<br />haribaik.seawise.id
+              Hari Baik, dikembangkan Seawise Studio, dioperasikan Mayaloka Digital<br />${SITUS_NAMA}
             </p>
           </td>
         </tr>

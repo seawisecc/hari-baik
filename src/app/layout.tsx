@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { SITUS } from "@/lib/situs";
 import { Inter, Source_Serif_4 } from "next/font/google";
 import { PWA } from "@/components/PWA";
 import { AppShell } from "@/components/shell/AppShell";
@@ -26,7 +27,6 @@ const body = Inter({
   display: "swap",
 });
 
-const SITUS = "https://haribaik.seawise.id";
 // Dua pihak, dua peran. Seawise Studio yang membangun aplikasinya, Mayaloka
 // Digital yang menjalankan layanannya sehari-hari: langganan, pembayaran, dan
 // dukungan pelanggan. Keduanya ikut di metadata, bukan hanya di layar, supaya

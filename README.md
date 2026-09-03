@@ -28,9 +28,9 @@ Pro dikunci sesuai status langganan.
 2. **Authentication** → aktifkan metode **Email/Password**.
 3. **Firestore Database** → buat database (mode production).
 4. Salin `.env.example` → `.env.local`, isi nilai klien dari
-   *Project settings → General → Your apps*.
-5. Unduh kunci server dari *Project settings → Service accounts →
-   Generate new private key*, lalu:
+   _Project settings → General → Your apps_.
+5. Unduh kunci server dari _Project settings → Service accounts →
+   Generate new private key_, lalu:
    ```bash
    npm run import-sa        # baca JSON-nya, tulis ke .env.local
    npm run check-firebase   # pastikan benar-benar tersambung
@@ -61,23 +61,23 @@ Fitur Pro juga didaftarkan di sana (`RUTE_PRO`). Navigasi mengambil penanda
 "PRO" dari daftar yang sama, sehingga tidak mungkin sebuah halaman ditandai
 Pro tapi lupa dipasangi penjaganya.
 
-| Rute | Isi | Akses |
-|---|---|---|
-| `/` | Landing page | publik |
-| `/login`, `/register`, `/lupa-sandi` | Autentikasi | publik |
-| `/verify-email` | Menunggu verifikasi email | login |
-| `/onboarding` | Nama + tanggal lahir, mulai trial 3 hari | login |
-| `/hari-ini` | **Halaman utama** — insight hari ini + perkiraan 7 hari | login |
-| `/kalender` | Grid bulanan + panduan hari terpilih | login |
-| `/kepribadian` | Pangarasan & Pancasuda dari weton lahir | login |
-| `/nama-makna` | Makna nama lewat aksara Bali | Pro |
-| `/kecocokan` | Petemon Lanang Istri | Pro |
-| `/perjalanan-hidup` | Peta rejeki & kesehatan per periode usia | Pro |
-| `/profil` | Profil & status langganan | login |
-| `/expired` | Layar terkunci + kontak admin | login |
-| `/admin` | Kelola pengguna & langganan | admin |
-| `/styleguide` | Sistem desain | dev |
-| `/debug-wariga` | Self-test engine (41 tes) | dev |
+| Rute                                 | Isi                                                     | Akses  |
+| ------------------------------------ | ------------------------------------------------------- | ------ |
+| `/`                                  | Landing page                                            | publik |
+| `/login`, `/register`, `/lupa-sandi` | Autentikasi                                             | publik |
+| `/verify-email`                      | Menunggu verifikasi email                               | login  |
+| `/onboarding`                        | Nama + tanggal lahir, mulai trial 3 hari                | login  |
+| `/hari-ini`                          | **Halaman utama** — insight hari ini + perkiraan 7 hari | login  |
+| `/kalender`                          | Grid bulanan + panduan hari terpilih                    | login  |
+| `/kepribadian`                       | Pangarasan & Pancasuda dari weton lahir                 | login  |
+| `/nama-makna`                        | Makna nama lewat aksara Bali                            | Pro    |
+| `/kecocokan`                         | Petemon Lanang Istri                                    | Pro    |
+| `/perjalanan-hidup`                  | Peta rejeki & kesehatan per periode usia                | Pro    |
+| `/profil`                            | Profil & status langganan                               | login  |
+| `/expired`                           | Layar terkunci + kontak admin                           | login  |
+| `/admin`                             | Kelola pengguna & langganan                             | admin  |
+| `/styleguide`                        | Sistem desain                                           | dev    |
+| `/debug-wariga`                      | Self-test engine (41 tes)                               | dev    |
 
 ## Struktur
 
@@ -131,10 +131,11 @@ npm run protection -- on      # tutup lagi
 
 ### Domain
 
-| Domain | Keterangan |
-|---|---|
-| `hari-baik-seawise.vercel.app` | aktif |
-| `haribaik.seawise.id` | menunggu DNS |
+| Domain                         | Keterangan             |
+| ------------------------------ | ---------------------- |
+| `hari-baik-seawise.vercel.app` | aktif                  |
+| `www.cariharibaik.com`         | aktif, kanonik         |
+| `haribaik.seawise.id`          | aktif, tidak dialihkan |
 
 DNS `seawise.id` dikelola di cloudhost.id, jadi record-nya dibuat di sana:
 

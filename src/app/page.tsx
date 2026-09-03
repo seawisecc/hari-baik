@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { bacaHarga } from "@/lib/harga-server";
 import { daftarPaketPromo, sisaHariPromo, sisaPromoRinci } from "@/lib/promo";
 import { LandingClient } from "./LandingClient";
@@ -16,6 +17,26 @@ import { LandingClient } from "./LandingClient";
  * adalah jendela di mana angka di layar berbeda dari angka di tagihan. Sejam
  * terlalu lama untuk itu.
  */
+/**
+ * Canonical, dan hanya di halaman ini.
+ *
+ * Sejak `cariharibaik.com` hidup, dua alamat menyajikan isi yang sama persis:
+ * domain baru yang kanonik dan `haribaik.seawise.id` yang sengaja dibiarkan
+ * tetap melayani, karena webhook Midtrans dan daftar domain terotorisasi
+ * Firebase masih terdaftar atas nama yang lama. Tanpa tag ini mesin pencari
+ * memilih sendiri mana yang ditampilkan, dan nilai tautan yang masuk terbelah
+ * di antara keduanya.
+ *
+ * Dipasang di halaman ini saja, bukan di layout. Canonical "/" di layout ikut
+ * menempel ke setiap halaman turunannya, jadi `/login` dan `/register` akan
+ * mengaku sebagai salinan halaman depan, dan itu keliru. Halaman lain di sini
+ * ada di balik gerbang akses atau bersifat sekali pakai, jadi tidak ada yang
+ * perlu dikanonikkan selain yang ini.
+ */
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
+
 export const revalidate = 600;
 
 export default async function LandingPage() {
