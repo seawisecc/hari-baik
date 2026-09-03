@@ -9,6 +9,7 @@ import {
   Check,
   FileText,
   Fingerprint,
+  Gift,
   Heart,
   Route,
   ShieldCheck,
@@ -22,6 +23,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { BilahPromo, SASARAN } from "@/components/BilahPromo";
+import { HitungMundur } from "@/components/HitungMundur";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { LangToggle } from "@/components/ui/LangToggle";
@@ -33,7 +36,13 @@ import { TestimoniSlider } from "@/components/TestimoniSlider";
 import { TESTIMONI } from "@/lib/content/testimoni";
 import { PerbandinganPaket } from "@/components/PerbandinganPaket";
 import { rupiah, teks, type PengaturanHarga } from "@/lib/harga";
-import { hematPromo, perTahunPromo, type PaketPromo } from "@/lib/promo";
+import {
+  hematPromo,
+  nilaiHemat,
+  perTahunPromo,
+  type PaketPromo,
+  type SisaPromo,
+} from "@/lib/promo";
 import { HARI_TRIAL } from "@/lib/subscription";
 
 const LANGKAH: { icon: LucideIcon; n: number }[] = [
@@ -161,10 +170,24 @@ function TombolAwal({ adaPromo }: { adaPromo: boolean }) {
   return (
     <div className="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center sm:justify-center">
       {adaPromo && (
-        <a href="#promo" className="sm:w-auto">
-          <Button size="lg" block className="sm:w-auto">
-            {t("landing.cta.promo")}
-            <ArrowRight className="h-4 w-4" aria-hidden />
+        <a href="#promo" className="relative sm:w-auto">
+          {/* Cincin yang berdenyut di belakang tombolnya, bukan di tombolnya.
+              Tombol yang ikut membesar akan menggeser teks yang sedang dibaca
+              dan memindahkan sasaran tepat saat jari sudah mengarah ke sana. */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 rounded-pill bg-accent-strong/45 hb-degup"
+          />
+          <Button size="lg" block variant="promo" className="relative sm:w-auto">
+            <span className="relative z-10">{t("landing.cta.promo")}</span>
+            <ArrowRight className="relative z-10 h-4 w-4" aria-hidden />
+            {/* Kilau yang menyapu. Berada di dalam tombol yang
+                `overflow-hidden`, jadi dia terpotong rapi oleh sudut
+                membulatnya alih-alih melewatinya. */}
+            <span
+              aria-hidden
+              className="absolute inset-y-0 -left-10 w-12 bg-white/45 blur-[4px] hb-kilau"
+            />
           </Button>
         </a>
       )}
@@ -183,21 +206,75 @@ function TombolAwal({ adaPromo }: { adaPromo: boolean }) {
   );
 }
 
-/** Lencana promo berikut hitungan mundurnya. Sisa harinya dihitung di server. */
-function LencanaPromo({ sisa, diskonMaks }: { sisa: number; diskonMaks: number }) {
+/**
+ * Pita promo di hero: berapa potongannya, berapa rupiah yang dihemat, dan
+ * berapa lama lagi.
+ *
+ * Menggantikan lencana satu baris yang berbunyi "Promo, potongan 25%,
+ * berakhir 27 hari lagi". Kalimat itu benar dan hampir tidak berbunyi apa-
+ * apa: persen menuntut pembacanya mengalikan sendiri sebelum tahu artinya,
+ * dan "27 hari lagi" terbaca seperti sesuatu yang bisa diurus minggu depan.
+ * Tiga hal yang berubah di sini, dan ketiganya tentang mengubah keterangan
+ * jadi alasan untuk bergerak sekarang: angkanya disebut dalam rupiah, bonusnya
+ * disebut ada, dan batas waktunya berdetak.
+ *
+ * Baris terakhir sengaja menjelaskan bahwa harganya kembali normal sendiri
+ * setelah tanggal itu. Itu bukan tekanan tambahan, itu kebalikannya: janji
+ * yang bisa diperiksa, dan pembeda antara promo berjangka dengan potongan
+ * yang terpasang selamanya sampai ada yang ingat mencabutnya.
+ */
+function PitaPromo({
+  diskonMaks,
+  hemat,
+  adaBonus,
+  sisaHari,
+  sisaRinci,
+  berakhirPromo,
+}: {
+  diskonMaks: number;
+  /** Rupiah yang dihemat pada paket terbaik. Nol berarti tidak disebut. */
+  hemat: number;
+  adaBonus: boolean;
+  sisaHari: number;
+  sisaRinci: SisaPromo | null;
+  berakhirPromo: string | null;
+}) {
   const t = useT();
   return (
-    <div className="mx-auto mb-7 inline-flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 rounded-pill bg-accent-wash px-4 py-2 hb-raise-1">
-      <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-accent-deep">
-        <Tag className="h-3 w-3" aria-hidden />
-        {t("promo.badge")}
-      </span>
-      <span className="text-sm font-semibold text-ink">
-        {t("promo.off", { n: diskonMaks })}
-      </span>
-      <span className="text-xs text-ink-soft">
-        {sisa <= 1 ? t("promo.endsToday") : t("promo.ends", { n: sisa })}
-      </span>
+    <div className="mx-auto w-full max-w-md rounded-lg bg-accent-wash px-5 py-5 hb-raise-2">
+      <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
+        <span className="inline-flex items-center gap-1.5 rounded-pill bg-accent px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-accent-ink">
+          <Tag className="h-3 w-3" aria-hidden />
+          {t("promo.badge")}
+        </span>
+        <span className="font-heading text-xl font-bold text-ink sm:text-2xl">
+          {t("promo.upTo", { n: diskonMaks })}
+        </span>
+      </div>
+
+      {hemat > 0 && (
+        <p className="mt-2.5 text-center text-sm font-semibold text-guru-teks">
+          {t("promo.saveUpTo", { v: rupiah(hemat) })}
+          {adaBonus && <span className="text-ink-soft"> · {t("promo.bonusFree")}</span>}
+        </p>
+      )}
+
+      {/* Jam mundurnya butuh dua hal dari server sekaligus: tanggal berakhir
+          dan sisa waktu saat dirender. Kalau salah satunya tidak ada, yang
+          tampil kalimat lamanya, bukan jam yang mulai dari angka salah. */}
+      <div className="mt-4">
+        {sisaRinci && berakhirPromo ? (
+          <HitungMundur berakhirPada={berakhirPromo} awal={sisaRinci} />
+        ) : (
+          <p className="text-center text-sm font-semibold text-accent-deep">
+            {sisaHari <= 1 ? t("promo.endsToday") : t("promo.ends", { n: sisaHari })}
+          </p>
+        )}
+      </div>
+
+      <p className="mx-auto mt-3.5 max-w-xs text-center text-[11px] leading-relaxed text-ink-faint">
+        {t("promo.after")}
+      </p>
     </div>
   );
 }
@@ -218,6 +295,8 @@ export function LandingClient({
   harga,
   paketPromo,
   sisaPromo,
+  sisaRinci,
+  berakhirPromo,
   tahun,
 }: {
   harga: PengaturanHarga;
@@ -225,6 +304,15 @@ export function LandingClient({
   paketPromo: PaketPromo[];
   /** Sisa hari promo, null bila tidak ada promo berjalan. Dari server. */
   sisaPromo: number | null;
+  /**
+   * Sisa promo terperinci saat halaman dirender, untuk nilai awal jam
+   * mundurnya. Dari server dengan alasan yang sama seperti `sisaPromo`, dan
+   * lebih tegas lagi: yang berbeda antara HTML dan hidrasi bukan cuma tanggal
+   * di sekitar tengah malam, melainkan detiknya, tiap kali.
+   */
+  sisaRinci: SisaPromo | null;
+  /** ISO tanggal berakhirnya promo, untuk jam mundur di peramban. */
+  berakhirPromo: string | null;
   /** Tahun untuk footer, ditentukan di server supaya hidrasi tidak berbeda. */
   tahun: number;
 }) {
@@ -234,6 +322,13 @@ export function LandingClient({
   const addOn = harga.addOn.filter((a) => a.aktif);
   const diskonMaks = Math.max(0, ...paketPromo.map((p) => p.diskonPersen));
   const adaPromo = sisaPromo !== null && diskonMaks > 0;
+
+  /* Yang paling banyak dihemat di antara semua paket, dalam rupiah. Dipakai
+     di pita hero dan di bilah melayang, jadi keduanya menyebut angka yang
+     sama persis: dua angka berbeda untuk penawaran yang sama membuat
+     pembacanya berhenti mempercayai keduanya. */
+  const hematMaks = Math.max(0, ...paketPromo.map((p) => nilaiHemat(p, addOn)));
+  const adaBonus = paketPromo.some((p) => p.bonusAddOn.length > 0);
 
   return (
     <div className="mx-auto max-w-5xl px-6 pb-24 sm:px-8">
@@ -280,7 +375,16 @@ export function LandingClient({
         </p>
 
         <div className="mt-10 flex flex-col items-center gap-4">
-          {adaPromo && <LencanaPromo sisa={sisaPromo} diskonMaks={diskonMaks} />}
+          {adaPromo && (
+            <PitaPromo
+              diskonMaks={diskonMaks}
+              hemat={hematMaks}
+              adaBonus={adaBonus}
+              sisaHari={sisaPromo}
+              sisaRinci={sisaRinci}
+              berakhirPromo={berakhirPromo}
+            />
+          )}
           <TombolAwal adaPromo={adaPromo} />
           <p className="text-xs italic text-ink-faint">{t("landing.cta.noCard")}</p>
           <p className="text-sm font-medium text-ink-soft">{t("landing.hero.proof")}</p>
@@ -461,16 +565,33 @@ export function LandingClient({
               dulu dan tabelnya menyusul tepat di bawah. */}
           <div id="promo" className="scroll-mt-8" />
 
+          {/* Batas waktunya diulang di sini, tepat di atas angkanya.
+              Pengunjung yang mendarat di halaman ini lewat tautan ke #promo
+              tidak pernah melihat pita di hero, dan yang menggulir sampai
+              sini sudah melewatinya jauh di atas. */}
           {adaPromo && (
-            <p className="text-center text-sm font-medium text-accent-deep">
-              {sisaPromo <= 1 ? t("promo.endsToday") : t("promo.ends", { n: sisaPromo })}
-            </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-sm">
+              {sisaRinci && berakhirPromo ? (
+                <>
+                  <span className="font-medium text-accent-deep">{t("promo.countdown")}</span>
+                  <HitungMundur berakhirPada={berakhirPromo} awal={sisaRinci} ringkas />
+                </>
+              ) : (
+                <span className="font-medium text-accent-deep">
+                  {sisaPromo <= 1 ? t("promo.endsToday") : t("promo.ends", { n: sisaPromo })}
+                </span>
+              )}
+            </div>
           )}
 
-          <div className="grid gap-5 sm:grid-cols-3">
+          {/* Deret ini yang diamati bilah promo untuk tahu kapan dia harus
+              menyingkir. Jangkar `#promo` di atas tidak bisa dipakai untuk
+              itu: tingginya nol. Lihat catatan di BilahPromo. */}
+          <div id={SASARAN} className="grid gap-5 sm:grid-cols-3">
             {paketPromo.map((item) => {
               const p = item.paket;
               const diskon = hematPromo(item, paketPromo);
+              const hematRp = nilaiHemat(item, addOn);
               return (
                 <Card
                   key={p.id}
@@ -521,6 +642,18 @@ export function LandingClient({
                     {diskon > 0 ? t("price.saveShort", { n: diskon }) : ""}
                   </p>
 
+                  {/* Angka hemat dalam rupiah, bukan cuma persen di lencana
+                      atas. Persen menjawab "berapa turunnya"; rupiah menjawab
+                      "berapa yang tidak jadi saya bayar", dan itu pertanyaan
+                      yang sebenarnya sedang ditimbang orangnya. Nilainya
+                      sudah termasuk harga bonus yang ikut. */}
+                  {hematRp > 0 && (
+                    <p className="mt-3 inline-flex items-center gap-1.5 self-center rounded-pill bg-guru/15 px-3 py-1 text-xs font-semibold text-guru-teks">
+                      <Gift className="h-3 w-3" aria-hidden />
+                      {t("promo.saveTotal", { v: rupiah(hematRp) })}
+                    </p>
+                  )}
+
                   {/* Bonus disebut namanya, bukan dihitung jumlahnya.
                       "Plus 2 bonus" tidak memberi tahu apa pun tentang apa
                       yang didapat, dan yang menimbang paket panjang menimbang
@@ -552,6 +685,35 @@ export function LandingClient({
                       </ul>
                     </div>
                   )}
+
+                  {/*
+                   * Tiap kartu punya tombolnya sendiri.
+                   *
+                   * Sebelumnya seluruh bagian harga cuma punya satu tombol di
+                   * paling bawah, sesudah tabel perbandingan dan sesudah
+                   * daftar add-on, dan bunyinya "Coba gratis". Artinya orang
+                   * yang baru saja memutuskan paket mana yang dia mau tidak
+                   * punya apa pun untuk ditekan di tempat dia memutuskannya:
+                   * dia harus menggulir melewati dua blok lain dulu, dan yang
+                   * ditemukannya di sana menawarkan hal yang berbeda.
+                   * `mt-auto` menahan tombolnya sejajar di ketiga kartu walau
+                   * daftar bonusnya berbeda panjang.
+                   */}
+                  <div className="mt-auto pt-6">
+                    <Link href="/register" className="block">
+                      <Button block variant={p.populer ? "promo" : "surface"}>
+                        <span className="relative z-10">
+                          {adaPromo ? t("promo.take") : t("landing.cta.subscribe")}
+                        </span>
+                        {p.populer && (
+                          <span
+                            aria-hidden
+                            className="absolute inset-y-0 -left-10 w-12 bg-white/45 blur-[4px] hb-kilau"
+                          />
+                        )}
+                      </Button>
+                    </Link>
+                  </div>
                 </Card>
               );
             })}
@@ -631,6 +793,18 @@ export function LandingClient({
           <WhatsAppCard />
         </div>
       </div>
+
+      {/* Bilah melayang: membawa penawarannya ikut turun bersama pembaca di
+          halaman sepanjang ini. Bisa ditutup, dan menghilang sendiri begitu
+          bagian harga terlihat. Lihat catatan di berkasnya. */}
+      {adaPromo && sisaRinci && berakhirPromo && (
+        <BilahPromo
+          berakhirPada={berakhirPromo}
+          awal={sisaRinci}
+          hemat={rupiah(hematMaks)}
+          diskonMaks={diskonMaks}
+        />
+      )}
 
       <footer className="mt-16 flex flex-col items-center gap-1.5 text-center text-xs text-ink-faint">
         <p>

@@ -102,6 +102,57 @@ export function sisaHariPromo(
   return Math.max(1, Math.ceil(selisih / 86_400_000));
 }
 
+/**
+ * Sisa waktu promo yang sudah dipecah jadi hari, jam, menit, detik.
+ *
+ * Dipisah dari `sisaHariPromo()` dan tidak menggantikannya, karena keduanya
+ * membulatkan ke arah yang berlawanan dan memang harus begitu. Kalimat
+ * "berakhir 1 hari lagi" dibulatkan ke ATAS supaya hari terakhir tidak
+ * terbaca seperti sudah lewat. Jam yang berdetak dibulatkan ke BAWAH, karena
+ * angka yang menghitung mundur di depan mata harus benar-benar sama dengan
+ * waktu yang tersisa: menampilkan "1 hari" ketika tinggal dua jam adalah
+ * janji yang meleset sepuluh kali lipat, dan yang menungguinya sampai besok
+ * akan mendapati harganya sudah normal.
+ */
+export interface SisaPromo {
+  hari: number;
+  jam: number;
+  menit: number;
+  detik: number;
+  /** Milidetik tersisa, tidak pernah negatif. Nol berarti promonya lewat. */
+  total: number;
+}
+
+/** Pecah selisih milidetik jadi hari/jam/menit/detik. Murni, tanpa jam sistem. */
+export function pecahSisa(ms: number): SisaPromo {
+  const total = Math.max(0, ms);
+  const detikTotal = Math.floor(total / 1000);
+  return {
+    total,
+    hari: Math.floor(detikTotal / 86_400),
+    jam: Math.floor(detikTotal / 3_600) % 24,
+    menit: Math.floor(detikTotal / 60) % 60,
+    detik: detikTotal % 60,
+  };
+}
+
+/**
+ * Sisa promo terperinci, atau null bila tidak ada promo berjalan.
+ *
+ * Dipanggil di server untuk memberi nilai awal hitungan mundurnya. Sisi
+ * peramban tidak boleh menghitung nilai awal itu sendiri dengan `Date.now()`:
+ * hasil render server dan render pertama peramban akan berbeda pada detiknya,
+ * dan React membuang seluruh pohonnya lalu menggambar ulang. Setelah
+ * terpasang barulah jamnya berdetak dengan waktu peramban.
+ */
+export function sisaPromoRinci(
+  promo: PengaturanPromo | null | undefined,
+  sekarang: Date = new Date(),
+): SisaPromo | null {
+  if (!promoBerlaku(promo, sekarang)) return null;
+  return pecahSisa(Date.parse(promo!.berakhirPada!) - sekarang.getTime());
+}
+
 /** Aturan promo untuk satu paket, atau null bila paket itu tidak ikut promo. */
 export function promoUntuk(
   paketId: string,
@@ -212,6 +263,31 @@ export function hematPromo(item: PaketPromo, semua: PaketPromo[]): number {
   if (!acuan || item.paket.tahun === 1) return 0;
   const selisih = 1 - perTahunPromo(item) / perTahunPromo(acuan);
   return selisih > 0 ? Math.round(selisih * 100) : 0;
+}
+
+/**
+ * Nilai yang benar-benar dihemat dalam rupiah: potongan harga ditambah harga
+ * add-on yang ikut sebagai bonus.
+ *
+ * Rupiah, bukan persen, dan itu bukan soal selera. "Potongan 25%" menuntut
+ * pembacanya mengalikan sendiri sebelum tahu apa artinya, sementara
+ * "Hemat Rp 247.000" sudah selesai dibaca. Bonusnya ikut dihitung karena
+ * itulah bagian terbesar dari selisih paket panjang, dan tanpa dia angkanya
+ * meremehkan penawarannya sendiri.
+ *
+ * Menerima daftar add-on yang SUDAH disaring kesiapan jualnya, sama seperti
+ * `bonusAddOn` yang sudah disaring `hargaPromo()`. Id yang tidak ada di
+ * daftar dihitung nol, bukan dilewatkan diam-diam sebagai nilai penuh.
+ */
+export function nilaiHemat(
+  item: PaketPromo,
+  addOn: readonly { id: string; harga: number }[],
+): number {
+  const bonus = item.bonusAddOn.reduce(
+    (n, id) => n + (addOn.find((a) => a.id === id)?.harga ?? 0),
+    0,
+  );
+  return Math.max(0, item.hargaAsli - item.harga) + bonus;
 }
 
 /**

@@ -462,6 +462,24 @@ memang ada yang ditawarkan. Alihannya tiba sebagai `NEXT_REDIRECT` di payload
 flight, bukan sebagai 307 pada dokumennya, jadi memeriksanya dengan kode
 balasan `curl` akan menjawab 200 dan terlihat seperti tidak bekerja.
 
+**Ajakan promo di halaman depan berdetak, dan tetap bisa ditinggalkan.**
+Jam mundurnya dirender di hero, di atas kartu harga, dan di bilah yang
+menempel di bawah layar, tapi nilai awalnya SELALU datang dari server lewat
+`sisaPromoRinci()`. Menghitungnya sendiri di peramban dengan `Date.now()`
+memberi detik yang berbeda dari detik yang sudah tertulis di HTML halaman
+statis, dan React menjawabnya dengan menggambar ulang seluruh pohonnya:
+halaman yang berkedip pada muatan pertama. Bilah bawahnya punya tombol tutup
+yang bertahan sepanjang kunjungan dan menyingkir sendiri saat kartu harga
+terlihat, dengan alasan yang sama seperti `/penawaran`: ajakan yang tidak bisa
+disingkirkan berhenti dibaca dan mulai dihindari, dan hero sudah terlanjur
+menjanjikan "tanpa kartu kredit". Yang diamati bilah itu deret kartu harganya
+(`SASARAN`), BUKAN jangkar `#promo` di atasnya: jangkar itu setinggi nol, dan
+target setinggi nol tidak pernah dianggap berpotongan oleh
+`IntersectionObserver`, jadi pemeriksaannya diam tanpa satu pun error dan
+bilahnya menutupi kartu yang sedang dibaca orangnya. Nilai hematnya disebut
+dalam rupiah lewat `nilaiHemat()`, bukan cuma persen, dan angka yang sama
+dipakai ketiganya. Dijaga `promo.test.ts` dan `kontras.test.ts`.
+
 **Promo tanpa tanggal berakhir adalah promo yang mati.** `promoBerlaku()` di
 `src/lib/promo.ts` menolak `berakhirPada` yang null, dan route PUT harga
 menolak menyimpan promo aktif tanpa tanggal. Arah bawaan itu disengaja:

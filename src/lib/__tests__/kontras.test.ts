@@ -94,6 +94,24 @@ for (const tema of [undefined, "senja"] as const) {
     eq(`[${nama}] putih di atas ${k}-pekat (${bulat(r)}:1)`, true, r >= 4.5);
   }
 
+  /*
+   * Tombol promo memakai aksen yang lebih pekat daripada tombol biasa, dan
+   * itu justru pasangan yang paling gampang jatuh: yang menaikkan bobot
+   * warnanya demi perhatian hampir selalu menurunkan kontras tulisannya
+   * tanpa sadar. Dua keadaan tombolnya diperiksa terpisah, karena hover
+   * mengganti latar DAN warna tulisannya sekaligus.
+   */
+  eq(
+    `[${nama}] accent-ink di atas accent-strong (tombol promo) >= 4.5`,
+    true,
+    rasio(token("hb-accent-ink", tema), token("hb-accent-strong", tema)) >= 4.5,
+  );
+  eq(
+    `[${nama}] putih di atas accent-deep (tombol promo saat hover) >= 4.5`,
+    true,
+    rasio("#ffffff", token("hb-accent-deep", tema)) >= 4.5,
+  );
+
   // Penanda kalender itu grafis, bukan teks: ambangnya 3:1, dan warnanya
   // sengaja dipertahankan sama dengan aplikasi sebelumnya.
   for (const k of ["guru", "ratu", "lara", "pati"]) {

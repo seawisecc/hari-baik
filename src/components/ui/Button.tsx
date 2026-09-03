@@ -21,6 +21,23 @@ const button = cva(
           "bg-accent text-accent-ink border border-accent-deep/20 " +
           "shadow-[inset_0_1px_0_rgb(255_255_255/0.45),0_1px_2px_rgb(88_80_70/0.09)] " +
           "hover:bg-accent-strong",
+        /*
+         * Hanya untuk ajakan promo di halaman depan.
+         *
+         * Lebih pekat daripada `primary`, dan itu memang seluruh gunanya:
+         * begitu dua tombol berdiri berdampingan, yang menentukan mana yang
+         * ditekan bukan tulisannya melainkan bobot warnanya. Tinta gelap di
+         * atas mint pekat mencapai 5,3:1, jadi menaikkan bobotnya tidak
+         * menukar keterbacaan dengan perhatian.
+         *
+         * `relative overflow-hidden` ada di sini, bukan di pemanggilnya,
+         * karena kilau dan cincin denyutnya dipasang sebagai elemen di dalam
+         * tombol: tanpa keduanya kilau itu menyapu keluar melewati sudut
+         * membulatnya.
+         */
+        promo:
+          "relative overflow-hidden bg-accent-strong text-accent-ink font-semibold " +
+          "hb-cahaya hover:bg-accent-deep hover:text-white",
         surface:
           "bg-surface text-ink border border-black/8 " +
           "shadow-[inset_0_1px_0_rgb(255_255_255/0.7),0_1px_2px_rgb(88_80_70/0.07)] " +

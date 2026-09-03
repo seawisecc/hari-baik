@@ -6,6 +6,7 @@
  * benar-benar ikut, dan promo yang lewat tanggalnya harus mati sendiri tanpa
  * ada yang perlu mengingatnya.
  */
+import { readFileSync } from "node:fs";
 import { HARGA_BAWAAN, type PengaturanHarga } from "../harga";
 import { rakitPesanan } from "../pesanan";
 import {
@@ -18,9 +19,12 @@ import {
   gabungPromo,
   hargaPromo,
   hematPromo,
+  nilaiHemat,
+  pecahSisa,
   promoBerlaku,
   saringPromo,
   sisaHariPromo,
+  sisaPromoRinci,
   type PengaturanPromo,
 } from "../promo";
 
@@ -316,6 +320,171 @@ eq(
   3,
   saringPromo(PROMO_BAWAAN, ["tahunan", "dua-tahun", "tiga-tahun"]).paket.length,
 );
+
+// ------------------------------------------------------------- jam mundur
+
+/*
+ * Jam mundur dibulatkan ke BAWAH, kebalikan dari kalimat "N hari lagi".
+ *
+ * Keduanya harus ada dan harus berbeda arah. Kalimatnya dibulatkan ke atas
+ * supaya hari terakhir tidak berbunyi "0 hari lagi" seolah sudah lewat. Jamnya
+ * dibulatkan ke bawah karena angka yang berdetak di depan mata adalah janji
+ * yang bisa dicocokkan langsung: menuliskan "1 hari" ketika tinggal dua jam
+ * meleset sepuluh kali lipat, dan yang menundanya sampai besok akan mendapati
+ * harganya sudah normal.
+ */
+{
+  const j = 3_600_000;
+  eq("pecah 0 milidetik", { total: 0, hari: 0, jam: 0, menit: 0, detik: 0 }, pecahSisa(0));
+  eq(
+    "sisa negatif tidak pernah jadi angka negatif",
+    { total: 0, hari: 0, jam: 0, menit: 0, detik: 0 },
+    pecahSisa(-999_999),
+  );
+  eq(
+    "pecah 2 hari 3 jam 4 menit 5 detik",
+    { hari: 2, jam: 3, menit: 4, detik: 5 },
+    (({ hari, jam, menit, detik }) => ({ hari, jam, menit, detik }))(
+      pecahSisa(2 * 24 * j + 3 * j + 4 * 60_000 + 5_000),
+    ),
+  );
+  eq("jam dan menit tidak menumpuk ke hari", 23, pecahSisa(24 * j - 1).jam);
+  eq("sisa dua jam tetap nol hari", 0, pecahSisa(2 * j).hari);
+  eq("sisa dua jam tidak dibulatkan ke atas", 2, pecahSisa(2 * j).jam);
+}
+
+{
+  const berakhir = "2026-09-30T23:59:59+08:00";
+  const promo: PengaturanPromo = { ...PROMO_BAWAAN, berakhirPada: berakhir };
+  const jam36 = new Date(Date.parse(berakhir) - 36 * 3_600_000);
+
+  eq("rinci mati sesudah tanggalnya", null, sisaPromoRinci(promo, setelahPromo));
+  eq("rinci mati bila saklarnya mati", null, sisaPromoRinci({ ...promo, aktif: false }, jam36));
+  eq(
+    "rinci: 36 jam berarti 1 hari 12 jam",
+    { hari: 1, jam: 12 },
+    {
+      hari: sisaPromoRinci(promo, jam36)!.hari,
+      jam: sisaPromoRinci(promo, jam36)!.jam,
+    },
+  );
+
+  /* Dua fungsi, satu tanggal: yang membulatkan ke atas tidak boleh lebih
+     kecil daripada yang membulatkan ke bawah, kalau tidak halaman yang sama
+     menyebut dua sisa waktu yang berbeda dalam satu layar. */
+  eq(
+    "kalimat tidak pernah menyebut sisa lebih sedikit daripada jamnya",
+    true,
+    sisaHariPromo(promo, jam36)! >= sisaPromoRinci(promo, jam36)!.hari,
+  );
+}
+
+// ------------------------------------------------------------ nilai hemat
+
+/*
+ * Yang dihemat dalam rupiah, bukan persen.
+ *
+ * Angka ini dipakai di tiga tempat sekaligus di halaman depan (pita hero,
+ * kartu harga, bilah melayang), jadi kalau ia salah, ia salah bertiga dengan
+ * kompak dan tetap terlihat konsisten.
+ */
+{
+  const addOnAktif = harga.addOn.filter((a) => a.aktif);
+  const tiga = hargaPromo(paketDari("tiga-tahun"), PROMO_BAWAAN, saatPromo, boleh);
+  const bonusRp = tiga.bonusAddOn.reduce(
+    (n, id) => n + (addOnAktif.find((a) => a.id === id)?.harga ?? 0),
+    0,
+  );
+
+  eq("ada bonus untuk diuji", true, tiga.bonusAddOn.length > 0 && bonusRp > 0);
+  eq(
+    "hemat = potongan harga + harga bonus",
+    tiga.hargaAsli - tiga.harga + bonusRp,
+    nilaiHemat(tiga, addOnAktif),
+  );
+  eq(
+    "bonus yang tidak ada di daftar dihitung nol, bukan dilewatkan",
+    tiga.hargaAsli - tiga.harga,
+    nilaiHemat(tiga, []),
+  );
+
+  const tanpaPromo = hargaPromo(paketDari("tahunan"), null, saatPromo, boleh);
+  eq("tanpa promo tidak ada yang dihemat", 0, nilaiHemat(tanpaPromo, addOnAktif));
+}
+
+// --------------------------------------------------- ajakan di halaman depan
+
+/*
+ * Jam mundurnya WAJIB memulai dari waktu server.
+ *
+ * Halaman depan dirender di server dan disimpan sebagai halaman statis.
+ * Komponen yang menghitung sendiri nilai awalnya dengan `Date.now()` hampir
+ * pasti mendapat detik yang berbeda dari detik yang sudah tertulis di HTML,
+ * dan React menjawabnya dengan membuang seluruh pohonnya lalu menggambar
+ * ulang: halaman yang berkedip pada muatan pertama. Rantainya lewat tiga
+ * berkas yang tidak saling menyebut, jadi diperiksa ketiganya.
+ */
+{
+  const halaman = readFileSync("src/app/page.tsx", "utf8");
+  const landing = readFileSync("src/app/LandingClient.tsx", "utf8");
+  const mundur = readFileSync("src/components/HitungMundur.tsx", "utf8");
+
+  eq("server menghitung sisa promo", true, /sisaRinci=\{sisaPromoRinci\(/.test(halaman));
+  eq("server mengirim tanggal berakhirnya", true, /berakhirPromo=\{/.test(halaman));
+  eq("halaman depan meneruskannya", true, /sisaRinci/.test(landing));
+  eq(
+    "jam mundur memakai nilai kiriman, bukan jam sendiri",
+    true,
+    /useState<SisaPromo>\(\s*awal\s*\)/.test(mundur),
+  );
+}
+
+/*
+ * Bilah promo harus bisa disingkirkan, dan tidak boleh menutup ajakan gratis.
+ *
+ * Ini aturan yang sama dengan yang dipegang `/penawaran`: penawaran boleh
+ * mengejar pembacanya, tapi begitu ia tidak bisa ditutup ia berhenti dibaca
+ * dan mulai dihindari. Halaman depan sudah terlanjur menjanjikan "tanpa kartu
+ * kredit" di hero, jadi jalan masuk gratisnya harus tetap ada di sebelah
+ * tombol promonya, bukan digantikan olehnya.
+ */
+{
+  const bilah = readFileSync("src/components/BilahPromo.tsx", "utf8");
+  eq("bilah punya keadaan tertutup", true, /ditutup/.test(bilah));
+  eq(
+    "tertutup benar-benar menyembunyikannya",
+    true,
+    /const\s+tampil\s*=[^;]*!\s*ditutup/.test(bilah),
+  );
+  eq("bilah menempel di bawah layar", true, /fixed[^"`]*bottom-0/.test(bilah));
+  eq("bilah menghormati safe area iPhone", true, bilah.includes("env(safe-area-inset-bottom)"));
+
+  const landing = readFileSync("src/app/LandingClient.tsx", "utf8");
+  eq("jalan masuk gratis tetap ada di hero", true, landing.includes('href="/register"'));
+  eq("tombol promo turun ke daftar harga", true, landing.includes('href="#promo"'));
+
+  /*
+   * Bilah itu menyingkir sendiri saat kartu harga terlihat, dan yang
+   * diamatinya harus elemen yang punya tinggi.
+   *
+   * Jangkar `#promo` setinggi nol tidak pernah dianggap berpotongan, jadi
+   * mengarahkan pengamatnya ke sana membuat bilahnya tidak pernah menyingkir
+   * tanpa satu pun error. Pasangan id-nya juga ada di dua berkas, dan yang
+   * memindahkannya di satu sisi tidak akan mendapat keluhan apa pun dari sisi
+   * yang lain.
+   */
+  eq(
+    "bilah mengamati id yang diekspornya sendiri",
+    true,
+    /getElementById\(SASARAN\)/.test(bilah),
+  );
+  eq("halaman depan memasang id itu", true, /id=\{SASARAN\}/.test(landing));
+  eq(
+    "yang diberi id itu bukan jangkar setinggi nol",
+    false,
+    /id=\{SASARAN\}[^>]*\/>/.test(landing),
+  );
+}
 
 console.log(fail === 0 ? "✓ promo: semua lolos" : `✗ promo: ${fail} gagal`);
 if (fail > 0) process.exit(1);

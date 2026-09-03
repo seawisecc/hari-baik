@@ -239,6 +239,68 @@
   animation-delay: 360ms;
 }
 
+/*
+ * Gerak khusus ajakan promo.
+ *
+ * Melanggar aturan di atas dengan sengaja, dan hanya di satu tempat: tombol
+ * promo di halaman depan. Aturan "jangan jadi pertunjukan" ditulis untuk
+ * layar yang dibuka tiap pagi berulang kali, dan di sana gerak yang berulang
+ * memang berubah jadi gangguan. Halaman depan dilihat sekali oleh orang yang
+ * belum tahu ada penawaran sedang berjalan, dan yang perlu dijaga di sana
+ * justru kebalikannya: penawaran yang tidak terlihat sama dengan penawaran
+ * yang tidak ada.
+ *
+ * Karena itu keduanya dibatasi ke elemen bertanda `aria-hidden` di dalam
+ * tombolnya sendiri, bukan ke tombolnya, supaya tidak ada teks yang bergerak
+ * saat sedang dibaca. Pembaca layar tidak melihat apa pun dari ini, dan
+ * `prefers-reduced-motion` di bawah mematikannya seperti animasi lain.
+ */
+
+/* Kilau yang menyapu sekali lalu diam sejenak, bukan berjalan terus. Jeda itu
+   yang membuatnya terbaca sebagai penekanan, bukan sebagai kedipan. */
+@keyframes hb-kilau {
+  0% {
+    transform: translateX(-160%) skewX(-18deg);
+  }
+  55%,
+  100% {
+    transform: translateX(320%) skewX(-18deg);
+  }
+}
+
+/* Cincin yang melebar lalu memudar, seperti riak. Dimulai dari sedikit lebih
+   kecil daripada tombolnya supaya tepinya tidak terlihat menempel. */
+@keyframes hb-degup {
+  0% {
+    transform: scale(0.96);
+    opacity: 0.5;
+  }
+  70%,
+  100% {
+    transform: scale(1.22);
+    opacity: 0;
+  }
+}
+
+@utility hb-kilau {
+  animation: hb-kilau 3.8s ease-in-out infinite;
+}
+
+@utility hb-degup {
+  animation: hb-degup 2.6s var(--ease-hb) infinite;
+}
+
+/* Bayangan tombol promo: elevasi biasa ditambah halo setipis warna aksennya
+   sendiri. Halo memakai warna aksen, bukan hitam, supaya tombolnya terbaca
+   menyala alih-alih sekadar terangkat lebih tinggi. */
+@utility hb-cahaya {
+  border: 1px solid var(--hb-edge);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.45),
+    0 2px 4px rgb(88 80 70 / 0.1),
+    0 10px 26px color-mix(in srgb, var(--hb-accent-strong) 42%, transparent);
+}
+
 @utility hb-raise-1 {
   border: 1px solid var(--hb-edge);
   box-shadow:

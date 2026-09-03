@@ -1,5 +1,5 @@
 import { bacaHarga } from "@/lib/harga-server";
-import { daftarPaketPromo, sisaHariPromo } from "@/lib/promo";
+import { daftarPaketPromo, sisaHariPromo, sisaPromoRinci } from "@/lib/promo";
 import { LandingClient } from "./LandingClient";
 
 /**
@@ -35,6 +35,12 @@ export default async function LandingPage() {
       harga={harga}
       paketPromo={daftarPaketPromo(harga, sekarang)}
       sisaPromo={sisaHariPromo(harga.promo, sekarang)}
+      /* Jam mundurnya juga dimulai dari waktu server, bukan dihitung ulang
+         saat hidrasi. Detik yang berbeda antara HTML dan render pertama
+         peramban membuang seluruh pohonnya, dan yang terlihat halaman yang
+         berkedip. Lihat catatan di HitungMundur. */
+      sisaRinci={sisaPromoRinci(harga.promo, sekarang)}
+      berakhirPromo={harga.promo?.berakhirPada ?? null}
       tahun={sekarang.getFullYear()}
     />
   );
