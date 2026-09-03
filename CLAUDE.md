@@ -717,6 +717,38 @@ belum lengkap". Salin dulu sebelum menarik. Konsekuensi lain: kunci pihak
 ketiga tidak bisa diperiksa dari sini, jadi kegagalan pengiriman ditelusuri
 lewat `vercel logs`, bukan dengan memanggil API penyedianya.
 
+**`dig` tidak bisa dipercaya dari jaringan yang membajak port 53.** Jaringan
+tempat pemilik bekerja mencegat seluruh lalu lintas DNS port 53 dan
+menjawabnya sendiri, jadi `dig @<ip>` TIDAK PERNAH sampai ke server yang
+dituju. Yang terbaca isi cache pencegat pada saat itu. Gejalanya menyesatkan
+karena terlihat seperti kerusakan sungguhan: nomor seri SOA berubah-ubah tiap
+beberapa menit, server yang mestinya otoritatif mau menjawab `google.com`,
+dan query non-rekursif dijawab `REFUSED`. Pada 3 September 2026 ini
+menghasilkan dua laporan salah berturut-turut saat memindahkan domain, mula-
+mula "zona berkedip antar node", lalu "record apex dikembalikan sisi
+hosting". Keduanya tidak terjadi; DNS-nya sudah benar sejak menit pertama.
+Tesnya satu baris: `dig @192.0.2.1 google.com`. Alamat itu alamat khusus
+dokumentasi yang mustahil melayani DNS, jadi kalau ia menjawab, buang seluruh
+hasil `dig` sesi itu. Yang sah cuma DNS-over-HTTPS, karena lewat 443:
+
+```
+curl -s 'https://dns.google/resolve?name=DOMAIN&type=A'
+curl -s -H 'accept: application/dns-json' \
+  'https://cloudflare-dns.com/dns-query?name=DOMAIN&type=A'
+```
+
+**Panel DNS yang terbuka belum tentu zona yang dilayani.** `cariharibaik.com`
+sempat diedit berminggu-minggu di sebuah panel DNS tanpa satu pun perubahan
+terbit. Zona di panel itu memuat NS `rinjani.cloudhost.id`, sementara
+delegasi sebenarnya ke `ns1` sampai `ns4.mysecurecloudhost.com`: dua kumpulan
+record untuk satu nama domain, dan yang diedit bukan yang dipakai. Zona yang
+benar ada di cPanel `cpanel.cariharibaik.com:2083`, Domains, Zone Editor.
+Cara memastikannya sebelum mengetik apa pun: halaman itu menampilkan
+"Configured nameservers for this zone", dan daftarnya harus sama dengan
+delegasi asli. Bukti kedua yang lebih tajam, nomor seri SOA harus naik
+sesudah menyimpan; kalau ia diam berhari-hari, tidak ada satu pun editan yang
+pernah commit.
+
 **Grep pada HTML ikut mengenai payload RSC.** Untuk memeriksa apa yang
 benar-benar terlihat, buang `<script>` dan tag dulu. Dua kali aku salah lapor
 karena ini.
@@ -766,6 +798,18 @@ dan pindah baris, kalau tidak ia menjaga tata letak, bukan aturannya.
 - **Tidak ada yang memberi tahu admin saat pembayaran masuk.** Uang yang
   lunas cuma terlihat kalau ada yang membuka tab Pembayaran atau dashboard
   Midtrans. Untuk sekarang itu cukup, karena jumlahnya masih sedikit.
+- **`haribaik.seawise.id` belum bisa dialihkan.** URL notifikasi Midtrans
+  masih terdaftar atas namanya di dashboard mereka. POST webhook yang kena
+  308 tidak dikirim ulang badannya oleh kebanyakan pengirim, jadi
+  mengalihkannya sekarang membuat pembayaran lunas berhenti menyalakan
+  langganan tanpa ada yang berbunyi salah. Pindahkan dulu Payment
+  Notification URL ke domain baru, baru alihannya dipasang.
+- **SPF masih memuat `+a`.** Bunyinya
+  `v=spf1 +a +mx +ip4:192.250.235.126 include:spf.mysecurecloudhost.com ~all`.
+  Sejak apex `cariharibaik.com` menunjuk IP Vercel, `+a` memberi izin kirim
+  email atas nama domain ini kepada infrastruktur yang bukan milik kita.
+  Pengiriman tetap jalan karena `+ip4:` eksplisit, jadi ini kebersihan bukan
+  kerusakan, tapi `+a` sebaiknya dibuang.
 - **Kartu kredit dengan 3DS dan pesanan add-on saja belum pernah diuji
   sungguhan.** Keduanya jalan di sandbox; yang belum terbukti adalah
   kepulangan lewat alihan halaman pada kartu produksi, dan penerapan pesanan
@@ -787,9 +831,12 @@ src/lib/pembayaran-server  satu pintu mengubah pembayaran jadi langganan
 src/lib/admin-pembayaran  pencarian dan penyaringan pesanan, fungsi murni
 src/lib/addon-beli.ts  siapa boleh menambah add-on tanpa berlangganan lagi
 src/lib/promo.ts       promo berjangka: potongan, bonus, tanggal berakhirnya
+src/lib/situs.ts       alamat kanonik, jangan dipakai merakit tautan runtime
 src/lib/pesanan.ts     satu perakit isi pesanan, dipakai layar dan kedua route
 src/app/penawaran/     penawaran sekali jalan sesudah onboarding, selalu bisa dilewati
 src/app/terima-kasih/  ke mana orang mendarat setelah membayar
+src/components/BilahPromo  bilah promo melayang di halaman depan, bisa ditutup
+src/components/HitungMundur  jam mundur promo, nilai awalnya dari server
 scripts/akun-uji.ts    akun uji pembayaran, bisa dikunci ulang
 src/app/api/           route admin selalu requireAdmin, harga dihitung server
 docs/email/            template email Firebase dan batasnya
